@@ -1,23 +1,7 @@
 #include "console.h"
 #include "map.h"
-#include <iostream>
-#include <fstream>
-#include <vector>
+#include "util.h"
 #include <cstdlib>
-#include <ctime>
-
-std::string now()
-{
-	time_t t = time(0);
-	std::string s = ctime(&t);
-	return s.replace(s.find('\n'), 1, " ");
-}
-
-void log(const std::string & message)
-{
-	static std::ofstream lout("temple.log", std::ios::app);
-	lout << message << std::endl;
-}
 
 int main()
 {
@@ -29,14 +13,14 @@ int main()
 	for(int i = 0; i < 10; ++i) {
 		map.cell(rand() % map.get_width(), rand() % map.get_height()) = '#';
 	}
-	int player_x = 0, player_y = 0;
+	Point player;
 	while(true) {
 		for(int x = 0; x < map.get_width(); ++x) {
 			for(int y = 0; y < map.get_height(); ++y) {
 				console.print_sprite(x, y, map.cell(x, y));
 			}
 		}
-		console.print_player(player_x, player_y);
+		console.print_player(player.x, player.y);
 
 		int ch = console.get_control();
 		if(ch == 'q') {
@@ -45,14 +29,14 @@ int main()
 		console.clear();
 
 		switch(ch) {
-			case 'h': player_x--; break;
-			case 'j': player_y++; break;
-			case 'k': player_y--; break;
-			case 'l': player_x++; break;
-			case 'y': player_y--; player_x--; break;
-			case 'u': player_y--; player_x++; break;
-			case 'b': player_y++; player_x--; break;
-			case 'n': player_y++; player_x++; break;
+			case 'h': player.x--; break;
+			case 'j': player.y++; break;
+			case 'k': player.y--; break;
+			case 'l': player.x++; break;
+			case 'y': player.y--; player.x--; break;
+			case 'u': player.y--; player.x++; break;
+			case 'b': player.y++; player.x--; break;
+			case 'n': player.y++; player.x++; break;
 			default: break;
 		}
 	}
