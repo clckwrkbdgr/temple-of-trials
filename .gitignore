@@ -15,5 +15,7 @@
 # vim
 *.swp
 
-# Build
+# Build and run
+tmp/
 temple
+temple.log

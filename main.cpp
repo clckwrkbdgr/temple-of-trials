@@ -1,6 +1,6 @@
+#include "console.h"
 #include <iostream>
 #include <fstream>
-#include <ncurses.h>
 #include <time.h>
 
 std::string now()
@@ -18,26 +18,18 @@ void log(const std::string & message)
 
 int main()
 {
-	initscr();
-	raw();
-	keypad(stdscr, TRUE);
-	noecho();
-	curs_set(0);
-
-	log("");
-	log(now());
-	log("Start log.");
+	log("Log started: " + now());
+	Console console;
 
 	int x = 0, y = 0;
 	while(true) {
-		mvaddch(y, x, '@');
+		console.print_player(x, y);
 
-		int ch = getch();
+		int ch = console.get_control();
 		if(ch == 'q') {
 			break;
 		}
-
-		mvaddch(y, x, ' ');
+		console.clear();
 
 		switch(ch) {
 			case 'h': x--; break;
@@ -52,10 +44,6 @@ int main()
 		}
 	}
 
-	cbreak();
-	echo();
-	curs_set(1);
-	endwin();
-	log("Exit.");
+	log("Exiting.");
 	return 0;
 }
