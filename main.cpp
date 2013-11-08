@@ -2,94 +2,37 @@
 #include "map.h"
 #include "objects.h"
 #include "util.h"
+#include "game.h"
 #include <map>
 #include <cstdlib>
+
+void draw_game(Console & console, const Game & game)
+{
+
+	console.clear();
+	for(unsigned x = 0; x < game.map.get_width(); ++x) {
+		for(unsigned y = 0; y < game.map.get_height(); ++y) {
+			console.print_sprite(x, y, game.map.cell(x, y).sprite);
+		}
+	}
+	for(unsigned i = 0; i < game.doors.size(); ++i) {
+		console.print_sprite(game.doors[i].pos.x, game.doors[i].pos.y, game.doors[i].sprite());
+	}
+	console.print_sprite(game.player.pos.x, game.player.pos.y, game.player.sprite());
+}
 
 int main()
 {
 	srand(time(0));
 	log("Log started: " + now());
 	Console console;
-
-	std::map<int, Point> directions;
-	directions['h'] = Point(-1,  0);
-	directions['j'] = Point( 0, +1);
-	directions['k'] = Point( 0, -1);
-	directions['l'] = Point(+1,  0);
-	directions['y'] = Point(-1, -1);
-	directions['u'] = Point(+1, -1);
-	directions['b'] = Point(-1, +1);
-	directions['n'] = Point(+1, +1);
-
-	Map map(60, 23, Cell::floor());
-	for(int i = 0; i < 10; ++i) {
-		map.cell(rand() % map.get_width(), rand() % map.get_height()) = Cell::wall();
-	}
-	Player player = Player(Point());
-	std::vector<Door> doors;
-	for(int i = 0; i < 5; ++i) {
-		doors.push_back(Door(Point(rand() % map.get_width(), rand() % map.get_height())));
-	}
-	enum { NORMAL_MODE, OPEN_MODE, CLOSE_MODE };
-	int mode = NORMAL_MODE;
-
+	Game game;
 	while(true) {
-		for(unsigned x = 0; x < map.get_width(); ++x) {
-			for(unsigned y = 0; y < map.get_height(); ++y) {
-				console.print_sprite(x, y, map.cell(x, y).sprite);
-			}
-		}
-		for(unsigned i = 0; i < doors.size(); ++i) {
-			console.print_sprite(doors[i].pos.x, doors[i].pos.y, doors[i].sprite());
-		}
-		console.print_sprite(player.pos.x, player.pos.y, player.sprite());
-
+		draw_game(console, game);
 		int ch = console.get_control();
-		if(ch == 'q') {
+		bool ok = game.process(ch);
+		if(!ok) {
 			break;
-		}
-		console.clear();
-
-		Point shift;
-		if(directions.count(ch) > 0) {
-			shift = directions[ch];
-		}
-		Point new_pos = player.pos + shift;
-
-		if(mode == OPEN_MODE) {
-			for(unsigned i = 0; i < doors.size(); ++i) {
-				if(doors[i].pos == new_pos) {
-					doors[i].opened = true;
-				}
-			}
-			mode = NORMAL_MODE;
-		} else if(mode == CLOSE_MODE) {
-			for(unsigned i = 0; i < doors.size(); ++i) {
-				if(doors[i].pos == new_pos) {
-					doors[i].opened = false;
-				}
-			}
-			mode = NORMAL_MODE;
-		} else {
-			switch(ch) {
-				case 'o': mode = OPEN_MODE; break;
-				case 'c': mode = CLOSE_MODE; break;
-				default: break;
-			}
-			if(shift) {
-				bool can_move = true;
-				if(!map.is_passable(new_pos)) {
-					can_move = false;
-				}
-				for(unsigned i = 0; i < doors.size(); ++i) {
-					if(doors[i].pos == new_pos && !doors[i].opened) {
-						can_move = false;
-					}
-				}
-				if(can_move) {
-					player.pos = new_pos;
-				}
-			}
 		}
 	}
 
