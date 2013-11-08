@@ -18,11 +18,6 @@ Console::~Console()
 	endwin();
 }
 
-void Console::print_player(int x, int y)
-{
-	mvaddch(y, x, '@');
-}
-
 void Console::print_sprite(int x, int y, int sprite)
 {
 	mvaddch(y, x, sprite);
