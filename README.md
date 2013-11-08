@@ -1,4 +1,4 @@
-dungeon
+Temple
 =======
 There is a village. There is a Temple of Trials inside, consisting of 10 levels.
 At the bottom level of Temple somewhere lays a piece of plastic explosive. It must be located and brought to the exit of the Temple.
