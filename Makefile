@@ -29,4 +29,6 @@ clean:
 	$(RM) -rf tmp/*.o $(BIN) tmp/deps
 
 $(shell mkdir -p tmp)
+$(shell touch tmp/deps)
 include tmp/deps
+
