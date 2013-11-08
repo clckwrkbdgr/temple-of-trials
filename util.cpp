@@ -30,3 +30,13 @@ bool Point::operator==(const Point & other) const
 {
 	return x == other.x && y == other.y;
 }
+
+Point::operator bool() const
+{
+	return x != 0 || y != 0;
+}
+
+Point operator+(const Point & a, const Point & b)
+{
+	return Point(a.x + b.x, a.y + b.y);
+}

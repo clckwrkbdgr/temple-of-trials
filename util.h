@@ -9,6 +9,8 @@ struct Point {
 	Point(int _x, int _y);
 	Point();
 	bool operator==(const Point & other) const;
+	operator bool() const;
 };
+Point operator+(const Point & a, const Point & b);
 
 typedef char Sprite;

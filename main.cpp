@@ -2,6 +2,7 @@
 #include "map.h"
 #include "objects.h"
 #include "util.h"
+#include <map>
 #include <cstdlib>
 
 int main()
@@ -9,6 +10,16 @@ int main()
 	srand(time(0));
 	log("Log started: " + now());
 	Console console;
+
+	std::map<int, Point> directions;
+	directions['h'] = Point(-1,  0);
+	directions['j'] = Point( 0, +1);
+	directions['k'] = Point( 0, -1);
+	directions['l'] = Point(+1,  0);
+	directions['y'] = Point(-1, -1);
+	directions['u'] = Point(+1, -1);
+	directions['b'] = Point(-1, +1);
+	directions['n'] = Point(+1, +1);
 
 	Map map(60, 23, Cell::floor());
 	for(int i = 0; i < 10; ++i) {
@@ -37,30 +48,25 @@ int main()
 		}
 		console.clear();
 
-		Point new_pos = player.pos;
-		switch(ch) {
-			case 'h': new_pos.x--; break;
-			case 'j': new_pos.y++; break;
-			case 'k': new_pos.y--; break;
-			case 'l': new_pos.x++; break;
-			case 'y': new_pos.y--; new_pos.x--; break;
-			case 'u': new_pos.y--; new_pos.x++; break;
-			case 'b': new_pos.y++; new_pos.x--; break;
-			case 'n': new_pos.y++; new_pos.x++; break;
-			default: break;
-		}
-		bool can_move = true;
-		if(!map.is_passable(new_pos)) {
-			can_move = false;
-		}
-		for(unsigned i = 0; i < doors.size(); ++i) {
-			if(doors[i].pos == new_pos) {
-				can_move = false;
-			}
+		Point shift;
+		if(directions.count(ch) > 0) {
+			shift = directions[ch];
 		}
 
-		if(can_move) {
-			player.pos = new_pos;
+		if(shift) {
+			Point new_pos = player.pos + shift;
+			bool can_move = true;
+			if(!map.is_passable(new_pos)) {
+				can_move = false;
+			}
+			for(unsigned i = 0; i < doors.size(); ++i) {
+				if(doors[i].pos == new_pos) {
+					can_move = false;
+				}
+			}
+			if(can_move) {
+				player.pos = new_pos;
+			}
 		}
 	}
 
