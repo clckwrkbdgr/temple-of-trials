@@ -30,6 +30,8 @@ int main()
 	for(int i = 0; i < 5; ++i) {
 		doors.push_back(Door(Point(rand() % map.get_width(), rand() % map.get_height())));
 	}
+	enum { NORMAL_MODE, OPEN_MODE, CLOSE_MODE };
+	int mode = NORMAL_MODE;
 
 	while(true) {
 		for(unsigned x = 0; x < map.get_width(); ++x) {
@@ -52,20 +54,41 @@ int main()
 		if(directions.count(ch) > 0) {
 			shift = directions[ch];
 		}
+		Point new_pos = player.pos + shift;
 
-		if(shift) {
-			Point new_pos = player.pos + shift;
-			bool can_move = true;
-			if(!map.is_passable(new_pos)) {
-				can_move = false;
-			}
+		if(mode == OPEN_MODE) {
 			for(unsigned i = 0; i < doors.size(); ++i) {
 				if(doors[i].pos == new_pos) {
-					can_move = false;
+					doors[i].opened = true;
 				}
 			}
-			if(can_move) {
-				player.pos = new_pos;
+			mode = NORMAL_MODE;
+		} else if(mode == CLOSE_MODE) {
+			for(unsigned i = 0; i < doors.size(); ++i) {
+				if(doors[i].pos == new_pos) {
+					doors[i].opened = false;
+				}
+			}
+			mode = NORMAL_MODE;
+		} else {
+			switch(ch) {
+				case 'o': mode = OPEN_MODE; break;
+				case 'c': mode = CLOSE_MODE; break;
+				default: break;
+			}
+			if(shift) {
+				bool can_move = true;
+				if(!map.is_passable(new_pos)) {
+					can_move = false;
+				}
+				for(unsigned i = 0; i < doors.size(); ++i) {
+					if(doors[i].pos == new_pos && !doors[i].opened) {
+						can_move = false;
+					}
+				}
+				if(can_move) {
+					player.pos = new_pos;
+				}
 			}
 		}
 	}
