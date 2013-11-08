@@ -1,7 +1,23 @@
 #include "map.h"
 #include "util.h"
 
-Map::Map(int map_width, int map_height, Cell default_cell)
+Cell::Cell(const Sprite & cell_sprite, bool is_passable)
+	: sprite(cell_sprite), passable(is_passable)
+{
+}
+
+Cell Cell::floor()
+{
+	return Cell(' ');
+}
+
+Cell Cell::wall()
+{
+	return Cell('#', false);
+}
+
+
+Map::Map(unsigned map_width, unsigned map_height, Cell default_cell)
 	: width(map_width), height(map_height), cells(width * height, default_cell)
 {
 }
@@ -23,7 +39,7 @@ const Cell & Map::cell(const Point & pos) const
 
 bool Map::valid(const Point & pos) const
 {
-	return (pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height);
+	return (pos.x >= 0 && pos.x < int(width) && pos.y >= 0 && pos.y < int(height));
 }
 
 bool Map::is_passable(const Point & pos) const
