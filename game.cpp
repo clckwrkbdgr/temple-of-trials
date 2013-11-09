@@ -63,7 +63,7 @@ bool Game::process_normal_mode(int ch)
 		player.pos = new_pos;
 		return true;
 	}
-	message = "Unknown control '" + std::string(1, char(ch)) + "'";
+	message = format("Unknown control '{0}'", char(ch));
 	return true;
 }
 

@@ -1,6 +1,8 @@
 #include "util.h"
 #include <ctime>
 #include <fstream>
+#include <string>
+#include <sstream>
 
 std::string now()
 {
@@ -40,3 +42,51 @@ Point operator+(const Point & a, const Point & b)
 {
 	return Point(a.x + b.x, a.y + b.y);
 }
+
+
+Format::Format(const std::string & format_string)
+	: result(format_string)
+{
+}
+
+Format & Format::arg(int index, const std::string & value)
+{
+	std::ostringstream out;
+	out << "{" << index << "}";
+	std::string placeholder = out.str();
+	size_t pos = result.find(placeholder);
+	while(pos != std::string::npos) {
+		result.replace(pos, placeholder.size(), value);
+		pos = result.find(placeholder, pos + 1);
+	}
+	return *this;
+}
+
+Format & Format::arg(int index, int value)
+{
+	std::ostringstream out;
+	out << "{" << index << "}";
+	std::string placeholder = out.str();
+	size_t pos = result.find(placeholder);
+	while(pos != std::string::npos) {
+		std::ostringstream value_out;
+		value_out << value;
+		result.replace(pos, placeholder.size(), value_out.str());
+		pos = result.find(placeholder, pos + 1);
+	}
+	return *this;
+}
+
+Format & Format::arg(int index, char value)
+{
+	std::ostringstream out;
+	out << "{" << index << "}";
+	std::string placeholder = out.str();
+	size_t pos = result.find(placeholder);
+	while(pos != std::string::npos) {
+		result.replace(pos, placeholder.size(), std::string(1, value));
+		pos = result.find(placeholder, pos + 1);
+	}
+	return *this;
+}
+
