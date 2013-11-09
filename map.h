@@ -21,6 +21,8 @@ public:
 	unsigned get_width() const { return width; }
 	unsigned get_height() const { return height; }
 	bool is_passable(const Point & pos) const;
+
+	void save(std::ofstream & out) const;
 private:
 	unsigned width, height;
 	std::vector<Cell> cells;

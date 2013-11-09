@@ -13,6 +13,9 @@ struct Game {
 	std::string message;
 
 	Game();
+	void generate();
+	bool load(const std::string & filename);
+	bool save(const std::string & filename) const;
 	bool process(int ch);
 private:
 	static std::map<int, Point> directions;

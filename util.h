@@ -21,6 +21,7 @@ public:
 	const std::string & str() const { return result; }
 	Format & arg(int index, const std::string & value);
 	Format & arg(int index, int value);
+	Format & arg(int index, unsigned value);
 	Format & arg(int index, char value);
 private:
 	std::string result;

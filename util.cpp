@@ -77,6 +77,21 @@ Format & Format::arg(int index, int value)
 	return *this;
 }
 
+Format & Format::arg(int index, unsigned value)
+{
+	std::ostringstream out;
+	out << "{" << index << "}";
+	std::string placeholder = out.str();
+	size_t pos = result.find(placeholder);
+	while(pos != std::string::npos) {
+		std::ostringstream value_out;
+		value_out << value;
+		result.replace(pos, placeholder.size(), value_out.str());
+		pos = result.find(placeholder, pos + 1);
+	}
+	return *this;
+}
+
 Format & Format::arg(int index, char value)
 {
 	std::ostringstream out;

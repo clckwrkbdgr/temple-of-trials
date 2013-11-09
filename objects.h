@@ -10,7 +10,7 @@ struct Player {
 struct Door {
 	Point pos;
 	bool opened;
-	explicit Door(const Point & door_pos, bool is_opened = false);
+	explicit Door(const Point & door_pos = Point(), bool is_opened = false);
 	Sprite sprite() const;
 };
 

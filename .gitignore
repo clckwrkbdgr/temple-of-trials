@@ -18,4 +18,5 @@
 # Build and run
 tmp/
 temple
-temple.log
+*.log
+*.sav

@@ -5,6 +5,9 @@
 #include "game.h"
 #include <map>
 #include <cstdlib>
+#include <cstdio>
+
+const std::string SAVEFILE = "temple.sav";
 
 void draw_game(Console & console, const Game & game)
 {
@@ -28,6 +31,14 @@ int main()
 	log("Log started: " + now());
 	Console console;
 	Game game;
+	if(game.load(SAVEFILE)) {
+		if(remove(SAVEFILE.c_str()) != 0) {
+			log("Error: cannot delete savefile!");
+			return 1;
+		}
+	} else {
+		game.generate();
+	}
 	while(true) {
 		draw_game(console, game);
 		int ch = console.get_control();
@@ -36,6 +47,7 @@ int main()
 			break;
 		}
 	}
+	game.save(SAVEFILE);
 
 	log("Exiting.");
 	return 0;
