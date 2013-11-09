@@ -74,9 +74,13 @@ bool Game::process_open_mode(int ch)
 		bool ok = false;
 		for(unsigned i = 0; i < doors.size(); ++i) {
 			if(doors[i].pos == new_pos) {
-				doors[i].opened = true;
 				ok = true;
-				message = "You opened the door.";
+				if(doors[i].opened) {
+					message = "Door is already opened.";
+				} else {
+					doors[i].opened = true;
+					message = "You opened the door.";
+				}
 			}
 		}
 		if(!ok) {
@@ -96,9 +100,13 @@ bool Game::process_close_mode(int ch)
 		bool ok = false;
 		for(unsigned i = 0; i < doors.size(); ++i) {
 			if(doors[i].pos == new_pos) {
-				doors[i].opened = false;
 				ok = true;
-				message = "You closed the door.";
+				if(!doors[i].opened) {
+					message = "Door is already closed.";
+				} else {
+					doors[i].opened = false;
+					message = "You closed the door.";
+				}
 			}
 		}
 		if(!ok) {
