@@ -8,7 +8,6 @@
 
 void draw_game(Console & console, const Game & game)
 {
-
 	console.clear();
 	for(unsigned x = 0; x < game.map.get_width(); ++x) {
 		for(unsigned y = 0; y < game.map.get_height(); ++y) {
@@ -19,6 +18,8 @@ void draw_game(Console & console, const Game & game)
 		console.print_sprite(game.doors[i].pos.x, game.doors[i].pos.y, game.doors[i].sprite());
 	}
 	console.print_sprite(game.player.pos.x, game.player.pos.y, game.player.sprite());
+
+	console.print_line(0, game.map.get_height(), game.message);
 }
 
 int main()
