@@ -12,5 +12,6 @@ struct Door {
 	bool opened;
 	explicit Door(const Point & door_pos = Point(), bool is_opened = false);
 	Sprite sprite() const;
+    operator bool() const;
 };
 

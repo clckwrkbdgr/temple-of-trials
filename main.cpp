@@ -39,13 +39,10 @@ int main()
 	} else {
 		game.generate();
 	}
-	while(true) {
+	while(game.mode != Game::EXIT_MODE) {
 		draw_game(console, game);
 		int ch = console.get_control();
-		bool ok = game.process(ch);
-		if(!ok) {
-			break;
-		}
+		game.process(ch);
 	}
 	game.save(SAVEFILE);
 

@@ -4,7 +4,7 @@
 #include <map>
 
 struct Game {
-	enum { NORMAL_MODE, OPEN_MODE, CLOSE_MODE };
+	enum { EXIT_MODE, NORMAL_MODE, OPEN_MODE, CLOSE_MODE };
 
 	Map map;
 	Player player;
@@ -16,11 +16,12 @@ struct Game {
 	void generate();
 	bool load(const std::string & filename);
 	bool save(const std::string & filename) const;
-	bool process(int ch);
+	void process(int ch);
 private:
 	static std::map<int, Point> directions;
-	bool process_normal_mode(int ch);
-	bool process_open_mode(int ch);
-	bool process_close_mode(int ch);
+	void process_normal_mode(int ch);
+	void process_open_mode(int ch);
+	void process_close_mode(int ch);
+    Door & door_at(const Point & pos);
 };
 

@@ -20,3 +20,8 @@ Sprite Door::sprite() const
 {
 	return opened ? '-' : '+';
 }
+
+Door::operator bool() const
+{
+    return bool(pos);
+}
