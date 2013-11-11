@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sys/stat.h>
 
-enum { SAVEFILE_VERSION = 2 };
+enum { SAVEFILE_VERSION = 3 };
 
 bool file_exists(const std::string & filename)
 {
@@ -43,8 +43,21 @@ bool Game::load(const std::string & filename)
 		}
 	}
 
-	in >> player.pos.x >> player.pos.y >> player.sprite;
+	int player_sprite;
+	in >> player.pos.x >> player.pos.y >> player_sprite;
 	CHECK(in);
+	player.sprite = player_sprite;
+
+	unsigned monsters_count;
+	in >> monsters_count;
+	CHECK(in);
+	monsters.resize(monsters_count);
+	for(unsigned i = 0; i < monsters_count; ++i) {
+		int monster_sprite;
+		in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite;
+		CHECK(in);
+		monsters[i].sprite = monster_sprite;
+	}
 
 	unsigned doors_count;
 	in >> doors_count;
@@ -76,7 +89,13 @@ bool Game::save(const std::string & filename) const
 	}
 	out << '\n';
 
-	out << player.pos.x << ' ' << player.pos.y << ' ' << player.sprite << '\n';
+	out << player.pos.x << ' ' << player.pos.y << ' ' << int(player.sprite) << '\n';
+	out << '\n';
+
+	out << monsters.size() << '\n';
+	for(unsigned i = 0; i < monsters.size(); ++i) {
+		out << monsters[i].pos.x << ' ' << monsters[i].pos.y << ' ' << int(monsters[i].sprite) << '\n';
+	}
 	out << '\n';
 
 	out << doors.size() << '\n';
