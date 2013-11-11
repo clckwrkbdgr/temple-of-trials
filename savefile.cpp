@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sys/stat.h>
 
-enum { SAVEFILE_VERSION = 1 };
+enum { SAVEFILE_VERSION = 2 };
 
 bool file_exists(const std::string & filename)
 {
@@ -43,7 +43,7 @@ bool Game::load(const std::string & filename)
 		}
 	}
 
-	in >> player.pos.x >> player.pos.y;
+	in >> player.pos.x >> player.pos.y >> player.sprite;
 	CHECK(in);
 
 	unsigned doors_count;
@@ -76,7 +76,7 @@ bool Game::save(const std::string & filename) const
 	}
 	out << '\n';
 
-	out << player.pos.x << ' ' << player.pos.y << '\n';
+	out << player.pos.x << ' ' << player.pos.y << ' ' << player.sprite << '\n';
 	out << '\n';
 
 	out << doors.size() << '\n';

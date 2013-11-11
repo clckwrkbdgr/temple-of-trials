@@ -5,7 +5,7 @@
 std::map<int, Point> Game::directions;
 
 Game::Game()
-	: map(1, 1, Cell::floor()), player(Point()), mode(NORMAL_MODE)
+	: map(1, 1, Cell::floor()), player(), mode(NORMAL_MODE)
 {
 	if(directions.empty()) {
 		directions['h'] = Point(-1,  0);
@@ -24,12 +24,15 @@ void Game::generate()
 {
 	log("Generating new game...");
 	map = Map(60, 23, Cell::floor());
-	player = Player(Point());
+	player = Monster::player(Point());
 	for(int i = 0; i < 10; ++i) {
 		map.cell(rand() % map.get_width(), rand() % map.get_height()) = Cell::wall();
 	}
 	for(int i = 0; i < 5; ++i) {
 		doors.push_back(Door(Point(rand() % map.get_width(), rand() % map.get_height())));
+	}
+	for(int i = 0; i < 5; ++i) {
+		monsters.push_back(Monster::ant(Point(rand() % map.get_width(), rand() % map.get_height())));
 	}
 	log("Done.");
 }
@@ -56,6 +59,18 @@ Door & Game::door_at(const Point & pos)
     static Door defaultDoor;
     defaultDoor = Door();
     return defaultDoor;
+}
+
+Monster & Game::monster_at(const Point & pos)
+{
+    for(unsigned i = 0; i < monsters.size(); ++i) {
+        if(monsters[i].pos == pos) {
+            return monsters[i];
+        }
+    }
+    static Monster defaultMonster;
+    defaultMonster = Monster();
+    return defaultMonster;
 }
 
 void Game::process_normal_mode(int ch)

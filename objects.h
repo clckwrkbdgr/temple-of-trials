@@ -1,10 +1,14 @@
 #pragma once
 #include "util.h"
 
-struct Player {
+struct Monster {
 	Point pos;
-	explicit Player(const Point & player_pos);
-	Sprite sprite() const;
+	Sprite sprite;
+	Monster(const Point & monster_pos, const Sprite & monster_sprite);
+	Monster();
+
+	static Monster player(const Point & monster_pos = Point());
+	static Monster ant(const Point & monster_pos = Point());
 };
 
 struct Door {

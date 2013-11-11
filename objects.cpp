@@ -1,13 +1,23 @@
 #include "objects.h"
 
-Player::Player(const Point & player_pos)
-	: pos(player_pos)
+Monster::Monster(const Point & monster_pos, const Sprite & monster_sprite)
+	: pos(monster_pos), sprite(monster_sprite)
 {
 }
 
-Sprite Player::sprite() const
+Monster::Monster()
+	: sprite(' ')
 {
-	return '@';
+}
+
+Monster Monster::player(const Point & monster_pos)
+{
+	return Monster(monster_pos, '@');
+}
+
+Monster Monster::ant(const Point & monster_pos)
+{
+	return Monster(monster_pos, 'A');
 }
 
 

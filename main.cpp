@@ -20,7 +20,10 @@ void draw_game(Console & console, const Game & game)
 	for(unsigned i = 0; i < game.doors.size(); ++i) {
 		console.print_sprite(game.doors[i].pos.x, game.doors[i].pos.y, game.doors[i].sprite());
 	}
-	console.print_sprite(game.player.pos.x, game.player.pos.y, game.player.sprite());
+	for(unsigned i = 0; i < game.monsters.size(); ++i) {
+		console.print_sprite(game.monsters[i].pos.x, game.monsters[i].pos.y, game.monsters[i].sprite);
+	}
+	console.print_sprite(game.player.pos.x, game.player.pos.y, game.player.sprite);
 
 	console.print_line(0, game.map.get_height(), game.message);
 }
