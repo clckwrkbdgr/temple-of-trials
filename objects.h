@@ -6,6 +6,7 @@ struct Monster {
 	Sprite sprite;
 	Monster(const Point & monster_pos, const Sprite & monster_sprite);
 	Monster();
+    operator bool() const;
 
 	static Monster player(const Point & monster_pos = Point());
 	static Monster ant(const Point & monster_pos = Point());

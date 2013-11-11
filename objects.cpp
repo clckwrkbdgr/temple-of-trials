@@ -10,6 +10,11 @@ Monster::Monster()
 {
 }
 
+Monster::operator bool() const
+{
+    return bool(pos);
+}
+
 Monster Monster::player(const Point & monster_pos)
 {
 	return Monster(monster_pos, '@');

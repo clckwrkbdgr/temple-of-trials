@@ -95,6 +95,11 @@ void Game::process_normal_mode(int ch)
         message = "Door is closed.";
         return;
     }
+    Monster & monster = monster_at(new_pos);
+    if(monster) {
+        message = "You bump into the monster.";
+        return;
+    }
     player.pos = new_pos;
 }
 
