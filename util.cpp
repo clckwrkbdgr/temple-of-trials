@@ -64,6 +64,13 @@ std::string to_string(unsigned value)
     return value_out.str();
 }
 
+std::string to_string(long unsigned value)
+{
+    std::ostringstream value_out;
+    value_out << value;
+    return value_out.str();
+}
+
 std::string to_string(const std::string & value)
 {
     return value;

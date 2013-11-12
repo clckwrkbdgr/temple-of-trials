@@ -17,6 +17,7 @@ typedef char Sprite;
 
 std::string to_string(int value);
 std::string to_string(unsigned value);
+std::string to_string(long unsigned value);
 std::string to_string(char value);
 std::string to_string(const std::string & value);
 

@@ -62,9 +62,27 @@ Monster & Game::monster_at(const Point & pos)
     return defaultMonster;
 }
 
+void Game::message(const std::string & text)
+{
+	messages.push_back(text);
+	log("Message: " + text);
+}
+
 void Game::process(int ch)
 {
-	message.clear();
+	if(messages.size() > 1) {
+		if(ch == ' ') {
+			messages.pop_front();
+		}
+		if(ch == 'q') {
+			mode = EXIT_MODE;
+		}
+		return;
+	}
+	if(messages.size() == 1) {
+		messages.pop_front();
+	}
+
 	switch(mode) {
 		case OPEN_MODE: process_open_mode(ch); break;
 		case CLOSE_MODE: process_close_mode(ch); break;
@@ -81,21 +99,21 @@ void Game::process(int ch)
 				}
 				Point new_pos = monsters[i].pos + shift;
 				if(!map.is_passable(new_pos)) {
-					message = "Monster bump into the wall.";
+					message("Monster bump into the wall.");
 					continue;
 				}
 				Door & door = door_at(new_pos);
 				if(door && !door.opened) {
-					message = "Door is closed.";
+					message("Door is closed.");
 					continue;
 				}
 				Monster & monster = monster_at(new_pos);
 				if(monster) {
-					message = "Monster bump into the monster.";
+					message("Monster bump into the monster.");
 					continue;
 				}
 				if(player.pos == new_pos) {
-					message = "Monster bump into you.";
+					message("Monster bump into you.");
 					continue;
 				}
 				monsters[i].pos = new_pos;
@@ -114,23 +132,23 @@ void Game::process_normal_mode(int ch)
 		default: break;
 	}
 	if(directions.count(ch) == 0) {
-        message = format("Unknown control '{0}'", char(ch));
+        message(format("Unknown control '{0}'", char(ch)));
         return;
     }
     Point new_pos = player.pos + directions[ch];
 	turn_is_ended = true;
     if(!map.is_passable(new_pos)) {
-        message = "You bump into the wall.";
+        message("You bump into the wall.");
         return;
     }
     Door & door = door_at(new_pos);
     if(door && !door.opened) {
-        message = "Door is closed.";
+        message("Door is closed.");
         return;
     }
     Monster & monster = monster_at(new_pos);
     if(monster) {
-        message = "You bump into the monster.";
+        message("You bump into the monster.");
         return;
     }
     player.pos = new_pos;
@@ -140,43 +158,43 @@ void Game::process_open_mode(int ch)
 {
 	mode = Game::NORMAL_MODE;
 	if(directions.count(ch) == 0) {
-		message = "This is not a direction.";
+		message("This is not a direction.");
         return;
     }
 	turn_is_ended = true;
     Point new_pos = player.pos + directions[ch];
     Door & door = door_at(new_pos);
     if(!door) {
-        message = "There is nothing to open there.";
+        message("There is nothing to open there.");
         return;
     }
     if(door.opened) {
-        message = "Door is already opened.";
+        message("Door is already opened.");
         return;
     }
     door.opened = true;
-    message = "You opened the door.";
+    message("You opened the door.");
 }
 
 void Game::process_close_mode(int ch)
 {
 	mode = Game::NORMAL_MODE;
 	if(directions.count(ch) == 0) {
-		message = "This is not a direction.";
+		message("This is not a direction.");
         return;
     }
 	turn_is_ended = true;
     Point new_pos = player.pos + directions[ch];
     Door & door = door_at(new_pos);
     if(!door) {
-        message = "There is nothing to close there.";
+        message("There is nothing to close there.");
         return;
     }
     if(!door.opened) {
-        message = "Door is already closed.";
+        message("Door is already closed.");
         return;
     }
     door.opened = false;
-    message = "You closed the door.";
+    message("You closed the door.");
 }
 

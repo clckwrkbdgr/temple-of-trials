@@ -25,7 +25,14 @@ void draw_game(Console & console, const Game & game)
 	}
 	console.print_sprite(game.player.pos.x, game.player.pos.y, game.player.sprite);
 
-	console.print_line(0, game.map.get_height(), game.message);
+	std::string message;
+	if(game.messages.size() > 1) {
+		message += format("({0}) ", game.messages.size());
+	}
+	if(!game.messages.empty()) {
+		message += game.messages.front();
+	}
+	console.print_line(0, game.map.get_height(), message);
 }
 
 int main()
