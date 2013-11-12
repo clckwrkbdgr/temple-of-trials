@@ -113,7 +113,7 @@ void Game::process(int ch)
 				}
 				Point new_pos = monsters[i].pos + shift;
 				if(!map.is_passable(new_pos)) {
-					message("Monster bump into the wall.");
+					message(format("{0} bump into the wall.", monsters[i].name));
 					continue;
 				}
 				Door & door = find_at(doors, new_pos);
@@ -123,11 +123,11 @@ void Game::process(int ch)
 				}
 				Monster & monster = find_at(monsters, new_pos);
 				if(monster) {
-					message("Monster bump into the monster.");
+					message(format("{0} bump into {1}.", monsters[i].name, monster.name));
 					continue;
 				}
 				if(player.pos == new_pos) {
-					message("Monster bump into you.");
+					message(format("{0} bump into {1}.", monsters[i].name, player.name));
 					continue;
 				}
 				monsters[i].pos = new_pos;
@@ -153,7 +153,7 @@ void Game::process_normal_mode(int ch)
     Point new_pos = player.pos + directions[ch];
 	turn_is_ended = true;
     if(!map.is_passable(new_pos)) {
-        message("You bump into the wall.");
+        message(format("{0} bump into the wall.", player.name));
         return;
     }
     Door & door = find_at(doors, new_pos);
@@ -163,7 +163,7 @@ void Game::process_normal_mode(int ch)
     }
     Monster & monster = find_at(monsters, new_pos);
     if(monster) {
-        message("You bump into the monster.");
+        message(format("{0} bump into the {1}.", player.name, monster.name));
         return;
     }
     player.pos = new_pos;
@@ -188,7 +188,7 @@ void Game::process_open_mode(int ch)
         return;
     }
     door.opened = true;
-    message("You opened the door.");
+    message(format("{0} opened the door.", player.name));
 }
 
 void Game::process_close_mode(int ch)
@@ -210,6 +210,6 @@ void Game::process_close_mode(int ch)
         return;
     }
     door.opened = false;
-    message("You closed the door.");
+    message(format("{0} closed the door.", player.name));
 }
 
