@@ -9,25 +9,24 @@ BIN = temple
 LIBS = -lncurses
 SOURCES = $(wildcard *.cpp)
 OBJ = $(addprefix tmp/,$(SOURCES:.cpp=.o))
-CXXFLAGS = -Werror -Wall
+CXXFLAGS = -MD -MP -Werror -Wall
 
 run: $(BIN)
 	$(TERMINAL) './$(BIN)'
 
-$(BIN): tmp/deps $(OBJ)
+all: $(BIN)
+
+$(BIN): $(OBJ)
 	$(CXX) $(LIBS) -o $@ $(OBJ)
 
 tmp/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-.PHONY: tmp/deps clean Makefile
-
-tmp/deps: $(SOURCES)
-	$(CXX) -MM $^ > $@
+.PHONY: clean Makefile
 
 clean:
-	$(RM) -rf tmp/*.o $(BIN) tmp/deps
+	$(RM) -rf tmp/* $(BIN)
 
 $(shell mkdir -p tmp)
-include tmp/deps
+-include $(OBJ:%.o=%.d)
 
