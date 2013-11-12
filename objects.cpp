@@ -17,12 +17,16 @@ Monster::operator bool() const
 
 Monster Monster::player(const Point & monster_pos)
 {
-	return Monster(monster_pos, '@', AI_PLAYER);
+	Monster player(monster_pos, '@', AI_PLAYER);
+	player.name = "you";
+	return player;
 }
 
 Monster Monster::ant(int ai, const Point & monster_pos)
 {
-	return Monster(monster_pos, 'A', ai);
+	Monster ant(monster_pos, 'A', ai);
+	ant.name = "ant";
+	return ant;
 }
 
 

@@ -6,6 +6,7 @@ struct Monster {
 	Point pos;
 	Sprite sprite;
 	int ai;
+	std::string name;
 	Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_ai);
 	Monster();
 	operator bool() const;

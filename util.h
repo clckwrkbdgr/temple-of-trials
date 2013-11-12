@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 std::string now();
 void log(const std::string & message);
@@ -12,6 +13,32 @@ struct Point {
 	operator bool() const;
 };
 Point operator+(const Point & a, const Point & b);
+
+template<class T>
+const T & find_at(const std::vector<T> & container, const Point & pos)
+{
+    for(unsigned i = 0; i < container.size(); ++i) {
+        if(container[i].pos == pos) {
+            return container[i];
+        }
+    }
+    static T empty;
+    return empty;
+}
+
+template<class T>
+T & find_at(std::vector<T> & container, const Point & pos)
+{
+    for(unsigned i = 0; i < container.size(); ++i) {
+        if(container[i].pos == pos) {
+            return container[i];
+        }
+    }
+    static T empty;
+	empty = T();
+    return empty;
+}
+
 
 typedef char Sprite;
 

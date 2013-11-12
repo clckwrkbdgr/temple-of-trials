@@ -21,50 +21,63 @@ Game::Game()
 
 }
 
+Point Game::find_random_free_cell() const
+{
+	int counter = map.get_width() * map.get_height();
+	while(--counter > 0) {
+		Point new_pos = Point(rand() % map.get_width(), rand() % map.get_height());
+		if(!map.is_passable(new_pos)) {
+			continue;
+		}
+		if(find_at(doors, new_pos)) {
+			continue;
+		}
+		if(find_at(monsters, new_pos)) {
+			continue;
+		}
+		if(player.pos == new_pos) {
+			continue;
+		}
+		return new_pos;
+	}
+	return Point();
+}
+
 void Game::generate()
 {
 	log("Generating new game...");
+	doors.clear();
+	monsters.clear();
 	map = Map(60, 23, Cell::floor());
-	player = Monster::player(Point());
+	player = Monster::player(find_random_free_cell());
 	for(int i = 0; i < 10; ++i) {
-		map.cell(rand() % map.get_width(), rand() % map.get_height()) = Cell::wall();
+		Point point = find_random_free_cell();
+		if(point) {
+			map.cell(point.x, point.y) = Cell::wall();
+		}
 	}
 	for(int i = 0; i < 5; ++i) {
-		doors.push_back(Door(Point(rand() % map.get_width(), rand() % map.get_height())));
+		Point point = find_random_free_cell();
+		if(point) {
+			doors.push_back(Door(point));
+		}
 	}
 	for(int i = 0; i < 5; ++i) {
-		int ai = (rand() % 2) ? Monster::AI_STILL : Monster::AI_WANDER;
-		monsters.push_back(Monster::ant(ai, Point(rand() % map.get_width(), rand() % map.get_height())));
+		Point point = find_random_free_cell();
+		if(point) {
+			int ai = (rand() % 2) ? Monster::AI_STILL : Monster::AI_WANDER;
+			monsters.push_back(Monster::ant(ai, point));
+		}
 	}
 	log("Done.");
 }
 
-Door & Game::door_at(const Point & pos)
+void Game::message(std::string text)
 {
-    for(unsigned i = 0; i < doors.size(); ++i) {
-        if(doors[i].pos == pos) {
-            return doors[i];
-        }
-    }
-    static Door defaultDoor;
-    defaultDoor = Door();
-    return defaultDoor;
-}
-
-Monster & Game::monster_at(const Point & pos)
-{
-    for(unsigned i = 0; i < monsters.size(); ++i) {
-        if(monsters[i].pos == pos) {
-            return monsters[i];
-        }
-    }
-    static Monster defaultMonster;
-    defaultMonster = Monster();
-    return defaultMonster;
-}
-
-void Game::message(const std::string & text)
-{
+	if(text.empty()) {
+		return;
+	}
+	text[0] = toupper(text[0]);
 	messages.push_back(text);
 	log("Message: " + text);
 }
@@ -103,12 +116,12 @@ void Game::process(int ch)
 					message("Monster bump into the wall.");
 					continue;
 				}
-				Door & door = door_at(new_pos);
+				Door & door = find_at(doors, new_pos);
 				if(door && !door.opened) {
 					message("Door is closed.");
 					continue;
 				}
-				Monster & monster = monster_at(new_pos);
+				Monster & monster = find_at(monsters, new_pos);
 				if(monster) {
 					message("Monster bump into the monster.");
 					continue;
@@ -143,12 +156,12 @@ void Game::process_normal_mode(int ch)
         message("You bump into the wall.");
         return;
     }
-    Door & door = door_at(new_pos);
+    Door & door = find_at(doors, new_pos);
     if(door && !door.opened) {
         message("Door is closed.");
         return;
     }
-    Monster & monster = monster_at(new_pos);
+    Monster & monster = find_at(monsters, new_pos);
     if(monster) {
         message("You bump into the monster.");
         return;
@@ -165,7 +178,7 @@ void Game::process_open_mode(int ch)
     }
 	turn_is_ended = true;
     Point new_pos = player.pos + directions[ch];
-    Door & door = door_at(new_pos);
+    Door & door = find_at(doors, new_pos);
     if(!door) {
         message("There is nothing to open there.");
         return;
@@ -187,7 +200,7 @@ void Game::process_close_mode(int ch)
     }
 	turn_is_ended = true;
     Point new_pos = player.pos + directions[ch];
-    Door & door = door_at(new_pos);
+    Door & door = find_at(doors, new_pos);
     if(!door) {
         message("There is nothing to close there.");
         return;

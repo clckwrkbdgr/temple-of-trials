@@ -26,11 +26,10 @@ private:
 	bool turn_is_ended;
 	static std::map<int, Point> directions;
 
-	void message(const std::string & text);
+	void message(std::string text);
 	void process_normal_mode(int ch);
 	void process_open_mode(int ch);
 	void process_close_mode(int ch);
-    Door & door_at(const Point & pos);
-    Monster & monster_at(const Point & pos);
+	Point find_random_free_cell() const;
 };
 
