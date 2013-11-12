@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sys/stat.h>
 
-enum { SAVEFILE_VERSION = 4 };
+enum { SAVEFILE_VERSION = 5 };
 
 bool file_exists(const std::string & filename)
 {
@@ -10,7 +10,38 @@ bool file_exists(const std::string & filename)
 	return (stat(filename.c_str(), &buffer) == 0); 
 }
 
-#define CHECK(in) do { if(!(in).good()) { log("Error: savefile is corrupted."); return false; } } while(0)
+std::string read_string(std::istream & in, char quote = '"')
+{
+	std::string result;
+	char c;
+	in >> std::ws;
+	in.get(c);
+	if(c != quote) {
+		return result;
+	}
+	in.get(c);
+	while(in.good() && c != quote) {
+		if(c == '\\') {
+			in.get(c);
+		}
+		result += c;
+		in.get(c);
+	}
+	return result;
+}
+
+std::string escaped(const std::string & s)
+{
+	std::string result = s;
+	size_t pos = result.find('"');
+	while(pos != std::string::npos) {
+		result.replace(pos, 1, "\\\"");
+		pos = result.find('"');
+	}
+	return '"' + result + '"';
+}
+
+#define CHECK(in, text) do { if(!(in).good()) { log("Error: savefile is corrupted (reading " + to_string(text) + ") ."); return false; } } while(0)
 bool Game::load(const std::string & filename)
 {
 	if(!file_exists(filename)) {
@@ -24,14 +55,14 @@ bool Game::load(const std::string & filename)
 
 	int version;
 	in >> version;
-	CHECK(in);
+	CHECK(in, "version");
 	if(version > SAVEFILE_VERSION) {
 		log(format("Savefile is of version {0}, which is incompatible with current program version {1}.", version, int(SAVEFILE_VERSION)));
 		return false;
 	}
 	unsigned width, height;
 	in >> width >> height;
-	CHECK(in);
+	CHECK(in, "map size");
 	map = Map(width, height, Cell::floor());
 	for(unsigned y = 0; y < map.get_height(); ++y) {
 		for(unsigned x = 0; x < map.get_width(); ++x) {
@@ -39,41 +70,47 @@ bool Game::load(const std::string & filename)
 			in >> sprite >> passable;
 			map.cell(x, y).sprite = sprite;
 			map.cell(x, y).passable = passable;
-			CHECK(in);
+			CHECK(in, "map cell");
 		}
 	}
 
 	int player_sprite;
-	if(SAVEFILE_VERSION <= 3) {
+	if(version <= 3) {
 		in >> player.pos.x >> player.pos.y >> player_sprite;
+	} else if(version <= 4) {
+		in >> player.pos.x >> player.pos.y >> player_sprite >> player.ai;
 	} else {
 		in >> player.pos.x >> player.pos.y >> player_sprite >> player.ai;
+		player.name = read_string(in);
 	}
-	CHECK(in);
+	CHECK(in, "player");
 	player.sprite = player_sprite;
 
 	unsigned monsters_count;
 	in >> monsters_count;
-	CHECK(in);
+	CHECK(in, "monster count");
 	monsters.resize(monsters_count);
 	for(unsigned i = 0; i < monsters_count; ++i) {
 		int monster_sprite;
-		if(SAVEFILE_VERSION <= 3) {
+		if(version <= 3) {
 			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite;
+		} else if(version <= 4) {
+			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite >> monsters[i].ai;
 		} else {
 			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite >> monsters[i].ai;
+			monsters[i].name = read_string(in);
 		}
-		CHECK(in);
+		CHECK(in, "monster");
 		monsters[i].sprite = monster_sprite;
 	}
 
 	unsigned doors_count;
 	in >> doors_count;
-	CHECK(in);
+	CHECK(in, "door count");
 	doors.resize(doors_count);
 	for(unsigned i = 0; i < doors_count; ++i) {
 		in >> doors[i].pos.x >> doors[i].pos.y >> doors[i].opened;
-		CHECK(in);
+		CHECK(in, "door");
 	}
 	return true;
 }
@@ -97,12 +134,14 @@ bool Game::save(const std::string & filename) const
 	}
 	out << '\n';
 
-	out << player.pos.x << ' ' << player.pos.y << ' ' << int(player.sprite) << ' ' << player.ai << '\n';
+	out << player.pos.x << ' ' << player.pos.y << ' ' << int(player.sprite) << ' ' << player.ai << ' ';
+	out << escaped(player.name) << '\n';
 	out << '\n';
 
 	out << monsters.size() << '\n';
 	for(unsigned i = 0; i < monsters.size(); ++i) {
-		out << monsters[i].pos.x << ' ' << monsters[i].pos.y << ' ' << int(monsters[i].sprite) << ' ' << monsters[i].ai << '\n';
+		out << monsters[i].pos.x << ' ' << monsters[i].pos.y << ' ' << int(monsters[i].sprite) << ' ' << monsters[i].ai << ' ';
+		out << escaped(monsters[i].name) << '\n';
 	}
 	out << '\n';
 
