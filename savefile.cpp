@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sys/stat.h>
 
-enum { SAVEFILE_VERSION = 3 };
+enum { SAVEFILE_VERSION = 4 };
 
 bool file_exists(const std::string & filename)
 {
@@ -25,7 +25,7 @@ bool Game::load(const std::string & filename)
 	int version;
 	in >> version;
 	CHECK(in);
-	if(version != SAVEFILE_VERSION) {
+	if(version > SAVEFILE_VERSION) {
 		log(format("Savefile is of version {0}, which is incompatible with current program version {1}.", version, int(SAVEFILE_VERSION)));
 		return false;
 	}
@@ -44,7 +44,11 @@ bool Game::load(const std::string & filename)
 	}
 
 	int player_sprite;
-	in >> player.pos.x >> player.pos.y >> player_sprite;
+	if(SAVEFILE_VERSION <= 3) {
+		in >> player.pos.x >> player.pos.y >> player_sprite;
+	} else {
+		in >> player.pos.x >> player.pos.y >> player_sprite >> player.ai;
+	}
 	CHECK(in);
 	player.sprite = player_sprite;
 
@@ -54,7 +58,11 @@ bool Game::load(const std::string & filename)
 	monsters.resize(monsters_count);
 	for(unsigned i = 0; i < monsters_count; ++i) {
 		int monster_sprite;
-		in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite;
+		if(SAVEFILE_VERSION <= 3) {
+			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite;
+		} else {
+			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite >> monsters[i].ai;
+		}
 		CHECK(in);
 		monsters[i].sprite = monster_sprite;
 	}
@@ -89,12 +97,12 @@ bool Game::save(const std::string & filename) const
 	}
 	out << '\n';
 
-	out << player.pos.x << ' ' << player.pos.y << ' ' << int(player.sprite) << '\n';
+	out << player.pos.x << ' ' << player.pos.y << ' ' << int(player.sprite) << ' ' << player.ai << '\n';
 	out << '\n';
 
 	out << monsters.size() << '\n';
 	for(unsigned i = 0; i < monsters.size(); ++i) {
-		out << monsters[i].pos.x << ' ' << monsters[i].pos.y << ' ' << int(monsters[i].sprite) << '\n';
+		out << monsters[i].pos.x << ' ' << monsters[i].pos.y << ' ' << int(monsters[i].sprite) << ' ' << monsters[i].ai << '\n';
 	}
 	out << '\n';
 

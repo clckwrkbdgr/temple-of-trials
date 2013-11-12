@@ -1,12 +1,12 @@
 #include "objects.h"
 
-Monster::Monster(const Point & monster_pos, const Sprite & monster_sprite)
-	: pos(monster_pos), sprite(monster_sprite)
+Monster::Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_ai)
+	: pos(monster_pos), sprite(monster_sprite), ai(monster_ai)
 {
 }
 
 Monster::Monster()
-	: sprite(' ')
+	: sprite(' '), ai(AI_STILL)
 {
 }
 
@@ -17,12 +17,12 @@ Monster::operator bool() const
 
 Monster Monster::player(const Point & monster_pos)
 {
-	return Monster(monster_pos, '@');
+	return Monster(monster_pos, '@', AI_PLAYER);
 }
 
-Monster Monster::ant(const Point & monster_pos)
+Monster Monster::ant(int ai, const Point & monster_pos)
 {
-	return Monster(monster_pos, 'A');
+	return Monster(monster_pos, 'A', ai);
 }
 
 

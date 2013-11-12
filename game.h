@@ -25,5 +25,6 @@ private:
 	void process_close_mode(int ch);
     Door & door_at(const Point & pos);
     Monster & monster_at(const Point & pos);
+	bool turn_is_ended;
 };
 

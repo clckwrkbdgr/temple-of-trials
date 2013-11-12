@@ -5,7 +5,7 @@
 std::map<int, Point> Game::directions;
 
 Game::Game()
-	: map(1, 1, Cell::floor()), player(), mode(NORMAL_MODE)
+	: map(1, 1, Cell::floor()), player(), mode(NORMAL_MODE), turn_is_ended(false)
 {
 	if(directions.empty()) {
 		directions['h'] = Point(-1,  0);
@@ -32,21 +32,10 @@ void Game::generate()
 		doors.push_back(Door(Point(rand() % map.get_width(), rand() % map.get_height())));
 	}
 	for(int i = 0; i < 5; ++i) {
-		monsters.push_back(Monster::ant(Point(rand() % map.get_width(), rand() % map.get_height())));
+		int ai = (rand() % 2) ? Monster::AI_STILL : Monster::AI_WANDER;
+		monsters.push_back(Monster::ant(ai, Point(rand() % map.get_width(), rand() % map.get_height())));
 	}
 	log("Done.");
-}
-
-void Game::process(int ch)
-{
-	message.clear();
-	switch(mode) {
-		case OPEN_MODE: process_open_mode(ch); break;
-		case CLOSE_MODE: process_close_mode(ch); break;
-		case NORMAL_MODE: process_normal_mode(ch); break;
-		case EXIT_MODE: break;
-		default: log("Unknown game mode!"); break;
-	}
 }
 
 Door & Game::door_at(const Point & pos)
@@ -73,6 +62,49 @@ Monster & Game::monster_at(const Point & pos)
     return defaultMonster;
 }
 
+void Game::process(int ch)
+{
+	message.clear();
+	switch(mode) {
+		case OPEN_MODE: process_open_mode(ch); break;
+		case CLOSE_MODE: process_close_mode(ch); break;
+		case NORMAL_MODE: process_normal_mode(ch); break;
+		case EXIT_MODE: break;
+		default: log("Unknown game mode!"); break;
+	}
+	if(turn_is_ended) {
+		for(unsigned i = 0; i < monsters.size(); ++i) {
+			if(monsters[i].ai == Monster::AI_WANDER) {
+				Point shift(rand() % 3 - 1, rand() % 3 - 1);
+				if(!shift) {
+					continue;
+				}
+				Point new_pos = monsters[i].pos + shift;
+				if(!map.is_passable(new_pos)) {
+					message = "Monster bump into the wall.";
+					continue;
+				}
+				Door & door = door_at(new_pos);
+				if(door && !door.opened) {
+					message = "Door is closed.";
+					continue;
+				}
+				Monster & monster = monster_at(new_pos);
+				if(monster) {
+					message = "Monster bump into the monster.";
+					continue;
+				}
+				if(player.pos == new_pos) {
+					message = "Monster bump into you.";
+					continue;
+				}
+				monsters[i].pos = new_pos;
+			}
+		}
+		turn_is_ended = false;
+	}
+}
+
 void Game::process_normal_mode(int ch)
 {
 	switch(ch) {
@@ -86,6 +118,7 @@ void Game::process_normal_mode(int ch)
         return;
     }
     Point new_pos = player.pos + directions[ch];
+	turn_is_ended = true;
     if(!map.is_passable(new_pos)) {
         message = "You bump into the wall.";
         return;
@@ -110,6 +143,7 @@ void Game::process_open_mode(int ch)
 		message = "This is not a direction.";
         return;
     }
+	turn_is_ended = true;
     Point new_pos = player.pos + directions[ch];
     Door & door = door_at(new_pos);
     if(!door) {
@@ -131,6 +165,7 @@ void Game::process_close_mode(int ch)
 		message = "This is not a direction.";
         return;
     }
+	turn_is_ended = true;
     Point new_pos = player.pos + directions[ch];
     Door & door = door_at(new_pos);
     if(!door) {
