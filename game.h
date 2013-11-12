@@ -13,6 +13,7 @@ struct Game {
 	std::vector<Door> doors;
 	int mode;
 	std::list<std::string> messages;
+	int turns;
 
 	Game();
 	void generate();

@@ -14,16 +14,16 @@ void draw_game(Console & console, const Game & game)
 	console.clear();
 	for(unsigned x = 0; x < game.map.get_width(); ++x) {
 		for(unsigned y = 0; y < game.map.get_height(); ++y) {
-			console.print_sprite(x, y, game.map.cell(x, y).sprite);
+			console.print_tile(x, y, game.map.cell(x, y).sprite);
 		}
 	}
 	for(unsigned i = 0; i < game.doors.size(); ++i) {
-		console.print_sprite(game.doors[i].pos.x, game.doors[i].pos.y, game.doors[i].sprite());
+		console.print_tile(game.doors[i].pos.x, game.doors[i].pos.y, game.doors[i].sprite());
 	}
 	for(unsigned i = 0; i < game.monsters.size(); ++i) {
-		console.print_sprite(game.monsters[i].pos.x, game.monsters[i].pos.y, game.monsters[i].sprite);
+		console.print_tile(game.monsters[i].pos.x, game.monsters[i].pos.y, game.monsters[i].sprite);
 	}
-	console.print_sprite(game.player.pos.x, game.player.pos.y, game.player.sprite);
+	console.print_tile(game.player.pos.x, game.player.pos.y, game.player.sprite);
 
 	std::string message;
 	if(game.messages.size() > 1) {
@@ -32,7 +32,9 @@ void draw_game(Console & console, const Game & game)
 	if(!game.messages.empty()) {
 		message += game.messages.front();
 	}
-	console.print_line(0, game.map.get_height(), message);
+	console.print_message(message);
+
+	console.print_stat(0, format("Turns: {0}", game.turns));
 }
 
 int main()

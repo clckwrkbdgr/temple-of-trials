@@ -5,7 +5,8 @@
 std::map<int, Point> Game::directions;
 
 Game::Game()
-	: map(1, 1, Cell::floor()), player(), mode(NORMAL_MODE), turn_is_ended(false)
+	: map(1, 1, Cell::floor()), player(), mode(NORMAL_MODE), turns(0),
+	turn_is_ended(false)
 {
 	if(directions.empty()) {
 		directions['h'] = Point(-1,  0);
@@ -119,6 +120,7 @@ void Game::process(int ch)
 				monsters[i].pos = new_pos;
 			}
 		}
+		++turns;
 		turn_is_ended = false;
 	}
 }

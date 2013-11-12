@@ -4,8 +4,9 @@
 struct Console {
 	Console();
 	~Console();
-	void print_sprite(int x, int y, int sprite);
-	void print_line(int x, int y, const std::string & line);
+	void print_tile(int x, int y, int sprite);
+	void print_message(const std::string & text);
+	void print_stat(int row, const std::string & text);
 	void clear();
 	int get_control();
 };
