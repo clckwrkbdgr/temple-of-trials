@@ -31,5 +31,9 @@ private:
 	void process_open_mode(int ch);
 	void process_close_mode(int ch);
 	Point find_random_free_cell() const;
+
+	void move(Monster & someone, const Point & shift);
+	void open(Monster & someone, const Point & shift);
+	void close(Monster & someone, const Point & shift);
 };
 

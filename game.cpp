@@ -82,6 +82,71 @@ void Game::message(std::string text)
 	log("Message: " + text);
 }
 
+void Game::move(Monster & someone, const Point & shift)
+{
+	if(!shift) {
+		return;
+	}
+	Point new_pos = someone.pos + shift;
+	if(!map.is_passable(new_pos)) {
+		message(format("{0} bump into the wall.", someone.name));
+		return;
+	}
+    Door & door = find_at(doors, new_pos);
+	if(door && !door.opened) {
+		message("Door is closed.");
+		return;
+	}
+    Monster & monster = find_at(monsters, new_pos);
+	if(monster) {
+		message(format("{0} bump into {1}.", someone.name, monster.name));
+		return;
+	}
+	if(player.pos == new_pos) {
+		message(format("{0} bump into {1}.", someone.name, player.name));
+		return;
+	}
+    someone.pos = new_pos;
+}
+
+void Game::open(Monster & someone, const Point & shift)
+{
+	if(!shift) {
+		return;
+	}
+    Point new_pos = someone.pos + shift;
+    Door & door = find_at(doors, new_pos);
+    if(!door) {
+        message("There is nothing to open there.");
+        return;
+    }
+    if(door.opened) {
+        message("Door is already opened.");
+        return;
+    }
+    door.opened = true;
+    message(format("{0} opened the door.", someone.name));
+}
+
+void Game::close(Monster & someone, const Point & shift)
+{
+	if(!shift) {
+		return;
+	}
+    Point new_pos = someone.pos + shift;
+    Door & door = find_at(doors, new_pos);
+    if(!door) {
+        message("There is nothing to close there.");
+        return;
+    }
+    if(!door.opened) {
+        message("Door is already closed.");
+        return;
+    }
+    door.opened = false;
+    message(format("{0} closed the door.", someone.name));
+}
+
 void Game::process(int ch)
 {
 	if(messages.size() > 1) {
@@ -108,29 +173,7 @@ void Game::process(int ch)
 		for(unsigned i = 0; i < monsters.size(); ++i) {
 			if(monsters[i].ai == Monster::AI_WANDER) {
 				Point shift(rand() % 3 - 1, rand() % 3 - 1);
-				if(!shift) {
-					continue;
-				}
-				Point new_pos = monsters[i].pos + shift;
-				if(!map.is_passable(new_pos)) {
-					message(format("{0} bump into the wall.", monsters[i].name));
-					continue;
-				}
-				Door & door = find_at(doors, new_pos);
-				if(door && !door.opened) {
-					message("Door is closed.");
-					continue;
-				}
-				Monster & monster = find_at(monsters, new_pos);
-				if(monster) {
-					message(format("{0} bump into {1}.", monsters[i].name, monster.name));
-					continue;
-				}
-				if(player.pos == new_pos) {
-					message(format("{0} bump into {1}.", monsters[i].name, player.name));
-					continue;
-				}
-				monsters[i].pos = new_pos;
+				move(monsters[i], shift);
 			}
 		}
 		++turns;
@@ -150,23 +193,8 @@ void Game::process_normal_mode(int ch)
         message(format("Unknown control '{0}'", char(ch)));
         return;
     }
-    Point new_pos = player.pos + directions[ch];
+	move(player, directions[ch]);
 	turn_is_ended = true;
-    if(!map.is_passable(new_pos)) {
-        message(format("{0} bump into the wall.", player.name));
-        return;
-    }
-    Door & door = find_at(doors, new_pos);
-    if(door && !door.opened) {
-        message("Door is closed.");
-        return;
-    }
-    Monster & monster = find_at(monsters, new_pos);
-    if(monster) {
-        message(format("{0} bump into the {1}.", player.name, monster.name));
-        return;
-    }
-    player.pos = new_pos;
 }
 
 void Game::process_open_mode(int ch)
@@ -176,19 +204,8 @@ void Game::process_open_mode(int ch)
 		message("This is not a direction.");
         return;
     }
+	open(player, directions[ch]);
 	turn_is_ended = true;
-    Point new_pos = player.pos + directions[ch];
-    Door & door = find_at(doors, new_pos);
-    if(!door) {
-        message("There is nothing to open there.");
-        return;
-    }
-    if(door.opened) {
-        message("Door is already opened.");
-        return;
-    }
-    door.opened = true;
-    message(format("{0} opened the door.", player.name));
 }
 
 void Game::process_close_mode(int ch)
@@ -198,18 +215,7 @@ void Game::process_close_mode(int ch)
 		message("This is not a direction.");
         return;
     }
+	close(player, directions[ch]);
 	turn_is_ended = true;
-    Point new_pos = player.pos + directions[ch];
-    Door & door = find_at(doors, new_pos);
-    if(!door) {
-        message("There is nothing to close there.");
-        return;
-    }
-    if(!door.opened) {
-        message("Door is already closed.");
-        return;
-    }
-    door.opened = false;
-    message(format("{0} closed the door.", player.name));
 }
 
