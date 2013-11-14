@@ -37,6 +37,12 @@ void draw_game(Console & console, const Game & game)
 	console.print_stat(0, format("Turns: {0}", game.turns));
 }
 
+int draw_and_get_control(Console & console, const Game & game)
+{
+	draw_game(console, game);
+	return console.get_control();
+}
+
 int main()
 {
 	srand(time(0));
@@ -51,31 +57,65 @@ int main()
 	} else {
 		game.generate();
 	}
+
+	std::map<int, Point> directions;
+	directions['h'] = Point(-1,  0);
+	directions['j'] = Point( 0, +1);
+	directions['k'] = Point( 0, -1);
+	directions['l'] = Point(+1,  0);
+	directions['y'] = Point(-1, -1);
+	directions['u'] = Point(+1, -1);
+	directions['b'] = Point(-1, +1);
+	directions['n'] = Point(+1, +1);
+
 	while(game.mode != Game::EXIT_MODE) {
-		game.turn_is_ended = false;
-		while(!game.turn_is_ended && game.mode != Game::EXIT_MODE) {
-			draw_game(console, game);
-			int ch = console.get_control();
+		bool turn_is_ended = false;
+		while(!turn_is_ended && game.mode != Game::EXIT_MODE) {
+			int ch = draw_and_get_control(console, game);
 
 			if(game.messages.size() > 1) {
-				if(ch == ' ') {
-					game.messages.pop_front();
-				}
-				if(ch == 'q') {
-					game.mode = Game::EXIT_MODE;
+				switch(ch) {
+					case ' ': game.messages.pop_front(); break;
+					case 'q': game.mode = Game::EXIT_MODE; break;
+					default: break;
 				}
 				continue;
-			}
-			if(game.messages.size() == 1) {
+			} else if(game.messages.size() == 1) {
 				game.messages.pop_front();
 			}
 
-			switch(game.mode) {
-				case Game::OPEN_MODE: game.process_open_mode(ch); break;
-				case Game::CLOSE_MODE: game.process_close_mode(ch); break;
-				case Game::NORMAL_MODE: game.process_normal_mode(ch); break;
-				case Game::EXIT_MODE: break;
-				default: log("Unknown game mode!"); break;
+			if(game.mode == Game::NORMAL_MODE) {
+				switch(ch) {
+					case 'o': game.mode = Game::OPEN_MODE; continue;
+					case 'c': game.mode = Game::CLOSE_MODE; continue;
+					case 'q': game.mode = Game::EXIT_MODE; continue;
+					default: break;
+				}
+				if(directions.count(ch) == 0) {
+					game.message(format("Unknown control '{0}'", char(ch)));
+					continue;
+				}
+				game.move(game.player, directions[ch]);
+				turn_is_ended = true;
+			} else if(game.mode == Game::OPEN_MODE) {
+				game.mode = Game::NORMAL_MODE;
+				if(directions.count(ch) == 0) {
+					game.message("This is not a direction.");
+					continue;
+				}
+				game.open(game.player, directions[ch]);
+				turn_is_ended = true;
+			} else if(game.mode == Game::CLOSE_MODE) {
+				game.mode = Game::NORMAL_MODE;
+				if(directions.count(ch) == 0) {
+					game.message("This is not a direction.");
+					continue;
+				}
+				game.close(game.player, directions[ch]);
+				turn_is_ended = true;
+			} else {
+				log("Unknown game mode!");
+				game.mode = Game::EXIT_MODE;
 			}
 		}
 		for(unsigned i = 0; i < game.monsters.size(); ++i) {

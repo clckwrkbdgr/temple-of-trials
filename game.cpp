@@ -2,23 +2,9 @@
 #include <map>
 #include <cstdlib>
 
-std::map<int, Point> Game::directions;
-
 Game::Game()
-	: map(1, 1, Cell::floor()), player(), mode(NORMAL_MODE), turns(0),
-	turn_is_ended(false)
+	: map(1, 1, Cell::floor()), player(), mode(NORMAL_MODE), turns(0)
 {
-	if(directions.empty()) {
-		directions['h'] = Point(-1,  0);
-		directions['j'] = Point( 0, +1);
-		directions['k'] = Point( 0, -1);
-		directions['l'] = Point(+1,  0);
-		directions['y'] = Point(-1, -1);
-		directions['u'] = Point(+1, -1);
-		directions['b'] = Point(-1, +1);
-		directions['n'] = Point(+1, +1);
-	}
-
 }
 
 Point Game::find_random_free_cell() const
@@ -145,43 +131,5 @@ void Game::close(Monster & someone, const Point & shift)
     }
     door.opened = false;
     message(format("{0} closed the door.", someone.name));
-}
-
-void Game::process_normal_mode(int ch)
-{
-	switch(ch) {
-		case 'o': mode = Game::OPEN_MODE; return;
-		case 'c': mode = Game::CLOSE_MODE; return;
-		case 'q': mode = Game::EXIT_MODE; return;
-		default: break;
-	}
-	if(directions.count(ch) == 0) {
-        message(format("Unknown control '{0}'", char(ch)));
-        return;
-    }
-	move(player, directions[ch]);
-	turn_is_ended = true;
-}
-
-void Game::process_open_mode(int ch)
-{
-	mode = Game::NORMAL_MODE;
-	if(directions.count(ch) == 0) {
-		message("This is not a direction.");
-        return;
-    }
-	open(player, directions[ch]);
-	turn_is_ended = true;
-}
-
-void Game::process_close_mode(int ch)
-{
-	mode = Game::NORMAL_MODE;
-	if(directions.count(ch) == 0) {
-		message("This is not a direction.");
-        return;
-    }
-	close(player, directions[ch]);
-	turn_is_ended = true;
 }
 

@@ -22,13 +22,7 @@ struct Game {
 	int get_message_count() const;
 	const std::string & get_top_message() const;
 
-	bool turn_is_ended;
-	static std::map<int, Point> directions;
-
 	void message(std::string text);
-	void process_normal_mode(int ch);
-	void process_open_mode(int ch);
-	void process_close_mode(int ch);
 	Point find_random_free_cell() const;
 
 	void move(Monster & someone, const Point & shift);
