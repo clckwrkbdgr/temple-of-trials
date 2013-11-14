@@ -147,40 +147,6 @@ void Game::close(Monster & someone, const Point & shift)
     message(format("{0} closed the door.", someone.name));
 }
 
-void Game::process(int ch)
-{
-	if(messages.size() > 1) {
-		if(ch == ' ') {
-			messages.pop_front();
-		}
-		if(ch == 'q') {
-			mode = EXIT_MODE;
-		}
-		return;
-	}
-	if(messages.size() == 1) {
-		messages.pop_front();
-	}
-
-	switch(mode) {
-		case OPEN_MODE: process_open_mode(ch); break;
-		case CLOSE_MODE: process_close_mode(ch); break;
-		case NORMAL_MODE: process_normal_mode(ch); break;
-		case EXIT_MODE: break;
-		default: log("Unknown game mode!"); break;
-	}
-	if(turn_is_ended) {
-		for(unsigned i = 0; i < monsters.size(); ++i) {
-			if(monsters[i].ai == Monster::AI_WANDER) {
-				Point shift(rand() % 3 - 1, rand() % 3 - 1);
-				move(monsters[i], shift);
-			}
-		}
-		++turns;
-		turn_is_ended = false;
-	}
-}
-
 void Game::process_normal_mode(int ch)
 {
 	switch(ch) {

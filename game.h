@@ -19,10 +19,9 @@ struct Game {
 	void generate();
 	bool load(const std::string & filename);
 	bool save(const std::string & filename) const;
-	void process(int ch);
 	int get_message_count() const;
 	const std::string & get_top_message() const;
-private:
+
 	bool turn_is_ended;
 	static std::map<int, Point> directions;
 

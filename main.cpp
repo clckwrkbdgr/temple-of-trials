@@ -52,9 +52,39 @@ int main()
 		game.generate();
 	}
 	while(game.mode != Game::EXIT_MODE) {
-		draw_game(console, game);
-		int ch = console.get_control();
-		game.process(ch);
+		game.turn_is_ended = false;
+		while(!game.turn_is_ended && game.mode != Game::EXIT_MODE) {
+			draw_game(console, game);
+			int ch = console.get_control();
+
+			if(game.messages.size() > 1) {
+				if(ch == ' ') {
+					game.messages.pop_front();
+				}
+				if(ch == 'q') {
+					game.mode = Game::EXIT_MODE;
+				}
+				continue;
+			}
+			if(game.messages.size() == 1) {
+				game.messages.pop_front();
+			}
+
+			switch(game.mode) {
+				case Game::OPEN_MODE: game.process_open_mode(ch); break;
+				case Game::CLOSE_MODE: game.process_close_mode(ch); break;
+				case Game::NORMAL_MODE: game.process_normal_mode(ch); break;
+				case Game::EXIT_MODE: break;
+				default: log("Unknown game mode!"); break;
+			}
+		}
+		for(unsigned i = 0; i < game.monsters.size(); ++i) {
+			if(game.monsters[i].ai == Monster::AI_WANDER) {
+				Point shift(rand() % 3 - 1, rand() % 3 - 1);
+				game.move(game.monsters[i], shift);
+			}
+		}
+		++game.turns;
 	}
 	game.save(SAVEFILE);
 
