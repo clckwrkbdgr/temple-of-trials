@@ -6,7 +6,6 @@
 
 struct Game {
 	Map map;
-	Monster player;
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;
 	bool done;

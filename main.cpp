@@ -23,7 +23,6 @@ void draw_game(Console & console, const Game & game)
 	for(unsigned i = 0; i < game.monsters.size(); ++i) {
 		console.print_tile(game.monsters[i].pos.x, game.monsters[i].pos.y, game.monsters[i].sprite);
 	}
-	console.print_tile(game.player.pos.x, game.player.pos.y, game.player.sprite);
 
 	std::string message;
 	if(game.messages.size() > 1) {
@@ -84,39 +83,41 @@ int main()
 	directions['n'] = Point(+1, +1);
 
 	while(!game.done) {
-		bool turn_is_ended = false;
-		while(!turn_is_ended && !game.done) {
-			int ch = draw_and_get_control(console, game);
-
-			if(ch == 'q') {
-				game.done = true;
-			} else if(directions.count(ch) != 0) {
-				game.move(game.player, directions[ch]);
-				turn_is_ended = true;
-			} else if(ch == 'o') {
-				ch = draw_and_get_control(console, game);
-				if(directions.count(ch) == 0) {
-					game.message("This is not a direction.");
-					continue;
-				}
-				game.open(game.player, directions[ch]);
-				turn_is_ended = true;
-			} else if(ch == 'c') {
-				ch = draw_and_get_control(console, game);
-				if(directions.count(ch) == 0) {
-					game.message("This is not a direction.");
-					continue;
-				}
-				game.close(game.player, directions[ch]);
-				turn_is_ended = true;
-			} else {
-				game.message(format("Unknown control '{0}'", char(ch)));
-			}
-		}
 		for(unsigned i = 0; i < game.monsters.size(); ++i) {
-			if(game.monsters[i].ai == Monster::AI_WANDER) {
+			Monster & monster = game.monsters[i];
+			if(monster.ai == Monster::AI_PLAYER) {
+				bool turn_is_ended = false;
+				while(!turn_is_ended && !game.done) {
+					int ch = draw_and_get_control(console, game);
+
+					if(ch == 'q') {
+						game.done = true;
+					} else if(directions.count(ch) != 0) {
+						game.move(monster, directions[ch]);
+						turn_is_ended = true;
+					} else if(ch == 'o') {
+						ch = draw_and_get_control(console, game);
+						if(directions.count(ch) == 0) {
+							game.message("This is not a direction.");
+							continue;
+						}
+						game.open(monster, directions[ch]);
+						turn_is_ended = true;
+					} else if(ch == 'c') {
+						ch = draw_and_get_control(console, game);
+						if(directions.count(ch) == 0) {
+							game.message("This is not a direction.");
+							continue;
+						}
+						game.close(monster, directions[ch]);
+						turn_is_ended = true;
+					} else {
+						game.message(format("Unknown control '{0}'", char(ch)));
+					}
+				}
+			} else if(monster.ai == Monster::AI_WANDER) {
 				Point shift(rand() % 3 - 1, rand() % 3 - 1);
-				game.move(game.monsters[i], shift);
+				game.move(monster, shift);
 			}
 		}
 		++game.turns;

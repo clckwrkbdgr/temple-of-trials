@@ -3,7 +3,7 @@
 #include <cstdlib>
 
 Game::Game()
-	: map(1, 1, Cell::floor()), player(), done(false), turns(0)
+	: map(1, 1, Cell::floor()), done(false), turns(0)
 {
 }
 
@@ -21,9 +21,6 @@ Point Game::find_random_free_cell() const
 		if(find_at(monsters, new_pos)) {
 			continue;
 		}
-		if(player.pos == new_pos) {
-			continue;
-		}
 		return new_pos;
 	}
 	return Point();
@@ -35,7 +32,7 @@ void Game::generate()
 	doors.clear();
 	monsters.clear();
 	map = Map(60, 23, Cell::floor());
-	player = Monster::player(find_random_free_cell());
+	monsters.push_back(Monster::player(find_random_free_cell()));
 	for(int i = 0; i < 10; ++i) {
 		Point point = find_random_free_cell();
 		if(point) {
@@ -86,10 +83,6 @@ void Game::move(Monster & someone, const Point & shift)
     Monster & monster = find_at(monsters, new_pos);
 	if(monster) {
 		message(format("{0} bump into {1}.", someone.name, monster.name));
-		return;
-	}
-	if(player.pos == new_pos) {
-		message(format("{0} bump into {1}.", someone.name, player.name));
 		return;
 	}
     someone.pos = new_pos;

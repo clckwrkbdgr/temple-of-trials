@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sys/stat.h>
 
-enum { SAVEFILE_VERSION = 5 };
+enum { SAVEFILE_VERSION = 6 };
 
 bool file_exists(const std::string & filename)
 {
@@ -75,11 +75,12 @@ bool Game::load(const std::string & filename)
 	}
 
 	int player_sprite;
+	Monster player;
 	if(version <= 3) {
 		in >> player.pos.x >> player.pos.y >> player_sprite;
 	} else if(version <= 4) {
 		in >> player.pos.x >> player.pos.y >> player_sprite >> player.ai;
-	} else {
+	} else if(version <= 5) {
 		in >> player.pos.x >> player.pos.y >> player_sprite >> player.ai;
 		player.name = read_string(in);
 	}
@@ -132,10 +133,6 @@ bool Game::save(const std::string & filename) const
 		}
 		out << '\n';
 	}
-	out << '\n';
-
-	out << player.pos.x << ' ' << player.pos.y << ' ' << int(player.sprite) << ' ' << player.ai << ' ';
-	out << escaped(player.name) << '\n';
 	out << '\n';
 
 	out << monsters.size() << '\n';
