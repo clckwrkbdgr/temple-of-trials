@@ -21,29 +21,20 @@ Monster::operator bool() const
     return bool(pos);
 }
 
-Monster Monster::player(const Point & monster_pos)
+
+Door::Door()
+	: opened_sprite(' '), closed_sprite(' '), opened(false)
 {
-	Monster player(monster_pos, '@', AI(AI::PLAYER));
-	player.name = "you";
-	return player;
 }
 
-Monster Monster::ant(const AI & ai, const Point & monster_pos)
-{
-	Monster ant(monster_pos, 'A', ai);
-	ant.name = "ant";
-	return ant;
-}
-
-
-Door::Door(const Point & door_pos, bool is_opened)
-	: pos(door_pos), opened(false)
+Door::Door(const Point & door_pos, const Sprite & opened_door_sprite, const Sprite & closed_door_sprite, bool is_opened)
+	: pos(door_pos), opened_sprite(opened_door_sprite), closed_sprite(closed_door_sprite), opened(false)
 {
 }
 
 Sprite Door::sprite() const
 {
-	return opened ? '-' : '+';
+	return opened ? opened_sprite : closed_sprite;
 }
 
 Door::operator bool() const

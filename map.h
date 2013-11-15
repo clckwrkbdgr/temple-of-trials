@@ -7,8 +7,7 @@ struct Cell {
 	bool passable;
 
 	explicit Cell(const Sprite & cell_sprite, bool is_passable = true);
-	static Cell floor();
-	static Cell wall();
+	Cell();
 };
 
 class Map {

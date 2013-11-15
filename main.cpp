@@ -1,8 +1,9 @@
-#include "console.h"
+#include "generate.h"
+#include "game.h"
 #include "map.h"
 #include "objects.h"
+#include "console.h"
 #include "util.h"
-#include "game.h"
 #include <map>
 #include <cstdlib>
 #include <cstdio>
@@ -69,7 +70,7 @@ int main()
 			return 1;
 		}
 	} else {
-		game.generate();
+		generate(game);
 	}
 
 	std::map<int, Point> directions;

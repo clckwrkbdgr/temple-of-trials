@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sys/stat.h>
 
-enum { SAVEFILE_VERSION = 7 };
+enum { SAVEFILE_VERSION = 8 };
 
 bool file_exists(const std::string & filename)
 {
@@ -63,7 +63,7 @@ bool Game::load(const std::string & filename)
 	unsigned width, height;
 	in >> width >> height;
 	CHECK(in, "map size");
-	map = Map(width, height, Cell::floor());
+	map = Map(width, height, Cell());
 	for(unsigned y = 0; y < map.get_height(); ++y) {
 		for(unsigned x = 0; x < map.get_width(); ++x) {
 			int sprite, passable;
@@ -115,7 +115,14 @@ bool Game::load(const std::string & filename)
 	CHECK(in, "door count");
 	doors.resize(doors_count);
 	for(unsigned i = 0; i < doors_count; ++i) {
-		in >> doors[i].pos.x >> doors[i].pos.y >> doors[i].opened;
+		if(version <= 7) {
+			in >> doors[i].pos.x >> doors[i].pos.y >> doors[i].opened;
+		} else {
+			int opened_sprite, closed_sprite;
+			in >> doors[i].pos.x >> doors[i].pos.y >> opened_sprite >> closed_sprite >> doors[i].opened;
+			doors[i].opened_sprite = opened_sprite;
+			doors[i].closed_sprite = closed_sprite;
+		}
 		CHECK(in, "door");
 	}
 	return true;
@@ -150,7 +157,9 @@ bool Game::save(const std::string & filename) const
 
 	out << doors.size() << '\n';
 	for(unsigned i = 0; i < doors.size(); ++i) {
-		out << doors[i].pos.x << ' ' << doors[i].pos.y << ' ' << int(doors[i].opened) << '\n';
+		out << doors[i].pos.x << ' ' << doors[i].pos.y << ' ';
+		out << int(doors[i].opened_sprite) << ' ' << int(doors[i].closed_sprite) << ' ';
+		out << int(doors[i].opened) << '\n';
 	}
 	out << '\n';
 

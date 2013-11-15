@@ -3,7 +3,7 @@
 #include <cstdlib>
 
 Game::Game()
-	: map(1, 1, Cell::floor()), done(false), turns(0)
+	: map(1, 1, Cell()), done(false), turns(0)
 {
 }
 
@@ -24,35 +24,6 @@ Point Game::find_random_free_cell() const
 		return new_pos;
 	}
 	return Point();
-}
-
-void Game::generate()
-{
-	log("Generating new game...");
-	doors.clear();
-	monsters.clear();
-	map = Map(60, 23, Cell::floor());
-	monsters.push_back(Monster::player(find_random_free_cell()));
-	for(int i = 0; i < 10; ++i) {
-		Point point = find_random_free_cell();
-		if(point) {
-			map.cell(point.x, point.y) = Cell::wall();
-		}
-	}
-	for(int i = 0; i < 5; ++i) {
-		Point point = find_random_free_cell();
-		if(point) {
-			doors.push_back(Door(point));
-		}
-	}
-	for(int i = 0; i < 5; ++i) {
-		Point point = find_random_free_cell();
-		if(point) {
-			AI ai(AI::MONSTER, (rand() % 2) ? AI::STILL : AI::WANDER);
-			monsters.push_back(Monster::ant(ai, point));
-		}
-	}
-	log("Done.");
 }
 
 void Game::message(std::string text)

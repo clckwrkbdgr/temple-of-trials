@@ -13,7 +13,6 @@ struct Game {
 	int turns;
 
 	Game();
-	void generate();
 	bool load(const std::string & filename);
 	bool save(const std::string & filename) const;
 	int get_message_count() const;

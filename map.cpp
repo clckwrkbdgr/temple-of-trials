@@ -6,14 +6,9 @@ Cell::Cell(const Sprite & cell_sprite, bool is_passable)
 {
 }
 
-Cell Cell::floor()
+Cell::Cell()
+	: sprite(' '), passable(false)
 {
-	return Cell(' ');
-}
-
-Cell Cell::wall()
-{
-	return Cell('#', false);
 }
 
 

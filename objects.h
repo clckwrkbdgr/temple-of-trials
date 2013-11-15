@@ -25,8 +25,10 @@ struct Monster {
 
 struct Door {
 	Point pos;
+	Sprite opened_sprite, closed_sprite;
 	bool opened;
-	explicit Door(const Point & door_pos = Point(), bool is_opened = false);
+	Door();
+	Door(const Point & door_pos, const Sprite & opened_door_sprite, const Sprite & closed_door_sprite, bool is_opened);
 	Sprite sprite() const;
 	operator bool() const;
 };
