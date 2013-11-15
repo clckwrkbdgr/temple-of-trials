@@ -5,13 +5,11 @@
 #include <list>
 
 struct Game {
-	enum { EXIT_MODE, NORMAL_MODE, OPEN_MODE, CLOSE_MODE };
-
 	Map map;
 	Monster player;
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;
-	int mode;
+	bool done;
 	std::list<std::string> messages;
 	int turns;
 

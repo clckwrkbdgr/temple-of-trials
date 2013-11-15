@@ -41,7 +41,7 @@ int draw_and_get_control(Console & console, Game & game)
 {
 	draw_game(console, game);
 	int ch = console.get_control();
-	while(game.mode != Game::EXIT_MODE) {
+	while(!game.messages.empty()) {
 		if(game.messages.size() > 1) {
 			switch(ch) {
 				case ' ': game.messages.pop_front(); break;
@@ -83,13 +83,13 @@ int main()
 	directions['b'] = Point(-1, +1);
 	directions['n'] = Point(+1, +1);
 
-	while(game.mode != Game::EXIT_MODE) {
+	while(!game.done) {
 		bool turn_is_ended = false;
-		while(!turn_is_ended && game.mode != Game::EXIT_MODE) {
+		while(!turn_is_ended && !game.done) {
 			int ch = draw_and_get_control(console, game);
 
 			if(ch == 'q') {
-				game.mode = Game::EXIT_MODE;
+				game.done = true;
 			} else if(directions.count(ch) != 0) {
 				game.move(game.player, directions[ch]);
 				turn_is_ended = true;

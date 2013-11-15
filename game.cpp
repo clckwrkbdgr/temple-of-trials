@@ -3,7 +3,7 @@
 #include <cstdlib>
 
 Game::Game()
-	: map(1, 1, Cell::floor()), player(), mode(NORMAL_MODE), turns(0)
+	: map(1, 1, Cell::floor()), player(), done(false), turns(0)
 {
 }
 
