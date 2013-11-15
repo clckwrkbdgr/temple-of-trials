@@ -37,10 +37,25 @@ void draw_game(Console & console, const Game & game)
 	console.print_stat(0, format("Turns: {0}", game.turns));
 }
 
-int draw_and_get_control(Console & console, const Game & game)
+int draw_and_get_control(Console & console, Game & game)
 {
 	draw_game(console, game);
-	return console.get_control();
+	int ch = console.get_control();
+	while(game.mode != Game::EXIT_MODE) {
+		if(game.messages.size() > 1) {
+			switch(ch) {
+				case ' ': game.messages.pop_front(); break;
+				default: break;
+			}
+			draw_game(console, game);
+			ch = console.get_control();
+			continue;
+		} else if(game.messages.size() == 1) {
+			game.messages.pop_front();
+		}
+		break;
+	}
+	return ch;
 }
 
 int main()
@@ -73,40 +88,21 @@ int main()
 		while(!turn_is_ended && game.mode != Game::EXIT_MODE) {
 			int ch = draw_and_get_control(console, game);
 
-			if(game.messages.size() > 1) {
-				switch(ch) {
-					case ' ': game.messages.pop_front(); break;
-					case 'q': game.mode = Game::EXIT_MODE; break;
-					default: break;
-				}
-				continue;
-			} else if(game.messages.size() == 1) {
-				game.messages.pop_front();
-			}
-
-			if(game.mode == Game::NORMAL_MODE) {
-				switch(ch) {
-					case 'o': game.mode = Game::OPEN_MODE; continue;
-					case 'c': game.mode = Game::CLOSE_MODE; continue;
-					case 'q': game.mode = Game::EXIT_MODE; continue;
-					default: break;
-				}
-				if(directions.count(ch) == 0) {
-					game.message(format("Unknown control '{0}'", char(ch)));
-					continue;
-				}
+			if(ch == 'q') {
+				game.mode = Game::EXIT_MODE;
+			} else if(directions.count(ch) != 0) {
 				game.move(game.player, directions[ch]);
 				turn_is_ended = true;
-			} else if(game.mode == Game::OPEN_MODE) {
-				game.mode = Game::NORMAL_MODE;
+			} else if(ch == 'o') {
+				ch = draw_and_get_control(console, game);
 				if(directions.count(ch) == 0) {
 					game.message("This is not a direction.");
 					continue;
 				}
 				game.open(game.player, directions[ch]);
 				turn_is_ended = true;
-			} else if(game.mode == Game::CLOSE_MODE) {
-				game.mode = Game::NORMAL_MODE;
+			} else if(ch == 'c') {
+				ch = draw_and_get_control(console, game);
 				if(directions.count(ch) == 0) {
 					game.message("This is not a direction.");
 					continue;
@@ -114,8 +110,7 @@ int main()
 				game.close(game.player, directions[ch]);
 				turn_is_ended = true;
 			} else {
-				log("Unknown game mode!");
-				game.mode = Game::EXIT_MODE;
+				game.message(format("Unknown control '{0}'", char(ch)));
 			}
 		}
 		for(unsigned i = 0; i < game.monsters.size(); ++i) {
