@@ -48,7 +48,7 @@ void Game::generate()
 	for(int i = 0; i < 5; ++i) {
 		Point point = find_random_free_cell();
 		if(point) {
-			int ai = (rand() % 2) ? Monster::AI_STILL : Monster::AI_WANDER;
+			AI ai(AI::MONSTER, (rand() % 2) ? AI::STILL : AI::WANDER);
 			monsters.push_back(Monster::ant(ai, point));
 		}
 	}

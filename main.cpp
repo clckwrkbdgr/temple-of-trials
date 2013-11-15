@@ -85,7 +85,7 @@ int main()
 	while(!game.done) {
 		for(unsigned i = 0; i < game.monsters.size(); ++i) {
 			Monster & monster = game.monsters[i];
-			if(monster.ai == Monster::AI_PLAYER) {
+			if(monster.ai.faction == AI::PLAYER) {
 				bool turn_is_ended = false;
 				while(!turn_is_ended && !game.done) {
 					int ch = draw_and_get_control(console, game);
@@ -115,9 +115,13 @@ int main()
 						game.message(format("Unknown control '{0}'", char(ch)));
 					}
 				}
-			} else if(monster.ai == Monster::AI_WANDER) {
-				Point shift(rand() % 3 - 1, rand() % 3 - 1);
-				game.move(monster, shift);
+			} else if(monster.ai.faction == AI::MONSTER) {
+				switch(monster.ai.movement) {
+					case AI::WANDER:
+						game.move(monster, Point(rand() % 3 - 1, rand() % 3 - 1));
+						break;
+					default: break;
+				}
 			}
 		}
 		++game.turns;

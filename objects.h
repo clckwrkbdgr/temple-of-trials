@@ -1,18 +1,26 @@
 #pragma once
 #include "util.h"
 
+struct AI {
+	enum Faction { DUMMY, PLAYER, MONSTER };
+	enum Movement { STILL, WANDER };
+
+	int faction;
+	int movement;
+	AI(int ai_faction = DUMMY, int ai_movement = STILL);
+};
+
 struct Monster {
-	enum AI { AI_PLAYER, AI_STILL, AI_WANDER };
 	Point pos;
 	Sprite sprite;
-	int ai;
+	AI ai;
 	std::string name;
-	Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_ai);
+	Monster(const Point & monster_pos, const Sprite & monster_sprite, const AI & monster_ai);
 	Monster();
 	operator bool() const;
 
 	static Monster player(const Point & monster_pos);
-	static Monster ant(int monster_ai, const Point & monster_pos);
+	static Monster ant(const AI & monster_ai, const Point & monster_pos);
 };
 
 struct Door {

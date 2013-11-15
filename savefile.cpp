@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sys/stat.h>
 
-enum { SAVEFILE_VERSION = 6 };
+enum { SAVEFILE_VERSION = 7 };
 
 bool file_exists(const std::string & filename)
 {
@@ -74,18 +74,16 @@ bool Game::load(const std::string & filename)
 		}
 	}
 
-	int player_sprite;
-	Monster player;
+	int player_sprite, player_pos_x, player_pos_y, player_ai;
 	if(version <= 3) {
-		in >> player.pos.x >> player.pos.y >> player_sprite;
+		in >> player_pos_x >> player_pos_y >> player_sprite;
 	} else if(version <= 4) {
-		in >> player.pos.x >> player.pos.y >> player_sprite >> player.ai;
+		in >> player_pos_x >> player_pos_y >> player_sprite >> player_ai;
 	} else if(version <= 5) {
-		in >> player.pos.x >> player.pos.y >> player_sprite >> player.ai;
-		player.name = read_string(in);
+		in >> player_pos_x >> player_pos_y >> player_sprite >> player_ai;
+		read_string(in);
 	}
 	CHECK(in, "player");
-	player.sprite = player_sprite;
 
 	unsigned monsters_count;
 	in >> monsters_count;
@@ -96,9 +94,16 @@ bool Game::load(const std::string & filename)
 		if(version <= 3) {
 			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite;
 		} else if(version <= 4) {
-			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite >> monsters[i].ai;
+			int ai;
+			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite >> ai;
+			monsters[i].ai = AI(ai == 0 ? AI::PLAYER : AI::MONSTER, ai == 1 ? AI::STILL : AI::WANDER);
+		} else if(version <= 6) {
+			int ai;
+			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite >> ai;
+			monsters[i].ai = AI(ai == 0 ? AI::PLAYER : AI::MONSTER, ai == 1 ? AI::STILL : AI::WANDER);
 		} else {
-			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite >> monsters[i].ai;
+			in >> monsters[i].pos.x >> monsters[i].pos.y >> monster_sprite;
+			in >> monsters[i].ai.faction >> monsters[i].ai.movement;
 			monsters[i].name = read_string(in);
 		}
 		CHECK(in, "monster");
@@ -137,7 +142,8 @@ bool Game::save(const std::string & filename) const
 
 	out << monsters.size() << '\n';
 	for(unsigned i = 0; i < monsters.size(); ++i) {
-		out << monsters[i].pos.x << ' ' << monsters[i].pos.y << ' ' << int(monsters[i].sprite) << ' ' << monsters[i].ai << ' ';
+		out << monsters[i].pos.x << ' ' << monsters[i].pos.y << ' ' << int(monsters[i].sprite) << ' ';
+		out << monsters[i].ai.faction << ' ' << monsters[i].ai.movement << ' ';
 		out << escaped(monsters[i].name) << '\n';
 	}
 	out << '\n';
