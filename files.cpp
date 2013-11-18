@@ -88,12 +88,6 @@ Reader & Reader::store(unsigned int & value)
 	return *this;
 }
 
-Reader & Reader::store(size_t & value)
-{
-	in >> value;
-	return *this;
-}
-
 Reader & Reader::store(char & value)
 {
 	int stored_value;
@@ -159,12 +153,6 @@ Writer & Writer::store(int value)
 }
 
 Writer & Writer::store(unsigned int value)
-{
-	out << value << ' ';
-	return *this;
-}
-
-Writer & Writer::store(size_t value)
 {
 	out << value << ' ';
 	return *this;

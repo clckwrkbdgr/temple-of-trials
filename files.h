@@ -18,7 +18,6 @@ public:
 	
 	Reader & store(int & value);
 	Reader & store(unsigned int & value);
-	Reader & store(size_t & value);
 	Reader & store(char & value);
 	Reader & store(bool & value);
 	Reader & store(std::string & value);
@@ -51,7 +50,6 @@ public:
 	
 	Writer & store(int value);
 	Writer & store(unsigned int value);
-	Writer & store(size_t value);
 	Writer & store(char value);
 	Writer & store(bool value);
 	Writer & store(const std::string & value);

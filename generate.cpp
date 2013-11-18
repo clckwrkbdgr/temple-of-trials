@@ -1,5 +1,6 @@
 #include "generate.h"
 #include "game.h"
+#include <cstdlib>
 
 namespace World {
 
