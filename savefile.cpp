@@ -129,39 +129,114 @@ bool Game::load(const std::string & filename)
 }
 #undef CHECK
 
+class Writer {
+public:
+	struct Exception {
+		std::string message;
+		Exception(const std::string text) : message(text) {}
+	};
+	Writer(const std::string & filename);
+
+	Writer & newline();
+	Writer & store(int value);
+	Writer & store(unsigned int value);
+	Writer & store(size_t value);
+	Writer & store(char value);
+	Writer & store(bool value);
+	Writer & store(const std::string & value);
+private:
+	std::ofstream out;
+};
+
+Writer::Writer(const std::string & filename)
+	: out(filename.c_str(), std::ios::out)
+{
+	if(!out) {
+		throw Exception(format("Cannot open file '{0}' for writing!", filename));
+	}
+}
+
+Writer & Writer::newline()
+{
+	out << '\n';
+	return *this;
+}
+
+Writer & Writer::store(int value)
+{
+	out << value << ' ';
+	return *this;
+}
+
+Writer & Writer::store(unsigned int value)
+{
+	out << value << ' ';
+	return *this;
+}
+
+Writer & Writer::store(size_t value)
+{
+	out << value << ' ';
+	return *this;
+}
+
+Writer & Writer::store(char value)
+{
+	out << int(value) << ' ';
+	return *this;
+}
+
+Writer & Writer::store(bool value)
+{
+	out << int(value) << ' ';
+	return *this;
+}
+
+Writer & Writer::store(const std::string & value)
+{
+	out << escaped(value) << ' ';
+	return *this;
+}
+
 bool Game::save(const std::string & filename) const
 {
-	std::ofstream out(filename.c_str(), std::ios::out);
-	if(!out) {
-		log(format("Cannot open file '{0}' for writing!", filename));
+	try {
+		Writer out(filename);
+		out.store(SAVEFILE_VERSION);
+		out.newline();
+		out.store(map.get_width()).store(map.get_height());
+		out.newline();
+		for(unsigned y = 0; y < map.get_height(); ++y) {
+			for(unsigned x = 0; x < map.get_width(); ++x) {
+				out.store(map.cell(x, y).sprite).store(map.cell(x, y).passable);
+			}
+			out.newline();
+		}
+		out.newline();
+
+		out.store(monsters.size());
+		out.newline();
+		for(unsigned i = 0; i < monsters.size(); ++i) {
+			out.store(monsters[i].pos.x).store(monsters[i].pos.y).store(monsters[i].sprite);
+			out.store(monsters[i].ai.faction).store(monsters[i].ai.movement);
+			out.store(monsters[i].name);
+			out.newline();
+		}
+		out.newline();
+
+		out.store(doors.size());
+		out.newline();
+		for(unsigned i = 0; i < doors.size(); ++i) {
+			out.store(doors[i].pos.x).store(doors[i].pos.y);
+			out.store(doors[i].opened_sprite).store(doors[i].closed_sprite);
+			out.store(doors[i].opened);
+			out.newline();
+		}
+		out.newline();
+	} catch(const Writer::Exception & e) {
+		log(e.message);
 		return false;
 	}
-
-	out << SAVEFILE_VERSION << '\n';
-	out << map.get_width() << ' ' << map.get_height() << '\n';
-	for(unsigned y = 0; y < map.get_height(); ++y) {
-		for(unsigned x = 0; x < map.get_width(); ++x) {
-			out << int(map.cell(x, y).sprite) << ' ' << int(map.cell(x, y).passable) << ' ';
-		}
-		out << '\n';
-	}
-	out << '\n';
-
-	out << monsters.size() << '\n';
-	for(unsigned i = 0; i < monsters.size(); ++i) {
-		out << monsters[i].pos.x << ' ' << monsters[i].pos.y << ' ' << int(monsters[i].sprite) << ' ';
-		out << monsters[i].ai.faction << ' ' << monsters[i].ai.movement << ' ';
-		out << escaped(monsters[i].name) << '\n';
-	}
-	out << '\n';
-
-	out << doors.size() << '\n';
-	for(unsigned i = 0; i < doors.size(); ++i) {
-		out << doors[i].pos.x << ' ' << doors[i].pos.y << ' ';
-		out << int(doors[i].opened_sprite) << ' ' << int(doors[i].closed_sprite) << ' ';
-		out << int(doors[i].opened) << '\n';
-	}
-	out << '\n';
 
 	return true;
 }
