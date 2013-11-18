@@ -1,13 +1,19 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_VERSION = 8 };
+enum { SAVEFILE_VERSION = 9 };
 
 template<class Savefile, class Game>
 void store(Savefile & savefile, Game & game)
 {
 	savefile.version(SAVEFILE_VERSION);
 	savefile.newline();
+
+	if(savefile.version() > 8) {
+		savefile.store(game.turns);
+		savefile.newline();
+	}
+
 	savefile.size_of(game.map);
 	savefile.newline();
 	savefile.check("map size");
