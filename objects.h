@@ -13,9 +13,10 @@ struct AI {
 struct Monster {
 	Point pos;
 	Sprite sprite;
+	int sight;
 	AI ai;
 	std::string name;
-	Monster(const Point & monster_pos, const Sprite & monster_sprite, const AI & monster_ai);
+	Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_sight, const AI & monster_ai);
 	Monster();
 	operator bool() const;
 

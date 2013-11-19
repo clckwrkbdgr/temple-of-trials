@@ -6,13 +6,13 @@ AI::AI(int ai_faction, int ai_movement)
 }
 
 
-Monster::Monster(const Point & monster_pos, const Sprite & monster_sprite, const AI & monster_ai)
-	: pos(monster_pos), sprite(monster_sprite), ai(monster_ai)
+Monster::Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_sight, const AI & monster_ai)
+	: pos(monster_pos), sprite(monster_sprite), sight(monster_sight), ai(monster_ai)
 {
 }
 
 Monster::Monster()
-	: sprite(' ')
+	: sprite(' '), sight(0)
 {
 }
 

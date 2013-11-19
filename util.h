@@ -45,6 +45,8 @@ T & find_at(std::vector<T> & container, const Point & pos)
     return empty;
 }
 
+int distance(const Point & a, const Point & b);
+
 
 typedef char Sprite;
 

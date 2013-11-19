@@ -123,11 +123,13 @@ int main()
 						break;
 					case AI::CHASE: {
 						const Monster & player = game.getPlayer();
-						Point shift = Point(
-								sign(player.pos.x - monster.pos.x),
-								sign(player.pos.y - monster.pos.y)
-								);
-						game.move(monster, shift);
+						if(distance(player.pos, monster.pos) <= monster.sight) {
+							Point shift = Point(
+									sign(player.pos.x - monster.pos.x),
+									sign(player.pos.y - monster.pos.y)
+									);
+							game.move(monster, shift);
+						}
 					}
 					default: break;
 				}

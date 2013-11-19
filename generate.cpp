@@ -16,14 +16,14 @@ Cell wall()
 
 Monster player(const Point & monster_pos)
 {
-	Monster player(monster_pos, '@', AI(AI::PLAYER));
+	Monster player(monster_pos, '@', 10, AI(AI::PLAYER));
 	player.name = "you";
 	return player;
 }
 
 Monster ant(const AI & ai, const Point & monster_pos)
 {
-	Monster ant(monster_pos, 'A', ai);
+	Monster ant(monster_pos, 'A', 6, ai);
 	ant.name = "ant";
 	return ant;
 }

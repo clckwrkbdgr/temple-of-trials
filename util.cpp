@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <cmath>
 
 std::string now()
 {
@@ -41,6 +42,13 @@ Point::operator bool() const
 Point operator+(const Point & a, const Point & b)
 {
 	return Point(a.x + b.x, a.y + b.y);
+}
+
+int distance(const Point & a, const Point & b)
+{
+	int x = a.x - b.x;
+	int y = a.y - b.y;
+	return int(std::sqrt(x * x + y * y));
 }
 
 std::string to_string(int value)
