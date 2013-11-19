@@ -1,3 +1,4 @@
+#include "ai.h"
 #include "game.h"
 #include <map>
 #include <cstdlib>
@@ -35,7 +36,7 @@ Point Game::find_random_free_cell() const
 const Monster & Game::getPlayer() const
 {
 	for(unsigned i = 0; i < monsters.size(); ++i) {
-		if(monsters[i].ai.faction == AI::PLAYER) {
+		if(monsters[i].ai == AI::PLAYER) {
 			return monsters[i];
 		}
 	}

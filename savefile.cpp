@@ -1,7 +1,46 @@
+#include "ai.h"
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_VERSION = 11 };
+enum { SAVEFILE_VERSION = 12 };
+
+void store_ai(Reader & savefile, Monster & monster)
+{
+	int faction, movement, temper;
+	savefile.store(faction).store(movement);
+	if(savefile.version() >= 11) {
+		savefile.store(temper);
+	}
+	if(faction == 0) {
+		monster.ai = AI::PLAYER;
+	} else {
+		if(movement == 0 && temper == 0) {
+			monster.ai = AI::CALM_AND_STILL;
+		} else if(movement == 0 && temper == 1) {
+			monster.ai = AI::ANGRY_AND_STILL;
+		} else if(movement == 1 && temper == 0) {
+			monster.ai = AI::CALM_AND_WANDER;
+		} else if(movement == 1 && temper == 1) {
+			monster.ai = AI::ANGRY_AND_WANDER;
+		}
+	}
+}
+
+void store_ai(Writer & savefile, const Monster & monster)
+{
+	int faction = 0, movement = 0, temper = 0;
+	switch(monster.ai) {
+		case AI::PLAYER: faction = 0; break;
+		case AI::ANGRY_AND_WANDER: movement = 1; temper = 1; break;
+		case AI::ANGRY_AND_STILL: movement = 0; temper = 1; break;
+		case AI::CALM_AND_WANDER: movement = 1; temper = 0; break;
+		case AI::CALM_AND_STILL: movement = 0; temper = 0; break;
+	}
+	savefile.store(faction).store(movement);
+	if(savefile.version() >= 11) {
+		savefile.store(temper);
+	}
+}
 
 template<class Savefile, class Game>
 void store(Savefile & savefile, Game & game)
@@ -34,9 +73,10 @@ void store(Savefile & savefile, Game & game)
 		if(savefile.version() >= 10) {
 			savefile.store(game.monsters[i].sight);
 		}
-		savefile.store(game.monsters[i].ai.faction).store(game.monsters[i].ai.movement);
-		if(savefile.version() >= 11) {
-			savefile.store(game.monsters[i].ai.temper);
+		if(savefile.version() <= 11) {
+			store_ai(savefile, game.monsters[i]);
+		} else {
+			savefile.store(game.monsters[i].ai);
 		}
 		savefile.store(game.monsters[i].name);
 		savefile.newline();

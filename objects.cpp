@@ -1,12 +1,6 @@
 #include "objects.h"
 
-AI::AI(int ai_faction, int ai_movement, int ai_temper)
-	: faction(ai_faction), movement(ai_movement), temper(ai_temper)
-{
-}
-
-
-Monster::Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_sight, const AI & monster_ai)
+Monster::Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_sight, int monster_ai)
 	: pos(monster_pos), sprite(monster_sprite), sight(monster_sight), ai(monster_ai)
 {
 }

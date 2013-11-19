@@ -1,4 +1,5 @@
 #include "generate.h"
+#include "ai.h"
 #include "game.h"
 #include "map.h"
 #include "objects.h"
@@ -100,30 +101,6 @@ Control get_player_control(Console & console, Game & game)
 	return Control();
 }
 
-Control get_ai_control(Monster & monster, Game & game)
-{
-	const Monster & player = game.getPlayer();
-	int d = distance(monster.pos, player.pos);
-	if(1 <= d && d <= monster.sight) {
-		switch(monster.ai.temper) {
-			case AI::TEMPER_ANGRY: {
-				Point shift = Point(
-						sign(player.pos.x - monster.pos.x),
-						sign(player.pos.y - monster.pos.y)
-						);
-				return Control(Control::MOVE, shift);
-			}
-			default: break;
-		}
-	}
-	switch(monster.ai.movement) {
-		case AI::MOVE_WANDER:
-			return Control(Control::MOVE, Point(rand() % 3 - 1, rand() % 3 - 1));
-		default: break;
-	}
-	return Control();
-}
-
 int main()
 {
 	srand(time(0));
@@ -143,10 +120,13 @@ int main()
 		for(unsigned i = 0; i < game.monsters.size(); ++i) {
 			Monster & monster = game.monsters[i];
 			Control control;
-			if(monster.ai.faction == AI::PLAYER) {
-				control = get_player_control(console, game);
-			} else if(monster.ai.faction == AI::MONSTER) {
-				control = get_ai_control(monster, game);
+			switch(monster.ai) {
+				case AI::PLAYER: control = get_player_control(console, game); break;
+				case AI::ANGRY_AND_WANDER: control = angry_and_wander(monster, game); break;
+				case AI::ANGRY_AND_STILL: control = angry_and_still(monster, game); break;
+				case AI::CALM_AND_WANDER: control = calm_and_wander(monster, game); break;
+				case AI::CALM_AND_STILL: control = calm_and_still(monster, game); break;
+				default: break;
 			}
 			switch(control.control) {
 				case Control::MOVE: game.move(monster, control.direction); break;

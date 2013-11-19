@@ -1,4 +1,5 @@
 #include "generate.h"
+#include "ai.h"
 #include "game.h"
 #include <cstdlib>
 
@@ -16,12 +17,12 @@ Cell wall()
 
 Monster player(const Point & monster_pos)
 {
-	Monster player(monster_pos, '@', 10, AI(AI::PLAYER));
+	Monster player(monster_pos, '@', 10, AI::PLAYER);
 	player.name = "you";
 	return player;
 }
 
-Monster ant(const AI & ai, const Point & monster_pos)
+Monster ant(int ai, const Point & monster_pos)
 {
 	Monster ant(monster_pos, 'A', 6, ai);
 	ant.name = "ant";
@@ -57,11 +58,7 @@ void generate(Game & game)
 	for(int i = 0; i < 5; ++i) {
 		Point point = game.find_random_free_cell();
 		if(point) {
-			AI ai(
-					AI::MONSTER,
-					(rand() % 2) ? AI::MOVE_STILL : AI::MOVE_WANDER,
-					(rand() % 2) ? AI::TEMPER_CALM : AI::TEMPER_ANGRY
-				 );
+			int ai = rand() % 4 + 1;
 			game.monsters.push_back(World::ant(ai, point));
 		}
 	}
