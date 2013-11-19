@@ -2,6 +2,12 @@
 #include <map>
 #include <cstdlib>
 
+Control::Control(int control_value, const Point & control_direction)
+	: control(control_value), direction(control_direction)
+{
+}
+
+
 Game::Game()
 	: map(1, 1, Cell()), done(false), turns(0)
 {

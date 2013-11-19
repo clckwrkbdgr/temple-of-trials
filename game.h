@@ -4,6 +4,14 @@
 #include <map>
 #include <list>
 
+struct Control {
+	enum { NONE, OPEN, CLOSE, MOVE };
+	int control;
+	Point direction;
+	Control(int control = NONE, const Point & direction = Point());
+	bool done() const { return control != NONE; }
+};
+
 struct Game {
 	Map map;
 	std::vector<Monster> monsters;
