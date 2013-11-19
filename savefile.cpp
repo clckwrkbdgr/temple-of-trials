@@ -1,7 +1,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_VERSION = 10 };
+enum { SAVEFILE_VERSION = 11 };
 
 template<class Savefile, class Game>
 void store(Savefile & savefile, Game & game)
@@ -31,10 +31,13 @@ void store(Savefile & savefile, Game & game)
 	savefile.check("monster count");
 	for(unsigned i = 0; i < game.monsters.size(); ++i) {
 		savefile.store(game.monsters[i].pos.x).store(game.monsters[i].pos.y).store(game.monsters[i].sprite);
-		if(savefile.version() > 9) {
+		if(savefile.version() >= 10) {
 			savefile.store(game.monsters[i].sight);
 		}
 		savefile.store(game.monsters[i].ai.faction).store(game.monsters[i].ai.movement);
+		if(savefile.version() >= 11) {
+			savefile.store(game.monsters[i].ai.temper);
+		}
 		savefile.store(game.monsters[i].name);
 		savefile.newline();
 		savefile.check("monster");

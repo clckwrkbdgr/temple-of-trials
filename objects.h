@@ -3,11 +3,13 @@
 
 struct AI {
 	enum Faction { DUMMY, PLAYER, MONSTER };
-	enum Movement { STILL, WANDER, CHASE };
+	enum Movement { MOVE_STILL, MOVE_WANDER };
+	enum Temper { TEMPER_CALM, TEMPER_ANGRY };
 
 	int faction;
 	int movement;
-	AI(int ai_faction = DUMMY, int ai_movement = STILL);
+	int temper;
+	AI(int ai_faction = DUMMY, int ai_movement = MOVE_STILL, int ai_temper = TEMPER_CALM);
 };
 
 struct Monster {

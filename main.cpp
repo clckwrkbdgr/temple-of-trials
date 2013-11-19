@@ -117,20 +117,31 @@ int main()
 					}
 				}
 			} else if(monster.ai.faction == AI::MONSTER) {
-				switch(monster.ai.movement) {
-					case AI::WANDER:
-						game.move(monster, Point(rand() % 3 - 1, rand() % 3 - 1));
-						break;
-					case AI::CHASE: {
-						const Monster & player = game.getPlayer();
-						if(distance(player.pos, monster.pos) <= monster.sight) {
+				const Monster & player = game.getPlayer();
+				bool turn_is_ended = false;
+				int d = distance(monster.pos, player.pos);
+				if(1 <= d && d <= monster.sight) {
+					switch(monster.ai.temper) {
+						case AI::TEMPER_ANGRY: {
 							Point shift = Point(
 									sign(player.pos.x - monster.pos.x),
 									sign(player.pos.y - monster.pos.y)
 									);
 							game.move(monster, shift);
+							turn_is_ended = true;
+							break;
 						}
+						default: break;
 					}
+				}
+				if(turn_is_ended) {
+					continue;
+				}
+				switch(monster.ai.movement) {
+					case AI::MOVE_WANDER:
+						game.move(monster, Point(rand() % 3 - 1, rand() % 3 - 1));
+						turn_is_ended = true;
+						break;
 					default: break;
 				}
 			}

@@ -1,7 +1,7 @@
 #include "objects.h"
 
-AI::AI(int ai_faction, int ai_movement)
-	: faction(ai_faction), movement(ai_movement)
+AI::AI(int ai_faction, int ai_movement, int ai_temper)
+	: faction(ai_faction), movement(ai_movement), temper(ai_temper)
 {
 }
 
