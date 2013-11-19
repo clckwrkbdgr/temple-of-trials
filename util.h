@@ -5,6 +5,12 @@
 std::string now();
 void log(const std::string & message);
 
+template<typename T>
+int sign(T val)
+{
+	return (T(0) < val) - (val < T(0));
+}
+
 struct Point {
 	int x, y;
 	Point(int _x, int _y);

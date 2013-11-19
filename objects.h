@@ -3,7 +3,7 @@
 
 struct AI {
 	enum Faction { DUMMY, PLAYER, MONSTER };
-	enum Movement { STILL, WANDER };
+	enum Movement { STILL, WANDER, CHASE };
 
 	int faction;
 	int movement;

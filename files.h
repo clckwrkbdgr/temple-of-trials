@@ -57,7 +57,7 @@ public:
 	template<class T>
 	Writer & size_of(const std::vector<T> & v)
 	{
-		store(v.size());
+		store(unsigned(v.size()));
 		return *this;
 	}
 private:

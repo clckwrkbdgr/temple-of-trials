@@ -121,6 +121,14 @@ int main()
 					case AI::WANDER:
 						game.move(monster, Point(rand() % 3 - 1, rand() % 3 - 1));
 						break;
+					case AI::CHASE: {
+						const Monster & player = game.getPlayer();
+						Point shift = Point(
+								sign(player.pos.x - monster.pos.x),
+								sign(player.pos.y - monster.pos.y)
+								);
+						game.move(monster, shift);
+					}
 					default: break;
 				}
 			}

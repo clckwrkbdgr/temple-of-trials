@@ -21,6 +21,8 @@ struct Game {
 	void message(std::string text);
 	Point find_random_free_cell() const;
 
+	const Monster & getPlayer() const;
+
 	void move(Monster & someone, const Point & shift);
 	void open(Monster & someone, const Point & shift);
 	void close(Monster & someone, const Point & shift);

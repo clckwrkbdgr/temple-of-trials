@@ -26,6 +26,17 @@ Point Game::find_random_free_cell() const
 	return Point();
 }
 
+const Monster & Game::getPlayer() const
+{
+	for(unsigned i = 0; i < monsters.size(); ++i) {
+		if(monsters[i].ai.faction == AI::PLAYER) {
+			return monsters[i];
+		}
+	}
+	static Monster empty;
+	return empty;
+}
+
 void Game::message(std::string text)
 {
 	if(text.empty()) {
