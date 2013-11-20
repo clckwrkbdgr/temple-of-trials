@@ -5,7 +5,7 @@
 #include <list>
 
 struct Control {
-	enum { NONE, OPEN, CLOSE, MOVE };
+	enum { NONE, OPEN, CLOSE, MOVE, WAIT };
 	int control;
 	Point direction;
 	Control(int control = NONE, const Point & direction = Point());

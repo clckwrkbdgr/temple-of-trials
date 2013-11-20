@@ -36,6 +36,8 @@ Control player_control(Monster & player, Game & game)
 
 		if(ch == 'q') {
 			game.done = true;
+		} else if(ch == '.') {
+			return Control(Control::WAIT);
 		} else if(directions.count(ch) != 0) {
 			return Control(Control::MOVE, directions[ch]);
 		} else if(ch == 'o') {
@@ -84,7 +86,7 @@ Control angry_and_still(Monster & monster, Game & game)
 				);
 		return Control(Control::MOVE, shift);
 	}
-	return Control();
+	return Control(Control::WAIT);
 }
 
 Control calm_and_wander(Monster & monster, Game & game)
@@ -94,6 +96,6 @@ Control calm_and_wander(Monster & monster, Game & game)
 
 Control calm_and_still(Monster & monster, Game & game)
 {
-	return Control();
+	return Control(Control::WAIT);
 }
 
