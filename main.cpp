@@ -105,7 +105,6 @@ int main()
 {
 	srand(time(0));
 	log("Log started: " + now());
-	Console console;
 	Game game;
 	if(game.load(SAVEFILE)) {
 		if(remove(SAVEFILE.c_str()) != 0) {
@@ -121,7 +120,7 @@ int main()
 			Monster & monster = game.monsters[i];
 			Control control;
 			switch(monster.ai) {
-				case AI::PLAYER: control = get_player_control(console, game); break;
+				case AI::PLAYER: control = get_player_control(Console::instance(), game); break;
 				case AI::ANGRY_AND_WANDER: control = angry_and_wander(monster, game); break;
 				case AI::ANGRY_AND_STILL: control = angry_and_still(monster, game); break;
 				case AI::CALM_AND_WANDER: control = calm_and_wander(monster, game); break;
