@@ -3,6 +3,19 @@
 #include "game.h"
 #include "objects.h"
 
+Controller get_controller(int ai)
+{
+	switch(ai) {
+		case AI::PLAYER: return player_control;
+		case AI::ANGRY_AND_WANDER: return angry_and_wander;
+		case AI::ANGRY_AND_STILL: return angry_and_still;
+		case AI::CALM_AND_WANDER: return calm_and_wander;
+		case AI::CALM_AND_STILL: return calm_and_still;
+		default: break;
+	}
+	return 0;
+}
+
 Control player_control(Monster & player, Game & game)
 {
 	static std::map<int, Point> directions;

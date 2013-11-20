@@ -28,15 +28,12 @@ int main()
 	while(!game.done) {
 		for(unsigned i = 0; i < game.monsters.size(); ++i) {
 			Monster & monster = game.monsters[i];
-			Control control;
-			switch(monster.ai) {
-				case AI::PLAYER: control = player_control(monster, game); break;
-				case AI::ANGRY_AND_WANDER: control = angry_and_wander(monster, game); break;
-				case AI::ANGRY_AND_STILL: control = angry_and_still(monster, game); break;
-				case AI::CALM_AND_WANDER: control = calm_and_wander(monster, game); break;
-				case AI::CALM_AND_STILL: control = calm_and_still(monster, game); break;
-				default: break;
+			Controller controller = get_controller(monster.ai);
+			if(!controller) {
+				log(format("No controller found for AI #{0}!", monster.ai));
+				continue;
 			}
+			Control control = controller(monster, game);
 			switch(control.control) {
 				case Control::MOVE: game.move(monster, control.direction); break;
 				case Control::OPEN: game.open(monster, control.direction); break;
