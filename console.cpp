@@ -1,4 +1,5 @@
 #include "console.h"
+#include "game.h"
 #include <ncurses.h>
 
 enum {
@@ -52,5 +53,53 @@ Console & Console::instance()
 {
 	static Console console;
 	return console;
+}
+
+void Console::draw_game(const Game & game)
+{
+	clear();
+	for(unsigned x = 0; x < game.map.get_width(); ++x) {
+		for(unsigned y = 0; y < game.map.get_height(); ++y) {
+			print_tile(x, y, game.map.cell(x, y).sprite);
+		}
+	}
+	for(unsigned i = 0; i < game.doors.size(); ++i) {
+		print_tile(game.doors[i].pos.x, game.doors[i].pos.y, game.doors[i].sprite());
+	}
+	for(unsigned i = 0; i < game.monsters.size(); ++i) {
+		print_tile(game.monsters[i].pos.x, game.monsters[i].pos.y, game.monsters[i].sprite);
+	}
+
+	std::string message;
+	if(game.messages.size() > 1) {
+		message += format("({0}) ", game.messages.size());
+	}
+	if(!game.messages.empty()) {
+		message += game.messages.front();
+	}
+	print_message(message);
+
+	print_stat(0, format("Turns: {0}", game.turns));
+}
+
+int Console::draw_and_get_control(Game & game)
+{
+	draw_game(game);
+	int ch = get_control();
+	while(!game.messages.empty()) {
+		if(game.messages.size() > 1) {
+			switch(ch) {
+				case ' ': game.messages.pop_front(); break;
+				default: break;
+			}
+			draw_game(game);
+			ch = get_control();
+			continue;
+		} else if(game.messages.size() == 1) {
+			game.messages.pop_front();
+		}
+		break;
+	}
+	return ch;
 }
 
