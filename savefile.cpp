@@ -84,9 +84,9 @@ void store(Savefile & savefile, Game & game)
 			savefile.size_of(game.monsters[i].inventory);
 			savefile.newline();
 			savefile.check("inventory size");
-			for(unsigned i = 0; i < game.monsters[i].inventory.size(); ++i) {
-				savefile.store(game.monsters[i].inventory[i].pos.x).store(game.monsters[i].inventory[i].pos.y);
-				savefile.store(game.monsters[i].inventory[i].sprite).store(game.monsters[i].inventory[i].name);
+			for(unsigned j = 0; j < game.monsters[i].inventory.size(); ++j) {
+				savefile.store(game.monsters[i].inventory[j].pos.x).store(game.monsters[i].inventory[j].pos.y);
+				savefile.store(game.monsters[i].inventory[j].sprite).store(game.monsters[i].inventory[j].name);
 				savefile.newline();
 				savefile.check("inventory item");
 			}

@@ -169,11 +169,21 @@ void Game::grab(Monster & someone)
 		message("Nothing here to pick up.");
 		return;
 	}
-	if(!someone.inventory.empty()) {
-		message(format("{0} has too much items already.", someone.name));
-		return;
+	std::vector<Item>::iterator empty_slot;
+	for(empty_slot = someone.inventory.begin(); empty_slot != someone.inventory.end(); ++empty_slot) {
+		if(!*empty_slot) {
+			break;
+		}
 	}
-	someone.inventory.push_back(item);
+	if(empty_slot == someone.inventory.end()) {
+		if(someone.inventory.size() >= 26) {
+			message(format("{0} carry too much items.", someone.name));
+			return;
+		}
+		someone.inventory.push_back(item);
+	} else {
+		*empty_slot = item;
+	}
 	items.erase(item_index);
 	message(format("{0} picked up {1} from the floor.", someone.name, item.name));
 }
