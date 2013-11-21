@@ -92,7 +92,7 @@ int Console::draw_and_get_control(Game & game)
 int Console::see_messages(Game & game)
 {
 	draw_game(game);
-	int ch = get_control();
+	int ch = (game.done && game.messages.empty()) ? 0 : get_control();
 	while(!game.messages.empty()) {
 		if(game.messages.size() > 1) {
 			switch(ch) {
