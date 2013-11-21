@@ -85,13 +85,13 @@ void Console::draw_game(const Game & game)
 
 int Console::draw_and_get_control(Game & game)
 {
-	draw_game(game);
 	int ch = see_messages(game);
 	return ch;
 }
 
 int Console::see_messages(Game & game)
 {
+	draw_game(game);
 	int ch = get_control();
 	while(!game.messages.empty()) {
 		if(game.messages.size() > 1) {
