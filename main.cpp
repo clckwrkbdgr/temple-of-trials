@@ -38,8 +38,9 @@ int main()
 				case Control::MOVE: game.move(monster, control.direction); break;
 				case Control::OPEN: game.open(monster, control.direction); break;
 				case Control::CLOSE: game.close(monster, control.direction); break;
+				case Control::SWING: game.swing(monster, control.direction); break;
 				case Control::WAIT: break;
-				default: break;
+				default: log("Unknown control: {0}", control.control); break;
 			}
 		}
 		++game.turns;

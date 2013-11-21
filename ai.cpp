@@ -11,7 +11,7 @@ Controller get_controller(int ai)
 		case AI::ANGRY_AND_STILL: return angry_and_still;
 		case AI::CALM_AND_WANDER: return calm_and_wander;
 		case AI::CALM_AND_STILL: return calm_and_still;
-		default: break;
+		default: log("Unknown AI code: {0}", ai); break;
 	}
 	return 0;
 }
@@ -40,6 +40,13 @@ Control player_control(Monster & player, Game & game)
 			return Control(Control::WAIT);
 		} else if(directions.count(ch) != 0) {
 			return Control(Control::MOVE, directions[ch]);
+		} else if(ch == 's') {
+			ch = console.draw_and_get_control(game);
+			if(directions.count(ch) == 0) {
+				game.message("This is not a direction.");
+				continue;
+			}
+			return Control(Control::SWING, directions[ch]);
 		} else if(ch == 'o') {
 			ch = console.draw_and_get_control(game);
 			if(directions.count(ch) == 0) {

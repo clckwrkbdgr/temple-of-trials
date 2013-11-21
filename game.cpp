@@ -115,3 +115,27 @@ void Game::close(Monster & someone, const Point & shift)
     message(format("{0} closed the door.", someone.name));
 }
 
+void Game::swing(Monster & someone, const Point & shift)
+{
+	if(!shift) {
+		return;
+	}
+    Point new_pos = someone.pos + shift;
+    Door & door = find_at(doors, new_pos);
+    if(door && !door.opened) {
+		message(format("{0} swing at door.", someone.name));
+		open(someone, shift);
+		return;
+    }
+    Monster & monster = find_at(monsters, new_pos);
+	if(monster) {
+		message(format("{0} hit {1}.", someone.name, monster.name));
+		return;
+	}
+	if(!map.is_passable(new_pos)) {
+		message(format("{0} hit wall.", someone.name));
+		return;
+	}
+    message(format("{0} swing at nothing.", someone.name));
+}
+
