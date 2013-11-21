@@ -17,26 +17,22 @@ Cell wall()
 
 Monster player(const Point & monster_pos)
 {
-	Monster::Builder player;
-	return player.pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you");
+	return Monster::Builder().pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you");
 }
 
 Monster ant(int ai, const Point & monster_pos)
 {
-	Monster::Builder ant;
-	return ant.pos(monster_pos).sprite('A').sight(6).hp(3).ai(ai).name("ant");
+	return Monster::Builder().pos(monster_pos).sprite('A').sight(6).hp(3).ai(ai).name("ant");
 }
 
 Door door(const Point & pos)
 {
-	Door::Builder door;
-	return door.pos(pos).opened_sprite('-').closed_sprite('+').opened(false);
+	return Door::Builder().pos(pos).opened_sprite('-').closed_sprite('+').opened(false);
 }
 
 Item money(const Point & pos)
 {
-	Item::Builder money;
-	return money.pos(pos).sprite('$').name("money");
+	return Item::Builder().pos(pos).sprite('$').name("money");
 }
 
 }
