@@ -18,9 +18,7 @@ void store_ai(Reader & savefile, Monster & monster)
 			monster.ai = AI::CALM_AND_STILL;
 		} else if(movement == 0 && temper == 1) {
 			monster.ai = AI::ANGRY_AND_STILL;
-		} else if(movement == 1 && temper == 0) {
-			monster.ai = AI::CALM_AND_WANDER;
-		} else if(movement == 1 && temper == 1) {
+		} else if(movement == 1) {
 			monster.ai = AI::ANGRY_AND_WANDER;
 		}
 	}
@@ -33,7 +31,6 @@ void store_ai(Writer & savefile, const Monster & monster)
 		case AI::PLAYER: faction = 0; break;
 		case AI::ANGRY_AND_WANDER: movement = 1; temper = 1; break;
 		case AI::ANGRY_AND_STILL: movement = 0; temper = 1; break;
-		case AI::CALM_AND_WANDER: movement = 1; temper = 0; break;
 		case AI::CALM_AND_STILL: movement = 0; temper = 0; break;
 	}
 	savefile.store(faction).store(movement);

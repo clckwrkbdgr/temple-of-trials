@@ -80,11 +80,18 @@ void Console::draw_game(const Game & game)
 	print_message(message);
 
 	print_stat(0, format("Turns: {0}", game.turns));
+	print_stat(1, format("HP   : {0}", game.getPlayer().hp));
 }
 
 int Console::draw_and_get_control(Game & game)
 {
 	draw_game(game);
+	int ch = see_messages(game);
+	return ch;
+}
+
+int Console::see_messages(Game & game)
+{
 	int ch = get_control();
 	while(!game.messages.empty()) {
 		if(game.messages.size() > 1) {
@@ -102,4 +109,3 @@ int Console::draw_and_get_control(Game & game)
 	}
 	return ch;
 }
-

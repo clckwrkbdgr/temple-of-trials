@@ -16,7 +16,7 @@ struct Game {
 	Map map;
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;
-	bool done;
+	bool done, player_died;
 	std::list<std::string> messages;
 	int turns;
 

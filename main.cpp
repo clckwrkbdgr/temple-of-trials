@@ -46,11 +46,17 @@ int main()
 				case Control::WAIT: break;
 				default: log("Unknown control: {0}", control.control); break;
 			}
+			if(game.done) {
+				break;
+			}
 		}
 		game.monsters.erase(std::remove_if(game.monsters.begin(), game.monsters.end(), std::mem_fun_ref(&Monster::is_dead)), game.monsters.end());
 		++game.turns;
 	}
-	game.save(SAVEFILE);
+	Console::instance().see_messages(game);
+	if(!game.player_died) {
+		game.save(SAVEFILE);
+	}
 
 	log("Exiting.");
 	return 0;

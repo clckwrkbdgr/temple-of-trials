@@ -10,7 +10,7 @@ Control::Control(int control_value, const Point & control_direction)
 
 
 Game::Game()
-	: map(1, 1, Cell()), done(false), turns(0)
+	: map(1, 1, Cell()), done(false), player_died(false), turns(0)
 {
 }
 
@@ -133,6 +133,11 @@ void Game::swing(Monster & someone, const Point & shift)
 		message(format("{0} hit {1} for 1 hp.", someone.name, monster.name));
 		if(monster.is_dead()) {
 			message(format("{0} kill {1}.", someone.name, monster.name));
+			if(monster.ai == AI::PLAYER) {
+				message("You died.");
+				done = true;
+				player_died = true;
+			}
 		}
 		return;
 	}

@@ -9,7 +9,6 @@ Controller get_controller(int ai)
 		case AI::PLAYER: return player_control;
 		case AI::ANGRY_AND_WANDER: return angry_and_wander;
 		case AI::ANGRY_AND_STILL: return angry_and_still;
-		case AI::CALM_AND_WANDER: return calm_and_wander;
 		case AI::CALM_AND_STILL: return calm_and_still;
 		default: log("Unknown AI code: {0}", ai); break;
 	}
@@ -78,12 +77,15 @@ Control angry_and_wander(Monster & monster, Game & game)
 {
 	const Monster & player = game.getPlayer();
 	int d = distance(monster.pos, player.pos);
-	if(1 <= d && d <= monster.sight) {
-		Point shift = Point(
-				sign(player.pos.x - monster.pos.x),
-				sign(player.pos.y - monster.pos.y)
-				);
+	Point shift = Point(
+			sign(player.pos.x - monster.pos.x),
+			sign(player.pos.y - monster.pos.y)
+			);
+	if(1 < d && d <= monster.sight) {
 		return Control(Control::MOVE, shift);
+	}
+	if(d == 1) {
+		return Control(Control::SWING, shift);
 	}
 	return Control(Control::MOVE, Point(rand() % 3 - 1, rand() % 3 - 1));
 }
@@ -92,23 +94,30 @@ Control angry_and_still(Monster & monster, Game & game)
 {
 	const Monster & player = game.getPlayer();
 	int d = distance(monster.pos, player.pos);
-	if(1 <= d && d <= monster.sight) {
-		Point shift = Point(
-				sign(player.pos.x - monster.pos.x),
-				sign(player.pos.y - monster.pos.y)
-				);
+	Point shift = Point(
+		sign(player.pos.x - monster.pos.x),
+		sign(player.pos.y - monster.pos.y)
+		);
+	if(1 < d && d <= monster.sight) {
 		return Control(Control::MOVE, shift);
+	}
+	if(d == 1) {
+		return Control(Control::SWING, shift);
 	}
 	return Control(Control::WAIT);
 }
 
-Control calm_and_wander(Monster & monster, Game & game)
-{
-	return Control(Control::MOVE, Point(rand() % 3 - 1, rand() % 3 - 1));
-}
-
 Control calm_and_still(Monster & monster, Game & game)
 {
+	const Monster & player = game.getPlayer();
+	int d = distance(monster.pos, player.pos);
+	Point shift = Point(
+		sign(player.pos.x - monster.pos.x),
+		sign(player.pos.y - monster.pos.y)
+		);
+	if(d == 1) {
+		return Control(Control::SWING, shift);
+	}
 	return Control(Control::WAIT);
 }
 
