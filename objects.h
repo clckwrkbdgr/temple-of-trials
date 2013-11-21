@@ -15,7 +15,8 @@ struct Monster {
 	struct Builder;
 };
 struct Monster::Builder {
-	Monster monster;
+	Monster result;
+	operator Monster() { return result; }
 	Builder & pos(const Point & value);
 	Builder & sprite(const Sprite & sprite);
 	Builder & sight(int value);
@@ -36,10 +37,28 @@ struct Door {
 	struct Builder;
 };
 struct Door::Builder {
-	Door door;
+	Door result;
+	operator Door() { return result; }
 	Builder & pos(const Point & value);
 	Builder & opened_sprite(const Sprite & value);
 	Builder & closed_sprite(const Sprite & value);
 	Builder & opened(bool value);
 };
 
+
+struct Item {
+	Point pos;
+	Sprite sprite;
+	std::string name;
+	Item();
+	operator bool() const;
+
+	struct Builder;
+};
+struct Item::Builder {
+	Item result;
+	operator Item() { return result; }
+	Builder & pos(const Point & value);
+	Builder & sprite(const Sprite & value);
+	Builder & name(const std::string & value);
+};
