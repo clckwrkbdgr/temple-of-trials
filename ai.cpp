@@ -44,6 +44,10 @@ Control player_control(Monster & player, Game & game)
 		} else if(ch == 'Q') {
 			game.done = true;
 			game.player_died = true;
+		} else if(ch == 'g') {
+			return Control(Control::GRAB);
+		} else if(ch == 'd') {
+			return Control(Control::DROP);
 		} else if(ch == '.') {
 			return Control(Control::WAIT);
 		} else if(directions.count(ch) != 0) {

@@ -148,3 +148,33 @@ void Game::swing(Monster & someone, const Point & shift)
     message(format("{0} swing at nothing.", someone.name));
 }
 
+void Game::drop(Monster & someone)
+{
+	if(someone.inventory.empty()) {
+		message(format("{0} have nothing to drop.", someone.name));
+		return;
+	}
+	Item item = someone.inventory.back();
+	someone.inventory.pop_back();
+	item.pos = someone.pos;
+	items.push_back(item);
+	message(format("{0} dropped {1} on the floor.", someone.name, item.name));
+}
+
+void Game::grab(Monster & someone)
+{
+	std::vector<Item>::iterator item_index;
+	Item item = find_at(items, someone.pos, &item_index);
+	if(!item) {
+		message("Nothing here to pick up.");
+		return;
+	}
+	if(!someone.inventory.empty()) {
+		message(format("{0} has too much items already.", someone.name));
+		return;
+	}
+	someone.inventory.push_back(item);
+	items.erase(item_index);
+	message(format("{0} picked up {1} from the floor.", someone.name, item.name));
+}
+

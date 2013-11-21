@@ -1,5 +1,6 @@
 #pragma once
 #include "util.h"
+class Item;
 
 struct Monster {
 	Point pos;
@@ -8,6 +9,7 @@ struct Monster {
 	int ai;
 	int hp;
 	std::string name;
+	std::vector<Item> inventory;
 	Monster();
 	operator bool() const;
 	bool is_dead() const { return hp <= 0; }
@@ -62,3 +64,4 @@ struct Item::Builder {
 	Builder & sprite(const Sprite & value);
 	Builder & name(const std::string & value);
 };
+

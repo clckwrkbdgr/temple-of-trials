@@ -84,6 +84,7 @@ void Console::draw_game(const Game & game)
 
 	print_stat(0, format("Turns: {0}", game.turns));
 	print_stat(1, format("HP   : {0}", game.getPlayer().hp));
+	print_stat(2, format("Inv  : {0}", game.getPlayer().inventory.empty() ? "none" : game.getPlayer().inventory.front().name));
 }
 
 int Console::draw_and_get_control(Game & game)

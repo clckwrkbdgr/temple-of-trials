@@ -53,11 +53,15 @@ struct Point {
 Point operator+(const Point & a, const Point & b);
 
 template<class T>
-const T & find_at(const std::vector<T> & container, const Point & pos)
+const T & find_at(const std::vector<T> & container, const Point & pos, typename std::vector<T>::const_iterator * index = 0)
 {
-    for(unsigned i = 0; i < container.size(); ++i) {
-        if(container[i].pos == pos) {
-            return container[i];
+	typename std::vector<T>::const_iterator i;
+    for(i = container.begin(); i != container.end(); ++i) {
+        if(i->pos == pos) {
+			if(index) {
+				*index = i;
+			}
+            return *i;
         }
     }
     static T empty;
@@ -65,11 +69,15 @@ const T & find_at(const std::vector<T> & container, const Point & pos)
 }
 
 template<class T>
-T & find_at(std::vector<T> & container, const Point & pos)
+T & find_at(std::vector<T> & container, const Point & pos, typename std::vector<T>::iterator * index = 0)
 {
-    for(unsigned i = 0; i < container.size(); ++i) {
-        if(container[i].pos == pos) {
-            return container[i];
+	typename std::vector<T>::iterator i;
+    for(i = container.begin(); i != container.end(); ++i) {
+        if(i->pos == pos) {
+			if(index) {
+				*index = i;
+			}
+            return *i;
         }
     }
     static T empty;

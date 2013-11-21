@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_VERSION = 14 };
+enum { SAVEFILE_VERSION = 15 };
 
 void store_ai(Reader & savefile, Monster & monster)
 {
@@ -79,7 +79,19 @@ void store(Savefile & savefile, Game & game)
 			savefile.store(game.monsters[i].ai);
 		}
 		savefile.store(game.monsters[i].name);
-		savefile.newline();
+		if(savefile.version() >= 15) {
+			savefile.newline();
+			savefile.size_of(game.monsters[i].inventory);
+			savefile.newline();
+			savefile.check("inventory size");
+			for(unsigned i = 0; i < game.monsters[i].inventory.size(); ++i) {
+				savefile.store(game.monsters[i].inventory[i].pos.x).store(game.monsters[i].inventory[i].pos.y);
+				savefile.store(game.monsters[i].inventory[i].sprite).store(game.monsters[i].inventory[i].name);
+				savefile.newline();
+				savefile.check("inventory item");
+			}
+			savefile.newline();
+		}
 		savefile.check("monster");
 	}
 	savefile.newline();
