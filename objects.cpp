@@ -1,12 +1,12 @@
 #include "objects.h"
 
 Monster::Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_sight, int monster_ai)
-	: pos(monster_pos), sprite(monster_sprite), sight(monster_sight), ai(monster_ai)
+	: alive(true), pos(monster_pos), sprite(monster_sprite), sight(monster_sight), ai(monster_ai)
 {
 }
 
 Monster::Monster()
-	: sprite(' '), sight(0)
+	: alive(true), sprite(' '), sight(0)
 {
 }
 

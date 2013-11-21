@@ -130,6 +130,8 @@ void Game::swing(Monster & someone, const Point & shift)
     Monster & monster = find_at(monsters, new_pos);
 	if(monster) {
 		message(format("{0} hit {1}.", someone.name, monster.name));
+		monster.alive = false;
+		message(format("{0} kill {1}.", someone.name, monster.name));
 		return;
 	}
 	if(!map.is_passable(new_pos)) {
