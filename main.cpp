@@ -29,7 +29,7 @@ int main()
 	while(!game.done) {
 		for(unsigned i = 0; i < game.monsters.size(); ++i) {
 			Monster & monster = game.monsters[i];
-			if(!monster.alive) {
+			if(monster.is_dead()) {
 				continue;
 			}
 			Controller controller = get_controller(monster.ai);

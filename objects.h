@@ -2,19 +2,16 @@
 #include "util.h"
 
 struct Monster {
-	bool alive;
 	Point pos;
 	Sprite sprite;
 	int sight;
 	int ai;
+	int hp;
 	std::string name;
-	Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_sight, int monster_ai);
+	Monster(const Point & monster_pos, const Sprite & monster_sprite, int monster_sight, int monster_health, int monster_ai);
 	Monster();
 	operator bool() const;
-	bool is_dead() const { return !alive; }
-
-	static Monster player(const Point & monster_pos);
-	static Monster ant(int monster_ai, const Point & monster_pos);
+	bool is_dead() const { return hp <= 0; }
 };
 
 struct Door {

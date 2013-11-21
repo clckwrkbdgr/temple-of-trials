@@ -16,6 +16,12 @@ Controller get_controller(int ai)
 	return 0;
 }
 
+
+Control dummy(Monster & monster, Game & game)
+{
+	return Control(Control::WAIT);
+}
+
 Control player_control(Monster & player, Game & game)
 {
 	static std::map<int, Point> directions;

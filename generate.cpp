@@ -17,14 +17,14 @@ Cell wall()
 
 Monster player(const Point & monster_pos)
 {
-	Monster player(monster_pos, '@', 10, AI::PLAYER);
+	Monster player(monster_pos, '@', 10, 20, AI::PLAYER);
 	player.name = "you";
 	return player;
 }
 
 Monster ant(int ai, const Point & monster_pos)
 {
-	Monster ant(monster_pos, 'A', 6, ai);
+	Monster ant(monster_pos, 'A', 6, 3, ai);
 	ant.name = "ant";
 	return ant;
 }
@@ -58,7 +58,7 @@ void generate(Game & game)
 	for(int i = 0; i < 5; ++i) {
 		Point point = game.find_random_free_cell();
 		if(point) {
-			int ai = rand() % 4 + 1;
+			int ai = rand() % 4 + 2;
 			game.monsters.push_back(World::ant(ai, point));
 		}
 	}
