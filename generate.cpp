@@ -17,21 +17,20 @@ Cell wall()
 
 Monster player(const Point & monster_pos)
 {
-	Monster player(monster_pos, '@', 10, 20, AI::PLAYER);
-	player.name = "you";
-	return player;
+	Monster::Builder player;
+	return player.pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you").monster;
 }
 
 Monster ant(int ai, const Point & monster_pos)
 {
-	Monster ant(monster_pos, 'A', 6, 3, ai);
-	ant.name = "ant";
-	return ant;
+	Monster::Builder ant;
+	return ant.pos(monster_pos).sprite('A').sight(6).hp(3).ai(ai).name("ant").monster;
 }
 
 Door door(const Point & pos)
 {
-	return Door(pos, '-', '+', false);
+	Door::Builder door;
+	return door.pos(pos).opened_sprite('-').closed_sprite('+').opened(false).door;
 }
 
 }
@@ -58,7 +57,13 @@ void generate(Game & game)
 	for(int i = 0; i < 5; ++i) {
 		Point point = game.find_random_free_cell();
 		if(point) {
-			int ai = rand() % 4 + 2;
+			int ai = AI::CALM_AND_STILL;
+			switch(rand() % 3) {
+				case 0: ai = AI::ANGRY_AND_WANDER; break;
+				case 1: ai = AI::ANGRY_AND_STILL; break;
+				case 2: ai = AI::CALM_AND_STILL; break;
+				default: break;
+			}
 			game.monsters.push_back(World::ant(ai, point));
 		}
 	}
