@@ -4,6 +4,7 @@ TODO inventory left after death of monster.
 TODO equipping (wielding) items. wielded damage.
 TODO wearing items. defense stat.
 TODO throwing items. throwing damage.
+Step 11:
 TODO terrain: impassable but shootable and visible (benches, pits etc).
 TODO edible items (not all of them, of course)
 TODO eat: healing.
@@ -15,8 +16,9 @@ TODO field of vision, fog of war.
 TODO examining, moving.
 v0.0.2
 
-TODO toxis waste.
+Step 12:
 TODO levels, stairs.
+TODO toxis waste.
 TODO fountains with healing abilities.
 TODO poisonous bites for monsters.
 TODO eat: antidote.
@@ -32,6 +34,7 @@ TODO story at create character screen.
 TODO level design.
 v0.1.0
 
+Step 13:
 TODO experience and exp levels.
 TODO skills. unarmed combat.
 TODO skill: melee combat.
@@ -41,9 +44,12 @@ TODO skill: lockpicking and trap disarming.
 TODO skill: sneaking.
 v0.2.0
 
-TODO handcrafting: producing item from bunch of other items.
-v0.3.0
-
+Step 14:
 TODO companion dog quest.
 TODO companion dog.
+v0.3.0
+
+Step 15:
+TODO handcrafting: producing item from bunch of other items.
 v0.4.0
+
