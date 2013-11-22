@@ -205,6 +205,9 @@ void Game::drop(Monster & someone, int slot)
 		message("No such object.");
 		return;
 	}
+	if(someone.wielded == slot) {
+		unwield(someone);
+	}
 	Item item = someone.inventory[slot];
 	someone.inventory[slot] = Item();
 	item.pos = someone.pos;
@@ -237,5 +240,51 @@ void Game::grab(Monster & someone)
 	}
 	items.erase(item_index);
 	message(format("{0} picked up {1} from the floor.", someone.name, item.name));
+}
+
+void Game::wield(Monster & someone, int slot)
+{
+	if(slot < 0) {
+		return;
+	}
+	if(someone.inventory.empty()) {
+		message(format("{0} have nothing to drop.", someone.name));
+		return;
+	}
+	if(int(someone.inventory.size()) < slot) {
+		message("No such object.");
+		return;
+	}
+	if(!someone.inventory[slot]) {
+		message("No such object.");
+		return;
+	}
+	Item item = someone.inventory[slot];
+	if(someone.wielded > -1) {
+		unwield(someone);
+	}
+	someone.wielded = slot;
+	message(format("{0} wields {1}.", someone.name, item.name));
+}
+
+void Game::unwield(Monster & someone)
+{
+	if(someone.wielded < 0) {
+		message(format("{0} is wielding nothing.", someone.name));
+		return;
+	}
+	if(someone.wielded >= int(someone.inventory.size())) {
+		log("{0} was wielding incorrect slot: {1}", someone.name, someone.wielded);
+		someone.wielded = -1;
+		return;
+	}
+	Item & item = someone.inventory[someone.wielded];
+	if(!item) {
+		log("{0} was wielding empty slot: {1}", someone.name, someone.wielded);
+		someone.wielded = -1;
+		return;
+	}
+	message(format("{0} unwields {1}.", someone.name, item.name));
+	someone.wielded = -1;
 }
 

@@ -93,9 +93,12 @@ void Console::draw_game(const Game & game)
 	mvprintw(0, 0, "%s", notification_text.c_str());
 	notification_text.clear();
 
-	print_stat(0, format("Turns: {0}", game.turns));
-	print_stat(1, format("HP   : {0}", game.getPlayer().hp));
-	print_stat(2, format("Items: {0}", game.getPlayer().inventory.size()));
+	const Monster & player = game.getPlayer();
+	int row = 0;
+	print_stat(row++, format("Turns: {0}", game.turns));
+	print_stat(row++, format("HP   : {0}", player.hp));
+	print_stat(row++, format("Items: {0}", player.inventory.size()));
+	print_stat(row++, format("Wield: {0}", player.wielded < 0 ? "none" : player.inventory[player.wielded].name));
 }
 
 int Console::draw_and_get_control(Game & game)
@@ -130,17 +133,20 @@ void Console::draw_inventory(const Game & game, const Monster & monster)
 	clear();
 	int width, height;
 	getmaxyx(stdscr, height, width);
-	int pos = 0;
-	char letter = 'a';
+	int pos = 0, index = 0;
 	foreach(const Item & item, monster.inventory) {
 		if(item) {
 			int x = (pos < 13) ? 0 : width / 2;
 			int y = 1 + ((pos < 13) ? pos : pos - 13);
-			mvprintw(y, x, format("{0} - {1}", letter, item.name).c_str());
+			std::string text = format("{0} - {1}", char(index + 'a'), item.name);
+			if(monster.wielded == index) {
+				text += " (wielded)";
+			}
+			mvprintw(y, x, text.c_str());
 			++pos;
 		}
-		++letter;
-		if(letter > 'z') {
+		++index;
+		if(index > 26) {
 			break;
 		}
 	}

@@ -10,6 +10,7 @@ struct Monster {
 	int hp;
 	std::string name;
 	std::vector<Item> inventory;
+	int wielded;
 	Monster();
 	operator bool() const;
 	bool is_dead() const { return hp <= 0; }

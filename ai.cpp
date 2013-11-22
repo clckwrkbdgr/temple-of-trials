@@ -50,6 +50,11 @@ Control player_control(Monster & player, Game & game)
 			console.draw_inventory(game, player);
 			console.get_control();
 			continue;
+		} else if(ch == 'w') {
+			int slot = console.get_inventory_slot(game, player);
+			return Control(Control::WIELD, slot);
+		} else if(ch == 'W') {
+			return Control(Control::UNWIELD);
 		} else if(ch == 'd') {
 			int slot = console.get_inventory_slot(game, player);
 			return Control(Control::DROP, slot);

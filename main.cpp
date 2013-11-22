@@ -44,6 +44,8 @@ int main()
 				case Control::SWING: game.swing(monster, control.direction); break;
 				case Control::GRAB: game.grab(monster); break;
 				case Control::DROP: game.drop(monster, control.slot); break;
+				case Control::WIELD: game.wield(monster, control.slot); break;
+				case Control::UNWIELD: game.unwield(monster); break;
 				case Control::WAIT: break;
 				default: log("Unknown control: {0}", control.control); break;
 			}
