@@ -46,6 +46,10 @@ Control player_control(Monster & player, Game & game)
 			game.player_died = true;
 		} else if(ch == 'g') {
 			return Control(Control::GRAB);
+		} else if(ch == 'i') {
+			console.draw_inventory(game, player);
+			console.get_control();
+			continue;
 		} else if(ch == 'd') {
 			int slot = console.get_inventory_slot(game, player);
 			return Control(Control::DROP, slot);

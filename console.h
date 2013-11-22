@@ -7,6 +7,7 @@ struct Console {
 	void draw_game(const Game & game);
 	int draw_and_get_control(Game & game);
 	int see_messages(Game & game);
+	void draw_inventory(const Game & game, const Monster & monster);
 	int get_inventory_slot(const Game & game, const Monster & monster);
 	void notification(const std::string & text);
 

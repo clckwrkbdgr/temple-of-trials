@@ -125,7 +125,7 @@ int Console::see_messages(Game & game)
 	return ch;
 }
 
-int Console::get_inventory_slot(const Game & game, const Monster & monster)
+void Console::draw_inventory(const Game & game, const Monster & monster)
 {
 	clear();
 	int width, height;
@@ -144,7 +144,14 @@ int Console::get_inventory_slot(const Game & game, const Monster & monster)
 			break;
 		}
 	}
+}
 
+int Console::get_inventory_slot(const Game & game, const Monster & monster)
+{
+	draw_inventory(game, monster);
+
+	int width, height;
+	getmaxyx(stdscr, height, width);
 	int slot = -1;
 	std::string error;
 	while(true) {
