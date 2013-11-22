@@ -2,6 +2,12 @@
 #include <string>
 #include <vector>
 
+#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#if GCC_VERSION < 403000
+// Ugly hack for decltype presence.
+#define decltype __typeof__
+#endif
+
 std::string to_string(int value);
 std::string to_string(unsigned value);
 std::string to_string(long unsigned value);

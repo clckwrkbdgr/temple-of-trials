@@ -65,28 +65,28 @@ void store(Savefile & savefile, Game & game)
 	savefile.size_of(game.monsters);
 	savefile.newline();
 	savefile.check("monster count");
-	for(unsigned i = 0; i < game.monsters.size(); ++i) {
-		savefile.store(game.monsters[i].pos.x).store(game.monsters[i].pos.y).store(game.monsters[i].sprite);
+	for(decltype(game.monsters.begin()) monster = game.monsters.begin(); monster != game.monsters.end(); ++monster) {
+		savefile.store(monster->pos.x).store(monster->pos.y).store(monster->sprite);
 		if(savefile.version() >= 10) {
-			savefile.store(game.monsters[i].sight);
+			savefile.store(monster->sight);
 		}
 		if(savefile.version() >= 13) {
-			savefile.store(game.monsters[i].hp);
+			savefile.store(monster->hp);
 		}
 		if(savefile.version() <= 11) {
-			store_ai(savefile, game.monsters[i]);
+			store_ai(savefile, *monster);
 		} else {
-			savefile.store(game.monsters[i].ai);
+			savefile.store(monster->ai);
 		}
-		savefile.store(game.monsters[i].name);
+		savefile.store(monster->name);
 		if(savefile.version() >= 15) {
 			savefile.newline();
-			savefile.size_of(game.monsters[i].inventory);
+			savefile.size_of(monster->inventory);
 			savefile.newline();
 			savefile.check("inventory size");
-			for(unsigned j = 0; j < game.monsters[i].inventory.size(); ++j) {
-				savefile.store(game.monsters[i].inventory[j].pos.x).store(game.monsters[i].inventory[j].pos.y);
-				savefile.store(game.monsters[i].inventory[j].sprite).store(game.monsters[i].inventory[j].name);
+			for(decltype(monster->inventory.begin()) item = monster->inventory.begin(); item != monster->inventory.end(); ++item) {
+				savefile.store(item->pos.x).store(item->pos.y);
+				savefile.store(item->sprite).store(item->name);
 				savefile.newline();
 				savefile.check("inventory item");
 			}
@@ -100,9 +100,9 @@ void store(Savefile & savefile, Game & game)
 		savefile.size_of(game.items);
 		savefile.newline();
 		savefile.check("item count");
-		for(unsigned i = 0; i < game.items.size(); ++i) {
-			savefile.store(game.items[i].pos.x).store(game.items[i].pos.y);
-			savefile.store(game.items[i].sprite).store(game.items[i].name);
+		for(decltype(game.items.begin()) item = game.items.begin(); item != game.items.end(); ++item) {
+			savefile.store(item->pos.x).store(item->pos.y);
+			savefile.store(item->sprite).store(item->name);
 			savefile.newline();
 			savefile.check("item");
 		}
@@ -112,10 +112,10 @@ void store(Savefile & savefile, Game & game)
 	savefile.size_of(game.doors);
 	savefile.newline();
 	savefile.check("door count");
-	for(unsigned i = 0; i < game.doors.size(); ++i) {
-		savefile.store(game.doors[i].pos.x).store(game.doors[i].pos.y);
-		savefile.store(game.doors[i].opened_sprite).store(game.doors[i].closed_sprite);
-		savefile.store(game.doors[i].opened);
+	for(decltype(game.doors.begin()) door = game.doors.begin(); door != game.doors.end(); ++door) {
+		savefile.store(door->pos.x).store(door->pos.y);
+		savefile.store(door->opened_sprite).store(door->closed_sprite);
+		savefile.store(door->opened);
 		savefile.newline();
 		savefile.check("door");
 	}
