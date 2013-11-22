@@ -99,16 +99,30 @@ void Game::open(Monster & someone, const Point & shift)
 	}
     Point new_pos = someone.pos + shift;
     Door & door = find_at(doors, new_pos);
-    if(!door) {
-        message("There is nothing to open there.");
-        return;
+    if(door) {
+		if(door.opened) {
+			message("Door is already opened.");
+			return;
+		}
+		door.opened = true;
+		message(format("{0} opened the door.", someone.name));
+		return;
     }
-    if(door.opened) {
-        message("Door is already opened.");
-        return;
-    }
-    door.opened = true;
-    message(format("{0} opened the door.", someone.name));
+	Container & container = find_at(containers, new_pos);
+	if(container) {
+		if(container.items.empty()) {
+			message(format("{0} is empty.", container.name));
+			return;
+		}
+		for(std::vector<Item>::iterator item = container.items.begin(); item != container.items.end(); ++item) {
+			item->pos = someone.pos;
+			items.push_back(*item);
+			message(format("{0} took up a {1} from {2}.", someone.name, item->name, container.name));
+		}
+		container.items.clear();
+		return;
+	}
+	message("There is nothing to open there.");
 }
 
 void Game::close(Monster & someone, const Point & shift)
