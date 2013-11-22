@@ -1,6 +1,6 @@
 XFCE_TERMINAL_VERSION := $(shell xfce4-terminal --version 2>/dev/null)
 ifdef XFCE_TERMINAL_VERSION
-	TERMINAL = xfce4-terminal -e
+	TERMINAL = xfce4-terminal --geometry 80x40 -e
 else
 	TERMINAL = screen
 endif

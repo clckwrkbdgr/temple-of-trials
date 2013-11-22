@@ -134,6 +134,7 @@ void Console::draw_inventory(const Game & game, const Monster & monster)
 	clear();
 	int width, height;
 	getmaxyx(stdscr, height, width);
+	(void)height;
 	int pos = 0, index = 0;
 	foreach(const Item & item, monster.inventory) {
 		if(item) {
@@ -159,6 +160,7 @@ int Console::get_inventory_slot(const Game & game, const Monster & monster)
 
 	int width, height;
 	getmaxyx(stdscr, height, width);
+	(void)height;
 	int slot = -1;
 	std::string error;
 	while(true) {

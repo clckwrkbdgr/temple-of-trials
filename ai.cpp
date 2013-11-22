@@ -2,6 +2,7 @@
 #include "console.h"
 #include "game.h"
 #include "objects.h"
+#include <cstdlib>
 
 Controller get_controller(int ai)
 {
