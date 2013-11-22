@@ -25,6 +25,7 @@ struct Monster::Builder {
 	Builder & ai(int value);
 	Builder & hp(int value);
 	Builder & name(const std::string & value);
+	Builder & item(const Item & value);
 };
 
 

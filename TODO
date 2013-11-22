@@ -2,6 +2,11 @@ TODO inventory left after death of monster.
 TODO equipping (wielding) items. wielded damage.
 TODO wearing items. defense stat.
 TODO throwing items. throwing damage.
+Step 10:
+TODO toxic waste.
+TODO fountains with healing abilities.
+TODO poisonous bites for monsters.
+TODO eat: antidote.
 Step 11:
 TODO terrain: impassable but shootable and visible (benches, pits etc).
 TODO edible items (not all of them, of course)
@@ -16,10 +21,6 @@ v0.0.2
 
 Step 12:
 TODO levels, stairs.
-TODO toxis waste.
-TODO fountains with healing abilities.
-TODO poisonous bites for monsters.
-TODO eat: antidote.
 TODO traps.
 TODO locked doors. keys.
 TODO eat: water flask becomes empty flask.

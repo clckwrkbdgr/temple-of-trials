@@ -162,6 +162,12 @@ void Game::swing(Monster & someone, const Point & shift)
 		message(format("{0} hit {1} for 1 hp.", someone.name, monster.name));
 		if(monster.is_dead()) {
 			message(format("{0} kill {1}.", someone.name, monster.name));
+			foreach(Item & item, monster.inventory) {
+				item.pos = monster.pos;
+				items.push_back(item);
+				message(format("{0} drops {1}.", monster.name, item.name));
+			}
+			monster.inventory.clear();
 			if(monster.ai == AI::PLAYER) {
 				message("You died.");
 				done = true;

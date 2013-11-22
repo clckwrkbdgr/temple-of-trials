@@ -16,6 +16,7 @@ Monster::Builder & Monster::Builder::sight(int value) { result.sight = value; re
 Monster::Builder & Monster::Builder::ai(int value) { result.ai = value; return *this; }
 Monster::Builder & Monster::Builder::hp(int value) { result.hp = value; return *this; }
 Monster::Builder & Monster::Builder::name(const std::string & value) { result.name = value; return *this; }
+Monster::Builder & Monster::Builder::item(const Item & value) { result.inventory.push_back(value); return *this; }
 
 
 Door::Door()

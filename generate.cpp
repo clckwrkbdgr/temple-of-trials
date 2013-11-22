@@ -15,6 +15,16 @@ Cell wall()
 	return Cell('#', false);
 }
 
+Item money(const Point & pos = Point())
+{
+	return Item::Builder().pos(pos).sprite('$').name("money");
+}
+
+Item scorpion_tail(const Point & pos = Point())
+{
+	return Item::Builder().pos(pos).sprite('!').name("scorpion tail");
+}
+
 Monster player(const Point & monster_pos)
 {
 	return Monster::Builder().pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you");
@@ -25,19 +35,19 @@ Monster ant(int ai, const Point & monster_pos)
 	return Monster::Builder().pos(monster_pos).sprite('A').sight(6).hp(3).ai(ai).name("ant");
 }
 
+Monster scorpion(int ai, const Point & monster_pos)
+{
+	return Monster::Builder().pos(monster_pos).sprite('S').sight(8).hp(5).ai(ai).name("scorpion").item(scorpion_tail());
+}
+
 Door door(const Point & pos)
 {
 	return Door::Builder().pos(pos).opened_sprite('-').closed_sprite('+').opened(false);
 }
 
-Item money(const Point & pos)
-{
-	return Item::Builder().pos(pos).sprite('$').name("money");
-}
-
 Container pot(const Point & pos)
 {
-	return Container::Builder().pos(pos).sprite('^').name("pot").item(money(pos));
+	return Container::Builder().pos(pos).sprite('^').name("pot").item(money());
 }
 
 }
@@ -83,6 +93,10 @@ void generate(Game & game)
 			}
 			game.monsters.push_back(World::ant(ai, point));
 		}
+	}
+	point = game.find_random_free_cell();
+	if(point) {
+		game.monsters.push_back(World::scorpion(AI::ANGRY_AND_WANDER, point));
 	}
 	log("Done.");
 }
