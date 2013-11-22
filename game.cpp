@@ -45,9 +45,9 @@ Point Game::find_random_free_cell() const
 
 const Monster & Game::getPlayer() const
 {
-	for(unsigned i = 0; i < monsters.size(); ++i) {
-		if(monsters[i].ai == AI::PLAYER) {
-			return monsters[i];
+	foreach(const Monster & monster, monsters) {
+		if(monster.ai == AI::PLAYER) {
+			return monster;
 		}
 	}
 	static Monster empty;
@@ -114,10 +114,10 @@ void Game::open(Monster & someone, const Point & shift)
 			message(format("{0} is empty.", container.name));
 			return;
 		}
-		for(std::vector<Item>::iterator item = container.items.begin(); item != container.items.end(); ++item) {
-			item->pos = someone.pos;
-			items.push_back(*item);
-			message(format("{0} took up a {1} from {2}.", someone.name, item->name, container.name));
+		foreach(Item & item, container.items) {
+			item.pos = someone.pos;
+			items.push_back(item);
+			message(format("{0} took up a {1} from {2}.", someone.name, item.name, container.name));
 		}
 		container.items.clear();
 		return;

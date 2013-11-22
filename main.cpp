@@ -27,8 +27,7 @@ int main()
 	}
 
 	while(!game.done) {
-		for(unsigned i = 0; i < game.monsters.size(); ++i) {
-			Monster & monster = game.monsters[i];
+		foreach(Monster & monster, game.monsters) {
 			if(monster.is_dead()) {
 				continue;
 			}

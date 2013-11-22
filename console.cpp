@@ -68,17 +68,17 @@ void Console::draw_game(const Game & game)
 			print_tile(x, y, game.map.cell(x, y).sprite);
 		}
 	}
-	for(unsigned i = 0; i < game.items.size(); ++i) {
-		print_tile(game.items[i].pos.x, game.items[i].pos.y, game.items[i].sprite);
+	foreach(const Item & item, game.items) {
+		print_tile(item.pos.x, item.pos.y, item.sprite);
 	}
-	for(unsigned i = 0; i < game.containers.size(); ++i) {
-		print_tile(game.containers[i].pos.x, game.containers[i].pos.y, game.containers[i].sprite);
+	foreach(const Container & container, game.containers) {
+		print_tile(container.pos.x, container.pos.y, container.sprite);
 	}
-	for(unsigned i = 0; i < game.doors.size(); ++i) {
-		print_tile(game.doors[i].pos.x, game.doors[i].pos.y, game.doors[i].sprite());
+	foreach(const Door & door, game.doors) {
+		print_tile(door.pos.x, door.pos.y, door.sprite());
 	}
-	for(unsigned i = 0; i < game.monsters.size(); ++i) {
-		print_tile(game.monsters[i].pos.x, game.monsters[i].pos.y, game.monsters[i].sprite);
+	foreach(const Monster & monster, game.monsters) {
+		print_tile(monster.pos.x, monster.pos.y, monster.sprite);
 	}
 
 	std::string message;
@@ -132,11 +132,11 @@ int Console::get_inventory_slot(const Game & game, const Monster & monster)
 	getmaxyx(stdscr, height, width);
 	int pos = 0;
 	char letter = 'a';
-	for(std::vector<Item>::const_iterator item = monster.inventory.begin(); item != monster.inventory.end(); ++item) {
-		if(*item) {
+	foreach(const Item & item, monster.inventory) {
+		if(item) {
 			int x = (pos < 13) ? 0 : width / 2;
 			int y = 1 + ((pos < 13) ? pos : pos - 13);
-			mvprintw(y, x, format("{0} - {1}", letter, item->name).c_str());
+			mvprintw(y, x, format("{0} - {1}", letter, item.name).c_str());
 			++pos;
 		}
 		++letter;
