@@ -113,3 +113,28 @@ int Console::see_messages(Game & game)
 	}
 	return ch;
 }
+
+int Console::get_inventory_slot(const Game & game, const Monster & monster)
+{
+	clear();
+	int width, height;
+	getmaxyx(stdscr, height, width);
+	int pos = 0;
+	char slot = 'a';
+	for(std::vector<Item>::const_iterator item = monster.inventory.begin(); item != monster.inventory.end(); ++item) {
+		if(*item) {
+			int x = (pos < 13) ? 0 : width / 2;
+			int y = (pos < 13) ? pos : pos - 13;
+			mvprintw(y, x, format("{0} - {1}", slot, item->name).c_str());
+			++pos;
+		}
+		++slot;
+		if(slot > 'z') {
+			break;
+		}
+	}
+
+	getch();
+	draw_game(game);
+	return 0;
+}

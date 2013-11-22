@@ -47,6 +47,7 @@ Control player_control(Monster & player, Game & game)
 		} else if(ch == 'g') {
 			return Control(Control::GRAB);
 		} else if(ch == 'd') {
+			console.get_inventory_slot(game, player);
 			return Control(Control::DROP);
 		} else if(ch == '.') {
 			return Control(Control::WAIT);
