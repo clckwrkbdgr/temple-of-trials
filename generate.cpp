@@ -27,17 +27,18 @@ Item scorpion_tail(const Point & pos = Point())
 
 Monster player(const Point & monster_pos)
 {
-	return Monster::Builder().pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you");
+	return Monster::Builder().pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you").hit_strength(3);
 }
 
 Monster ant(int ai, const Point & monster_pos)
 {
-	return Monster::Builder().pos(monster_pos).sprite('A').sight(6).hp(3).ai(ai).name("ant");
+	return Monster::Builder().pos(monster_pos).sprite('A').sight(6).hp(3).ai(ai).name("ant").hit_strength(1);
 }
 
 Monster scorpion(int ai, const Point & monster_pos)
 {
-	return Monster::Builder().pos(monster_pos).sprite('S').sight(8).hp(5).ai(ai).name("scorpion").item(scorpion_tail());
+	return Monster::Builder().pos(monster_pos).sprite('S').sight(8).hp(5).ai(ai).name("scorpion").item(scorpion_tail()).
+		hit_strength(2);
 }
 
 Door door(const Point & pos)

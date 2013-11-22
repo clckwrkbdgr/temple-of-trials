@@ -8,6 +8,7 @@ struct Monster {
 	int sight;
 	int ai;
 	int hp;
+	int hit_strength;
 	std::string name;
 	std::vector<Item> inventory;
 	int wielded;
@@ -27,6 +28,7 @@ struct Monster::Builder {
 	Builder & hp(int value);
 	Builder & name(const std::string & value);
 	Builder & item(const Item & value);
+	Builder & hit_strength(int value);
 };
 
 

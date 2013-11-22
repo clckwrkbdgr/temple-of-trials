@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_VERSION = 17 };
+enum { SAVEFILE_VERSION = 18 };
 
 void store_ai(Reader & savefile, Monster & monster)
 {
@@ -75,6 +75,9 @@ void store(Savefile & savefile, Game & game)
 		}
 		if(savefile.version() >= 17) {
 			savefile.store(monster->wielded);
+		}
+		if(savefile.version() >= 18) {
+			savefile.store(monster->hit_strength);
 		}
 		if(savefile.version() <= 11) {
 			store_ai(savefile, *monster);

@@ -1,7 +1,7 @@
 #include "objects.h"
 
 Monster::Monster()
-	: sprite(' '), sight(0), ai(0), hp(1), wielded(-1)
+	: sprite(' '), sight(0), ai(0), hp(1), hit_strength(0), wielded(-1)
 {
 }
 
@@ -17,6 +17,7 @@ Monster::Builder & Monster::Builder::ai(int value) { result.ai = value; return *
 Monster::Builder & Monster::Builder::hp(int value) { result.hp = value; return *this; }
 Monster::Builder & Monster::Builder::name(const std::string & value) { result.name = value; return *this; }
 Monster::Builder & Monster::Builder::item(const Item & value) { result.inventory.push_back(value); return *this; }
+Monster::Builder & Monster::Builder::hit_strength(int value) { result.hit_strength = value; return *this; }
 
 
 Door::Door()

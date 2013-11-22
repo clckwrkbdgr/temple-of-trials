@@ -158,8 +158,8 @@ void Game::swing(Monster & someone, const Point & shift)
     }
     Monster & monster = find_at(monsters, new_pos);
 	if(monster) {
-		monster.hp -= 1;
-		message(format("{0} hit {1} for 1 hp.", someone.name, monster.name));
+		monster.hp -= someone.hit_strength;
+		message(format("{0} hit {1} for {2} hp.", someone.name, monster.name, someone.hit_strength));
 		if(monster.is_dead()) {
 			message(format("{0} kill {1}.", someone.name, monster.name));
 			foreach(Item & item, monster.inventory) {
