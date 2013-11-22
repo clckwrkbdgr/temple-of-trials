@@ -8,7 +8,10 @@ struct Control {
 	enum { NONE, OPEN, CLOSE, MOVE, SWING, WAIT, GRAB, DROP };
 	int control;
 	Point direction;
-	Control(int control = NONE, const Point & direction = Point());
+	int slot;
+	Control(int control = NONE);
+	Control(int control, const Point & direction);
+	Control(int control, int slot);
 	bool done() const { return control != NONE; }
 };
 
@@ -37,6 +40,6 @@ struct Game {
 	void close(Monster & someone, const Point & shift);
 	void swing(Monster & someone, const Point & shift);
 	void grab(Monster & someone);
-	void drop(Monster & someone);
+	void drop(Monster & someone, int slot);
 };
 

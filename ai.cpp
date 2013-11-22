@@ -47,8 +47,8 @@ Control player_control(Monster & player, Game & game)
 		} else if(ch == 'g') {
 			return Control(Control::GRAB);
 		} else if(ch == 'd') {
-			console.get_inventory_slot(game, player);
-			return Control(Control::DROP);
+			int slot = console.get_inventory_slot(game, player);
+			return Control(Control::DROP, slot);
 		} else if(ch == '.') {
 			return Control(Control::WAIT);
 		} else if(directions.count(ch) != 0) {
@@ -56,26 +56,26 @@ Control player_control(Monster & player, Game & game)
 		} else if(ch == 's') {
 			ch = console.draw_and_get_control(game);
 			if(directions.count(ch) == 0) {
-				game.message("This is not a direction.");
+				console.notification("This is not a direction.");
 				continue;
 			}
 			return Control(Control::SWING, directions[ch]);
 		} else if(ch == 'o') {
 			ch = console.draw_and_get_control(game);
 			if(directions.count(ch) == 0) {
-				game.message("This is not a direction.");
+				console.notification("This is not a direction.");
 				continue;
 			}
 			return Control(Control::OPEN, directions[ch]);
 		} else if(ch == 'c') {
 			ch = console.draw_and_get_control(game);
 			if(directions.count(ch) == 0) {
-				game.message("This is not a direction.");
+				console.notification("This is not a direction.");
 				continue;
 			}
 			return Control(Control::CLOSE, directions[ch]);
 		} else {
-			game.message(format("Unknown control '{0}'", char(ch)));
+			console.notification(format("Unknown control '{0}'", char(ch)));
 		}
 	}
 	return Control();

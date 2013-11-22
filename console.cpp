@@ -4,7 +4,7 @@
 
 enum {
 	MAP_WIDTH = 60,
-	MAP_HEIGHT = 23
+	MAP_HEIGHT = 1 + 23
 };
 
 Console::Console()
@@ -26,7 +26,7 @@ Console::~Console()
 
 void Console::print_tile(int x, int y, int sprite)
 {
-	mvaddch(y, x, sprite);
+	mvaddch(y + 1, x, sprite);
 }
 
 void Console::print_message(const std::string & text)
@@ -55,6 +55,11 @@ Console & Console::instance()
 	return console;
 }
 
+void Console::notification(const std::string & text)
+{
+	notification_text = text;
+}
+
 void Console::draw_game(const Game & game)
 {
 	clear();
@@ -81,6 +86,9 @@ void Console::draw_game(const Game & game)
 		message += game.messages.front();
 	}
 	print_message(message);
+
+	mvprintw(0, 0, "%s", notification_text.c_str());
+	notification_text.clear();
 
 	print_stat(0, format("Turns: {0}", game.turns));
 	print_stat(1, format("HP   : {0}", game.getPlayer().hp));
@@ -120,21 +128,48 @@ int Console::get_inventory_slot(const Game & game, const Monster & monster)
 	int width, height;
 	getmaxyx(stdscr, height, width);
 	int pos = 0;
-	char slot = 'a';
+	char letter = 'a';
 	for(std::vector<Item>::const_iterator item = monster.inventory.begin(); item != monster.inventory.end(); ++item) {
 		if(*item) {
 			int x = (pos < 13) ? 0 : width / 2;
-			int y = (pos < 13) ? pos : pos - 13;
-			mvprintw(y, x, format("{0} - {1}", slot, item->name).c_str());
+			int y = 1 + ((pos < 13) ? pos : pos - 13);
+			mvprintw(y, x, format("{0} - {1}", letter, item->name).c_str());
 			++pos;
 		}
-		++slot;
-		if(slot > 'z') {
+		++letter;
+		if(letter > 'z') {
 			break;
 		}
 	}
 
-	getch();
-	draw_game(game);
-	return 0;
+	int slot = -1;
+	std::string error;
+	while(true) {
+		mvprintw(0, 0, "%s", std::string(width, ' ').c_str());
+		mvprintw(0, 0, "%s", error.c_str());
+
+		int ch = getch();
+		if(ch == 27) {
+			nodelay(stdscr, TRUE);
+			ch = getch();
+			nodelay(stdscr, FALSE);
+			if(ch == ERR || ch == 27) {
+				slot = -1;
+				break;
+			}
+			error = "This is not a slot";
+			continue;
+		}
+		if(ch < 'a' || 'z' < ch) {
+			error = "This is not a slot";
+			continue;
+		}
+		slot = ch - 'a';
+		if(slot >= int(monster.inventory.size()) || !monster.inventory[slot]) {
+			error = "Slot is empty; nothing is here.";
+			continue;
+		}
+		break;
+	}
+	return slot;
 }

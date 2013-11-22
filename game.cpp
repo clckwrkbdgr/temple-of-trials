@@ -3,8 +3,18 @@
 #include <map>
 #include <cstdlib>
 
+Control::Control(int control_value)
+	: control(control_value), slot(-1)
+{
+}
+
 Control::Control(int control_value, const Point & control_direction)
-	: control(control_value), direction(control_direction)
+	: control(control_value), direction(control_direction), slot(-1)
+{
+}
+
+Control::Control(int control_value, int control_slot)
+	: control(control_value), slot(control_slot)
 {
 }
 
@@ -148,14 +158,25 @@ void Game::swing(Monster & someone, const Point & shift)
     message(format("{0} swing at nothing.", someone.name));
 }
 
-void Game::drop(Monster & someone)
+void Game::drop(Monster & someone, int slot)
 {
+	if(slot < 0) {
+		return;
+	}
 	if(someone.inventory.empty()) {
 		message(format("{0} have nothing to drop.", someone.name));
 		return;
 	}
-	Item item = someone.inventory.back();
-	someone.inventory.pop_back();
+	if(int(someone.inventory.size()) < slot) {
+		message("No such object.");
+		return;
+	}
+	if(!someone.inventory[slot]) {
+		message("No such object.");
+		return;
+	}
+	Item item = someone.inventory[slot];
+	someone.inventory[slot] = Item();
 	item.pos = someone.pos;
 	items.push_back(item);
 	message(format("{0} dropped {1} on the floor.", someone.name, item.name));
