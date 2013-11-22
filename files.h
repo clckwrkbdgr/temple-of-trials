@@ -1,7 +1,14 @@
 #pragma once
+#include "util.h"
 #include <fstream>
 #include <vector>
 class Map;
+
+#define SAVEFILE_STORE_EXT(Type, variable) \
+	template<class Savefile> void store_ext(Savefile & savefile, Type & variable) { store_##variable(savefile, variable); } \
+	template<class Savefile> void store_ext(Savefile & savefile, const Type & variable) { store_##variable(savefile, variable); } \
+	template<class Savefile, class Type> \
+	void store_##variable(Savefile & savefile, Type & variable)
 
 class Reader {
 public:
@@ -29,6 +36,18 @@ public:
 		store(size);
 		v.resize(size);
 		return *this;
+	}
+	template<class T>
+	void store(std::vector<T> & v, const std::string & name)
+	{
+		size_of(v);
+		newline();
+		check(name + " count");
+		for(decltype(v.begin()) item = v.begin(); item != v.end(); ++item) {
+			store_ext(*this, *item);
+			newline();
+			check(name);
+		}
 	}
 private:
 	int actual_version;
@@ -59,6 +78,18 @@ public:
 	{
 		store(unsigned(v.size()));
 		return *this;
+	}
+	template<class T>
+	void store(const std::vector<T> & v, const std::string & name)
+	{
+		size_of(v);
+		newline();
+		check(name + " count");
+		for(decltype(v.begin()) item = v.begin(); item != v.end(); ++item) {
+			store_ext(*this, *item);
+			newline();
+			check(name);
+		}
 	}
 private:
 	int actual_version;

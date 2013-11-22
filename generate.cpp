@@ -67,47 +67,27 @@ void generate(Game & game)
 	game.monsters.push_back(World::player(game.find_random_free_cell()));
 	for(int i = 0; i < 10; ++i) {
 		Point point = game.find_random_free_cell();
-		if(point) {
-			game.map.cell(point.x, point.y) = World::wall();
-		}
+		game.map.cell(point.x, point.y) = World::wall();
 	}
 	for(int i = 0; i < 5; ++i) {
-		Point point = game.find_random_free_cell();
-		if(point) {
-			game.doors.push_back(World::door(point));
-		}
+		game.doors.push_back(World::door(game.find_random_free_cell()));
 	}
 	for(int i = 0; i < 5; ++i) {
-		Point point = game.find_random_free_cell();
-		if(point) {
-			game.items.push_back(World::money(point));
-		}
+		game.items.push_back(World::money(game.find_random_free_cell()));
 	}
-	Point point = game.find_random_free_cell();
-	if(point) {
-		game.containers.push_back(World::pot(point));
-	}
-	point = game.find_random_free_cell();
-	if(point) {
-		game.items.push_back(World::spear(point));
-	}
+	game.containers.push_back(World::pot(game.find_random_free_cell()));
+	game.items.push_back(World::spear(game.find_random_free_cell()));
 	for(int i = 0; i < 5; ++i) {
-		Point point = game.find_random_free_cell();
-		if(point) {
-			int ai = AI::CALM_AND_STILL;
-			switch(rand() % 3) {
-				case 0: ai = AI::ANGRY_AND_WANDER; break;
-				case 1: ai = AI::ANGRY_AND_STILL; break;
-				case 2: ai = AI::CALM_AND_STILL; break;
-				default: break;
-			}
-			game.monsters.push_back(World::ant(ai, point));
+		int ai = AI::CALM_AND_STILL;
+		switch(rand() % 3) {
+			case 0: ai = AI::ANGRY_AND_WANDER; break;
+			case 1: ai = AI::ANGRY_AND_STILL; break;
+			case 2: ai = AI::CALM_AND_STILL; break;
+			default: break;
 		}
+		game.monsters.push_back(World::ant(ai, game.find_random_free_cell()));
 	}
-	point = game.find_random_free_cell();
-	if(point) {
-		game.monsters.push_back(World::scorpion(AI::ANGRY_AND_WANDER, point));
-	}
+	game.monsters.push_back(World::scorpion(AI::ANGRY_AND_WANDER, game.find_random_free_cell()));
 	log("Done.");
 }
 
