@@ -65,3 +65,23 @@ struct Item::Builder {
 	Builder & name(const std::string & value);
 };
 
+
+struct Container {
+	Point pos;
+	Sprite sprite;
+	std::string name;
+	std::vector<Item> items;
+	Container();
+	operator bool() const;
+
+	struct Builder;
+};
+struct Container::Builder {
+	Container result;
+	operator Container() { return result; }
+	Builder & pos(const Point & value);
+	Builder & sprite(const Sprite & value);
+	Builder & name(const std::string & value);
+	Builder & item(const Item & value);
+};
+

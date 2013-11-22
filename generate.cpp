@@ -35,6 +35,11 @@ Item money(const Point & pos)
 	return Item::Builder().pos(pos).sprite('$').name("money");
 }
 
+Container pot(const Point & pos)
+{
+	return Container::Builder().pos(pos).sprite('^').name("pot").item(money(pos));
+}
+
 }
 
 void generate(Game & game)
@@ -61,6 +66,10 @@ void generate(Game & game)
 		if(point) {
 			game.items.push_back(World::money(point));
 		}
+	}
+	Point point = game.find_random_free_cell();
+	if(point) {
+		game.containers.push_back(World::pot(point));
 	}
 	for(int i = 0; i < 5; ++i) {
 		Point point = game.find_random_free_cell();

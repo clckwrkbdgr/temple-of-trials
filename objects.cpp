@@ -38,6 +38,7 @@ Door::Builder & Door::Builder::opened_sprite(const Sprite & value) { result.open
 Door::Builder & Door::Builder::closed_sprite(const Sprite & value) { result.closed_sprite = value; return *this; }
 Door::Builder & Door::Builder::opened(bool value) { result.opened = value; return *this; }
 
+
 Item::Item()
 	: sprite(' ')
 {
@@ -51,3 +52,19 @@ Item::operator bool() const
 Item::Builder & Item::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Item::Builder & Item::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
 Item::Builder & Item::Builder::name(const std::string & value) { result.name = value; return *this; }
+
+
+Container::Container()
+	: sprite(' ')
+{
+}
+
+Container::operator bool() const
+{
+	return bool(pos);
+}
+
+Container::Builder & Container::Builder::pos(const Point & value) { result.pos = value; return *this; }
+Container::Builder & Container::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+Container::Builder & Container::Builder::name(const std::string & value) { result.name = value; return *this; }
+Container::Builder & Container::Builder::item(const Item & value) { result.items.push_back(value); return *this; }

@@ -79,6 +79,11 @@ void Game::move(Monster & someone, const Point & shift)
 		message("Door is closed.");
 		return;
 	}
+    Container & container = find_at(containers, new_pos);
+	if(container) {
+		message(format("{0} bump into {1}.", someone.name, container.name));
+		return;
+	}
     Monster & monster = find_at(monsters, new_pos);
 	if(monster) {
 		message(format("{0} bump into {1}.", someone.name, monster.name));
@@ -149,6 +154,11 @@ void Game::swing(Monster & someone, const Point & shift)
 				player_died = true;
 			}
 		}
+		return;
+	}
+    Container & container = find_at(containers, new_pos);
+	if(container) {
+		message(format("{0} swing at {1}.", someone.name, container.name));
 		return;
 	}
 	if(!map.is_passable(new_pos)) {

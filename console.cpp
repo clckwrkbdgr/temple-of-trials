@@ -71,6 +71,9 @@ void Console::draw_game(const Game & game)
 	for(unsigned i = 0; i < game.items.size(); ++i) {
 		print_tile(game.items[i].pos.x, game.items[i].pos.y, game.items[i].sprite);
 	}
+	for(unsigned i = 0; i < game.containers.size(); ++i) {
+		print_tile(game.containers[i].pos.x, game.containers[i].pos.y, game.containers[i].sprite);
+	}
 	for(unsigned i = 0; i < game.doors.size(); ++i) {
 		print_tile(game.doors[i].pos.x, game.doors[i].pos.y, game.doors[i].sprite());
 	}

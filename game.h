@@ -20,6 +20,7 @@ struct Game {
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;
 	std::vector<Item> items;
+	std::vector<Container> containers;
 	bool done, player_died;
 	std::list<std::string> messages;
 	int turns;
