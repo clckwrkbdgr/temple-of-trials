@@ -99,6 +99,7 @@ void Console::draw_game(const Game & game)
 	print_stat(row++, format("HP   : {0}", player.hp));
 	print_stat(row++, format("Items: {0}", player.inventory.size()));
 	print_stat(row++, format("Wield: {0}", player.wielded < 0 ? "none" : player.inventory[player.wielded].name));
+	print_stat(row++, format("Dmg  : {0}", player.damage()));
 }
 
 int Console::draw_and_get_control(Game & game)

@@ -15,6 +15,7 @@ struct Monster {
 	Monster();
 	operator bool() const;
 	bool is_dead() const { return hp <= 0; }
+	int damage() const;
 
 	struct Builder;
 };
@@ -56,6 +57,7 @@ struct Item {
 	Point pos;
 	Sprite sprite;
 	std::string name;
+	int damage;
 	Item();
 	operator bool() const;
 
@@ -67,6 +69,7 @@ struct Item::Builder {
 	Builder & pos(const Point & value);
 	Builder & sprite(const Sprite & value);
 	Builder & name(const std::string & value);
+	Builder & damage(int damage);
 };
 
 

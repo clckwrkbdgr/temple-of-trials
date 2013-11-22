@@ -10,6 +10,17 @@ Monster::operator bool() const
     return bool(pos);
 }
 
+int Monster::damage() const
+{
+	if(-1 < wielded && wielded < int(inventory.size())) {
+		const Item & wielded_item = inventory[wielded];
+		if(wielded_item) {
+			return wielded_item.damage;
+		}
+	}
+	return hit_strength;
+}
+
 Monster::Builder & Monster::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Monster::Builder & Monster::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
 Monster::Builder & Monster::Builder::sight(int value) { result.sight = value; return *this; }
@@ -42,7 +53,7 @@ Door::Builder & Door::Builder::opened(bool value) { result.opened = value; retur
 
 
 Item::Item()
-	: sprite(' ')
+	: sprite(' '), damage(0)
 {
 }
 
@@ -54,6 +65,7 @@ Item::operator bool() const
 Item::Builder & Item::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Item::Builder & Item::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
 Item::Builder & Item::Builder::name(const std::string & value) { result.name = value; return *this; }
+Item::Builder & Item::Builder::damage(int value) { result.damage = value; return *this; }
 
 
 Container::Container()

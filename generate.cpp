@@ -25,6 +25,11 @@ Item scorpion_tail(const Point & pos = Point())
 	return Item::Builder().pos(pos).sprite('!').name("scorpion tail");
 }
 
+Item spear(const Point & pos = Point())
+{
+	return Item::Builder().pos(pos).sprite('(').name("spear").damage(5);
+}
+
 Monster player(const Point & monster_pos)
 {
 	return Monster::Builder().pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you").hit_strength(3);
@@ -81,6 +86,10 @@ void generate(Game & game)
 	Point point = game.find_random_free_cell();
 	if(point) {
 		game.containers.push_back(World::pot(point));
+	}
+	point = game.find_random_free_cell();
+	if(point) {
+		game.items.push_back(World::spear(point));
 	}
 	for(int i = 0; i < 5; ++i) {
 		Point point = game.find_random_free_cell();

@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_VERSION = 18 };
+enum { SAVEFILE_VERSION = 19 };
 
 void store_ai(Reader & savefile, Monster & monster)
 {
@@ -93,6 +93,9 @@ void store(Savefile & savefile, Game & game)
 			for(decltype(monster->inventory.begin()) item = monster->inventory.begin(); item != monster->inventory.end(); ++item) {
 				savefile.store(item->pos.x).store(item->pos.y);
 				savefile.store(item->sprite).store(item->name);
+				if(savefile.version() >= 19) {
+					savefile.store(item->damage);
+				}
 				savefile.newline();
 				savefile.check("inventory item");
 			}
@@ -109,6 +112,9 @@ void store(Savefile & savefile, Game & game)
 		for(decltype(game.items.begin()) item = game.items.begin(); item != game.items.end(); ++item) {
 			savefile.store(item->pos.x).store(item->pos.y);
 			savefile.store(item->sprite).store(item->name);
+			if(savefile.version() >= 19) {
+				savefile.store(item->damage);
+			}
 			savefile.newline();
 			savefile.check("item");
 		}
@@ -129,6 +135,9 @@ void store(Savefile & savefile, Game & game)
 			for(decltype(container->items.begin()) item = container->items.begin(); item != container->items.end(); ++item) {
 				savefile.store(item->pos.x).store(item->pos.y);
 				savefile.store(item->sprite).store(item->name);
+				if(savefile.version() >= 19) {
+					savefile.store(item->damage);
+				}
 				savefile.newline();
 				savefile.check("container item");
 			}
