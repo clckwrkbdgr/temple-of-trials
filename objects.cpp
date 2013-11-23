@@ -12,13 +12,88 @@ Monster::operator bool() const
 
 int Monster::damage() const
 {
-	if(-1 < wielded && wielded < int(inventory.size())) {
-		const Item & wielded_item = inventory[wielded];
-		if(wielded_item) {
-			return wielded_item.damage;
-		}
+	if(wielded_item()) {
+		return wielded_item().damage;
 	}
 	return hit_strength;
+}
+
+Item & Monster::wielded_item()
+{
+	static Item empty;
+	empty = Item();
+	if(wielded < 0) {
+		return empty;
+	}
+	if(wielded >= int(inventory.size())) {
+		log("{0} was wielding incorrect slot: {1}", name, wielded);
+		wielded = -1;
+		return empty;
+	}
+	Item & item = inventory[wielded];
+	if(!item) {
+		log("{0} was wielding empty slot: {1}", name, wielded);
+		wielded = -1;
+		return empty;
+	}
+	return item;
+}
+
+const Item & Monster::wielded_item() const
+{
+	static Item empty;
+	if(wielded < 0) {
+		return empty;
+	}
+	if(wielded >= int(inventory.size())) {
+		log("{0} was wielding incorrect slot: {1}", name, wielded);
+		return empty;
+	}
+	const Item & item = inventory[wielded];
+	if(!item) {
+		log("{0} was wielding empty slot: {1}", name, wielded);
+		return empty;
+	}
+	return item;
+}
+
+Item & Monster::worn_item()
+{
+	static Item empty;
+	empty = Item();
+	if(worn < 0) {
+		return empty;
+	}
+	if(worn >= int(inventory.size())) {
+		log("{0} was wearing incorrect slot: {1}", name, worn);
+		worn = -1;
+		return empty;
+	}
+	Item & item = inventory[worn];
+	if(!item) {
+		log("{0} was wearing empty slot: {1}", name, worn);
+		worn = -1;
+		return empty;
+	}
+	return item;
+}
+
+const Item & Monster::worn_item() const
+{
+	static Item empty;
+	if(worn < 0) {
+		return empty;
+	}
+	if(worn >= int(inventory.size())) {
+		log("{0} was wearing incorrect slot: {1}", name, worn);
+		return empty;
+	}
+	const Item & item = inventory[worn];
+	if(!item) {
+		log("{0} was wearing empty slot: {1}", name, worn);
+		return empty;
+	}
+	return item;
 }
 
 Monster::Builder & Monster::Builder::pos(const Point & value) { result.pos = value; return *this; }

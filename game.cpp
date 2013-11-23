@@ -126,6 +126,25 @@ void Game::close(Monster & someone, const Point & shift)
     message(format("{0} closed the door.", someone.name));
 }
 
+void Game::hit(Monster & someone, Monster & other)
+{
+	int received_damage = someone.damage();
+	other.hp -= received_damage;
+	game_assert(other.is_dead(), format("{0} hit {1} for {2} hp.", someone.name, other.name, received_damage));
+	message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, received_damage));
+	foreach(Item & item, other.inventory) {
+		item.pos = other.pos;
+		items.push_back(item);
+		message(format("{0} drops {1}.", other.name, item.name));
+	}
+	other.inventory.clear();
+	if(other.ai == AI::PLAYER) {
+		message("You died.");
+		done = true;
+		player_died = true;
+	}
+}
+
 void Game::swing(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
@@ -139,22 +158,7 @@ void Game::swing(Monster & someone, const Point & shift)
     }
     Monster & monster = find_at(monsters, new_pos);
 	if(monster) {
-		monster.hp -= someone.damage();
-		message(format("{0} hit {1} for {2} hp.", someone.name, monster.name, someone.damage()));
-		if(monster.is_dead()) {
-			message(format("{0} kill {1}.", someone.name, monster.name));
-			foreach(Item & item, monster.inventory) {
-				item.pos = monster.pos;
-				items.push_back(item);
-				message(format("{0} drops {1}.", monster.name, item.name));
-			}
-			monster.inventory.clear();
-			if(monster.ai == AI::PLAYER) {
-				message("You died.");
-				done = true;
-				player_died = true;
-			}
-		}
+		hit(someone, monster);
 		return;
 	}
     Container & container = find_at(containers, new_pos);
@@ -222,17 +226,8 @@ void Game::wield(Monster & someone, int slot)
 void Game::unwield(Monster & someone)
 {
 	game_assert(someone.wielded > -1, format("{0} is wielding nothing.", someone.name));
-	if(someone.wielded >= int(someone.inventory.size())) {
-		log("{0} was wielding incorrect slot: {1}", someone.name, someone.wielded);
-		someone.wielded = -1;
-		return;
-	}
-	Item & item = someone.inventory[someone.wielded];
-	if(!item) {
-		log("{0} was wielding empty slot: {1}", someone.name, someone.wielded);
-		someone.wielded = -1;
-		return;
-	}
+	Item & item = someone.wielded_item();
+	game_assert(item);
 	message(format("{0} unwields {1}.", someone.name, item.name));
 	someone.wielded = -1;
 }
@@ -257,17 +252,8 @@ void Game::wear(Monster & someone, int slot)
 void Game::take_off(Monster & someone)
 {
 	game_assert(someone.worn > -1, format("{0} is wearing nothing.", someone.name));
-	if(someone.worn >= int(someone.inventory.size())) {
-		log("{0} was wearing incorrect slot: {1}", someone.name, someone.worn);
-		someone.worn = -1;
-		return;
-	}
-	Item & item = someone.inventory[someone.worn];
-	if(!item) {
-		log("{0} was wearing empty slot: {1}", someone.name, someone.worn);
-		someone.worn = -1;
-		return;
-	}
+	Item & item = someone.worn_item();
+	game_assert(item);
 	message(format("{0} takes off {1}.", someone.name, item.name));
 	someone.worn = -1;
 }

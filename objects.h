@@ -17,6 +17,10 @@ struct Monster {
 	operator bool() const;
 	bool is_dead() const { return hp <= 0; }
 	int damage() const;
+	Item & wielded_item();
+	const Item & wielded_item() const;
+	Item & worn_item();
+	const Item & worn_item() const;
 
 	struct Builder;
 };

@@ -98,8 +98,8 @@ void Console::draw_game(const Game & game)
 	print_stat(row++, format("Turns: {0}", game.turns));
 	print_stat(row++, format("HP   : {0}", player.hp));
 	print_stat(row++, format("Items: {0}", player.inventory.size()));
-	print_stat(row++, format("Wield: {0}", player.wielded < 0 ? "none" : player.inventory[player.wielded].name));
-	print_stat(row++, format("Wear : {0}", player.worn < 0 ? "none" : player.inventory[player.worn].name));
+	print_stat(row++, format("Wield: {0}", player.wielded_item() ? player.wielded_item().name : "none"));
+	print_stat(row++, format("Wear : {0}", player.worn_item() ? player.worn_item().name : "none"));
 	print_stat(row++, format("Dmg  : {0}", player.damage()));
 }
 
