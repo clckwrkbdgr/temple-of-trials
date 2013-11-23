@@ -3,6 +3,21 @@
 #include <map>
 #include <cstdlib>
 
+void game_assert(bool condition, const std::string & message)
+{
+	if(!condition) {
+		throw Game::Message(message);
+	}
+}
+
+void game_assert(bool condition)
+{
+	if(!condition) {
+		throw Game::Message();
+	}
+}
+
+
 Control::Control(int control_value)
 	: control(control_value), slot(-1)
 {
@@ -66,90 +81,56 @@ void Game::message(std::string text)
 
 void Game::move(Monster & someone, const Point & shift)
 {
-	if(!shift) {
-		return;
-	}
+	game_assert(shift);
 	Point new_pos = someone.pos + shift;
-	if(!map.is_passable(new_pos)) {
-		message(format("{0} bump into the wall.", someone.name));
-		return;
-	}
+	game_assert(map.is_passable(new_pos), format("{0} bump into the wall.", someone.name));
     Door & door = find_at(doors, new_pos);
-	if(door && !door.opened) {
-		message("Door is closed.");
-		return;
-	}
+	game_assert(!door || door.opened, "Door is closed.");
     Container & container = find_at(containers, new_pos);
-	if(container) {
-		message(format("{0} bump into {1}.", someone.name, container.name));
-		return;
-	}
+	game_assert(!container, format("{0} bump into {1}.", someone.name, container.name));
     Monster & monster = find_at(monsters, new_pos);
-	if(monster) {
-		message(format("{0} bump into {1}.", someone.name, monster.name));
-		return;
-	}
+	game_assert(!monster, format("{0} bump into {1}.", someone.name, monster.name));
     someone.pos = new_pos;
 }
 
 void Game::open(Monster & someone, const Point & shift)
 {
-	if(!shift) {
-		return;
-	}
+	game_assert(shift);
     Point new_pos = someone.pos + shift;
     Door & door = find_at(doors, new_pos);
     if(door) {
-		if(door.opened) {
-			message("Door is already opened.");
-			return;
-		}
+		game_assert(!door.opened, "Door is already opened.");
 		door.opened = true;
 		message(format("{0} opened the door.", someone.name));
 		return;
     }
 	Container & container = find_at(containers, new_pos);
-	if(container) {
-		if(container.items.empty()) {
-			message(format("{0} is empty.", container.name));
-			return;
-		}
-		foreach(Item & item, container.items) {
-			item.pos = someone.pos;
-			items.push_back(item);
-			message(format("{0} took up a {1} from {2}.", someone.name, item.name, container.name));
-		}
-		container.items.clear();
-		return;
+	game_assert(container, "There is nothing to open there.");
+	game_assert(!container.items.empty(), format("{0} is empty.", container.name));
+	foreach(Item & item, container.items) {
+		item.pos = someone.pos;
+		items.push_back(item);
+		message(format("{0} took up a {1} from {2}.", someone.name, item.name, container.name));
 	}
-	message("There is nothing to open there.");
+	container.items.clear();
 }
 
 void Game::close(Monster & someone, const Point & shift)
 {
-	if(!shift) {
-		return;
-	}
+	game_assert(shift);
     Point new_pos = someone.pos + shift;
     Door & door = find_at(doors, new_pos);
-    if(!door) {
-        message("There is nothing to close there.");
-        return;
-    }
-    if(!door.opened) {
-        message("Door is already closed.");
-        return;
-    }
+    game_assert(door, "There is nothing to close there.");
+    game_assert(door.opened, "Door is already closed.");
     door.opened = false;
     message(format("{0} closed the door.", someone.name));
 }
 
 void Game::swing(Monster & someone, const Point & shift)
 {
-	if(!shift) {
-		return;
-	}
+	game_assert(shift);
     Point new_pos = someone.pos + shift;
+	game_assert(map.is_passable(new_pos), format("{0} hit wall.", someone.name));
     Door & door = find_at(doors, new_pos);
     if(door && !door.opened) {
 		message(format("{0} swing at door.", someone.name));
@@ -177,34 +158,16 @@ void Game::swing(Monster & someone, const Point & shift)
 		return;
 	}
     Container & container = find_at(containers, new_pos);
-	if(container) {
-		message(format("{0} swing at {1}.", someone.name, container.name));
-		return;
-	}
-	if(!map.is_passable(new_pos)) {
-		message(format("{0} hit wall.", someone.name));
-		return;
-	}
+	game_assert(!container, format("{0} swing at {1}.", someone.name, container.name));
     message(format("{0} swing at nothing.", someone.name));
 }
 
 void Game::drop(Monster & someone, int slot)
 {
-	if(slot < 0) {
-		return;
-	}
-	if(someone.inventory.empty()) {
-		message(format("{0} have nothing to drop.", someone.name));
-		return;
-	}
-	if(int(someone.inventory.size()) < slot) {
-		message("No such object.");
-		return;
-	}
-	if(!someone.inventory[slot]) {
-		message("No such object.");
-		return;
-	}
+	game_assert(slot > -1);
+	game_assert(!someone.inventory.empty(), format("{0} have nothing to drop.", someone.name));
+	game_assert(slot < int(someone.inventory.size()), "No such object.");
+	game_assert(someone.inventory[slot], "No such object.");
 	if(someone.wielded == slot) {
 		unwield(someone);
 	}
@@ -222,10 +185,7 @@ void Game::grab(Monster & someone)
 {
 	std::vector<Item>::iterator item_index;
 	Item item = find_at(items, someone.pos, &item_index);
-	if(!item) {
-		message("Nothing here to pick up.");
-		return;
-	}
+	game_assert(item, "Nothing here to pick up.");
 	std::vector<Item>::iterator empty_slot;
 	for(empty_slot = someone.inventory.begin(); empty_slot != someone.inventory.end(); ++empty_slot) {
 		if(!*empty_slot) {
@@ -233,10 +193,7 @@ void Game::grab(Monster & someone)
 		}
 	}
 	if(empty_slot == someone.inventory.end()) {
-		if(someone.inventory.size() >= 26) {
-			message(format("{0} carry too much items.", someone.name));
-			return;
-		}
+		game_assert(someone.inventory.size() < 26, format("{0} carry too much items.", someone.name));
 		someone.inventory.push_back(item);
 	} else {
 		*empty_slot = item;
@@ -247,21 +204,10 @@ void Game::grab(Monster & someone)
 
 void Game::wield(Monster & someone, int slot)
 {
-	if(slot < 0) {
-		return;
-	}
-	if(someone.inventory.empty()) {
-		message(format("{0} have nothing to wield.", someone.name));
-		return;
-	}
-	if(int(someone.inventory.size()) < slot) {
-		message("No such object.");
-		return;
-	}
-	if(!someone.inventory[slot]) {
-		message("No such object.");
-		return;
-	}
+	game_assert(slot > -1);
+	game_assert(!someone.inventory.empty(), format("{0} have nothing to wield.", someone.name));
+	game_assert(slot < int(someone.inventory.size()), "No such object.");
+	game_assert(someone.inventory[slot], "No such object.");
 	Item item = someone.inventory[slot];
 	if(someone.wielded > -1) {
 		unwield(someone);
@@ -275,10 +221,7 @@ void Game::wield(Monster & someone, int slot)
 
 void Game::unwield(Monster & someone)
 {
-	if(someone.wielded < 0) {
-		message(format("{0} is wielding nothing.", someone.name));
-		return;
-	}
+	game_assert(someone.wielded > -1, format("{0} is wielding nothing.", someone.name));
 	if(someone.wielded >= int(someone.inventory.size())) {
 		log("{0} was wielding incorrect slot: {1}", someone.name, someone.wielded);
 		someone.wielded = -1;
@@ -296,21 +239,10 @@ void Game::unwield(Monster & someone)
 
 void Game::wear(Monster & someone, int slot)
 {
-	if(slot < 0) {
-		return;
-	}
-	if(someone.inventory.empty()) {
-		message(format("{0} have nothing to wear.", someone.name));
-		return;
-	}
-	if(int(someone.inventory.size()) < slot) {
-		message("No such object.");
-		return;
-	}
-	if(!someone.inventory[slot]) {
-		message("No such object.");
-		return;
-	}
+	game_assert(slot > -1);
+	game_assert(!someone.inventory.empty(), format("{0} have nothing to wear.", someone.name));
+	game_assert(slot < int(someone.inventory.size()), "No such object.");
+	game_assert(someone.inventory[slot], "No such object.");
 	Item item = someone.inventory[slot];
 	if(someone.worn > -1) {
 		take_off(someone);
@@ -324,10 +256,7 @@ void Game::wear(Monster & someone, int slot)
 
 void Game::take_off(Monster & someone)
 {
-	if(someone.worn < 0) {
-		message(format("{0} is wearing nothing.", someone.name));
-		return;
-	}
+	game_assert(someone.worn > -1, format("{0} is wearing nothing.", someone.name));
 	if(someone.worn >= int(someone.inventory.size())) {
 		log("{0} was wearing incorrect slot: {1}", someone.name, someone.worn);
 		someone.worn = -1;

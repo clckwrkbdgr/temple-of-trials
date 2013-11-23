@@ -16,6 +16,11 @@ struct Control {
 };
 
 struct Game {
+	struct Message {
+		std::string text;
+		Message(const std::string & message_text) : text(message_text) {}
+		Message() {}
+	};
 	Map map;
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;

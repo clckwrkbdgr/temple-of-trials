@@ -37,19 +37,23 @@ int main()
 				continue;
 			}
 			Control control = controller(monster, game);
-			switch(control.control) {
-				case Control::MOVE: game.move(monster, control.direction); break;
-				case Control::OPEN: game.open(monster, control.direction); break;
-				case Control::CLOSE: game.close(monster, control.direction); break;
-				case Control::SWING: game.swing(monster, control.direction); break;
-				case Control::GRAB: game.grab(monster); break;
-				case Control::DROP: game.drop(monster, control.slot); break;
-				case Control::WIELD: game.wield(monster, control.slot); break;
-				case Control::UNWIELD: game.unwield(monster); break;
-				case Control::WEAR: game.wear(monster, control.slot); break;
-				case Control::TAKE_OFF: game.take_off(monster); break;
-				case Control::WAIT: break;
-				default: log("Unknown control: {0}", control.control); break;
+			try {
+				switch(control.control) {
+					case Control::MOVE: game.move(monster, control.direction); break;
+					case Control::OPEN: game.open(monster, control.direction); break;
+					case Control::CLOSE: game.close(monster, control.direction); break;
+					case Control::SWING: game.swing(monster, control.direction); break;
+					case Control::GRAB: game.grab(monster); break;
+					case Control::DROP: game.drop(monster, control.slot); break;
+					case Control::WIELD: game.wield(monster, control.slot); break;
+					case Control::UNWIELD: game.unwield(monster); break;
+					case Control::WEAR: game.wear(monster, control.slot); break;
+					case Control::TAKE_OFF: game.take_off(monster); break;
+					case Control::WAIT: break;
+					default: log("Unknown control: {0}", control.control); break;
+				}
+			} catch(const Game::Message & msg) {
+				game.message(msg.text);
 			}
 			if(game.done) {
 				break;
