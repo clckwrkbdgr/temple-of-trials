@@ -239,6 +239,7 @@ void Game::wear(Monster & someone, int slot)
 	game_assert(slot < int(someone.inventory.size()), "No such object.");
 	game_assert(someone.inventory[slot], "No such object.");
 	Item item = someone.inventory[slot];
+	game_assert(item.wearable, format("{0} cannot be worn.", item.name));
 	if(someone.worn > -1) {
 		take_off(someone);
 	}

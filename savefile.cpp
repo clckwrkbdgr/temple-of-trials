@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_VERSION = 20 };
+enum { SAVEFILE_VERSION = 21 };
 
 void store_ai(Reader & savefile, Monster & monster)
 {
@@ -50,6 +50,9 @@ SAVEFILE_STORE_EXT(Item, item)
 	savefile.store(item.sprite).store(item.name);
 	if(savefile.version() >= 19) {
 		savefile.store(item.damage);
+	}
+	if(savefile.version() >= 21) {
+		savefile.store(item.wearable);
 	}
 }
 

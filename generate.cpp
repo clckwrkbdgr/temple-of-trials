@@ -30,6 +30,11 @@ Item spear(const Point & pos = Point())
 	return Item::Builder().pos(pos).sprite('(').name("spear").damage(5);
 }
 
+Item jacket(const Point & pos = Point())
+{
+	return Item::Builder().pos(pos).sprite('[').name("jacket").wearable();
+}
+
 Monster player(const Point & monster_pos)
 {
 	return Monster::Builder().pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you").hit_strength(3);
@@ -53,7 +58,7 @@ Door door(const Point & pos)
 
 Container pot(const Point & pos)
 {
-	return Container::Builder().pos(pos).sprite('^').name("pot").item(money());
+	return Container::Builder().pos(pos).sprite('^').name("pot").item(money()).item(jacket());
 }
 
 }

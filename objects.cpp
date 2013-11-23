@@ -128,7 +128,7 @@ Door::Builder & Door::Builder::opened(bool value) { result.opened = value; retur
 
 
 Item::Item()
-	: sprite(' '), damage(0)
+	: sprite(' '), damage(0), wearable(false)
 {
 }
 
@@ -141,6 +141,7 @@ Item::Builder & Item::Builder::pos(const Point & value) { result.pos = value; re
 Item::Builder & Item::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
 Item::Builder & Item::Builder::name(const std::string & value) { result.name = value; return *this; }
 Item::Builder & Item::Builder::damage(int value) { result.damage = value; return *this; }
+Item::Builder & Item::Builder::wearable() { result.wearable = true; return *this; }
 
 
 Container::Container()
