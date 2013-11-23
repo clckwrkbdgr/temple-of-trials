@@ -32,7 +32,7 @@ Item spear(const Point & pos = Point())
 
 Item jacket(const Point & pos = Point())
 {
-	return Item::Builder().pos(pos).sprite('[').name("jacket").wearable();
+	return Item::Builder().pos(pos).sprite('[').name("jacket").wearable().defence(1);
 }
 
 Monster player(const Point & monster_pos)

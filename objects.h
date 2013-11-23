@@ -64,6 +64,7 @@ struct Item {
 	std::string name;
 	int damage;
 	bool wearable;
+	int defence;
 	Item();
 	operator bool() const;
 
@@ -77,6 +78,7 @@ struct Item::Builder {
 	Builder & name(const std::string & value);
 	Builder & damage(int damage);
 	Builder & wearable();
+	Builder & defence(int defence);
 };
 
 
