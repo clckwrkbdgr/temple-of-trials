@@ -1,7 +1,7 @@
 #include "objects.h"
 
 Monster::Monster()
-	: sprite(' '), sight(0), ai(0), hp(1), hit_strength(0), wielded(-1)
+	: sprite(' '), sight(0), ai(0), hp(1), hit_strength(0), wielded(-1), worn(-1)
 {
 }
 

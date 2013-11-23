@@ -5,7 +5,7 @@
 #include <list>
 
 struct Control {
-	enum { NONE, OPEN, CLOSE, MOVE, SWING, WAIT, GRAB, DROP, WIELD, UNWIELD };
+	enum { NONE, OPEN, CLOSE, MOVE, SWING, WAIT, GRAB, DROP, WIELD, UNWIELD, WEAR, TAKE_OFF };
 	int control;
 	Point direction;
 	int slot;
@@ -44,5 +44,7 @@ struct Game {
 	void drop(Monster & someone, int slot);
 	void wield(Monster & someone, int slot);
 	void unwield(Monster & someone);
+	void wear(Monster & someone, int slot);
+	void take_off(Monster & someone);
 };
 

@@ -55,7 +55,12 @@ Control player_control(Monster & player, Game & game)
 			int slot = console.get_inventory_slot(game, player);
 			return Control(Control::WIELD, slot);
 		} else if(ch == 'W') {
+			int slot = console.get_inventory_slot(game, player);
+			return Control(Control::WEAR, slot);
+		} else if(ch == 't') {
 			return Control(Control::UNWIELD);
+		} else if(ch == 'T') {
+			return Control(Control::TAKE_OFF);
 		} else if(ch == 'd') {
 			int slot = console.get_inventory_slot(game, player);
 			return Control(Control::DROP, slot);

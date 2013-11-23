@@ -99,6 +99,7 @@ void Console::draw_game(const Game & game)
 	print_stat(row++, format("HP   : {0}", player.hp));
 	print_stat(row++, format("Items: {0}", player.inventory.size()));
 	print_stat(row++, format("Wield: {0}", player.wielded < 0 ? "none" : player.inventory[player.wielded].name));
+	print_stat(row++, format("Wear : {0}", player.worn < 0 ? "none" : player.inventory[player.worn].name));
 	print_stat(row++, format("Dmg  : {0}", player.damage()));
 }
 
@@ -143,6 +144,9 @@ void Console::draw_inventory(const Game & game, const Monster & monster)
 			std::string text = format("{0} - {1}", char(index + 'a'), item.name);
 			if(monster.wielded == index) {
 				text += " (wielded)";
+			}
+			if(monster.worn == index) {
+				text += " (worn)";
 			}
 			mvprintw(y, x, text.c_str());
 			++pos;
