@@ -27,7 +27,7 @@ struct Game {
 	std::vector<Item> items;
 	std::vector<Container> containers;
 	bool done, player_died;
-	std::list<std::string> messages;
+	std::vector<std::string> messages;
 	int turns;
 
 	Game();

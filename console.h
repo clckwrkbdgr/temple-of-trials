@@ -19,6 +19,7 @@ struct Console {
 
 	static Console & instance();
 private:
+	unsigned messages_seen;
 	std::string notification_text;
 	Console();
 	~Console();

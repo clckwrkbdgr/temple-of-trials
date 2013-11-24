@@ -8,6 +8,7 @@ enum {
 };
 
 Console::Console()
+	: messages_seen(0)
 {
 	initscr();
 	raw();
@@ -81,14 +82,27 @@ void Console::draw_game(const Game & game)
 		print_tile(monster.pos.x, monster.pos.y, monster.sprite);
 	}
 
-	std::string message;
-	if(game.messages.size() > 1) {
-		message += format("({0}) ", game.messages.size());
+	if(game.messages.size() > messages_seen) {
+		int width, height;
+		getmaxyx(stdscr, height, width);
+		(void)width;
+		int message_pan = height - MAP_HEIGHT;
+		if(message_pan <= 0) {
+			messages_seen = game.messages.size();
+		} else {
+			int messages_left = game.messages.size() - messages_seen;
+			int message_count = std::min(messages_left, message_pan);
+			for(int i = 0; i < message_count; ++i) {
+				const std::string & message = game.messages[messages_seen + i];
+				if(message_count < messages_left && i == message_count - 1) {
+					mvprintw(MAP_HEIGHT + i, 0, "%s", (message + " (...)").c_str());
+				} else {
+					mvprintw(MAP_HEIGHT + i, 0, "%s", message.c_str());
+				}
+			}
+			messages_seen += message_count;
+		}
 	}
-	if(!game.messages.empty()) {
-		message += game.messages.front();
-	}
-	print_message(message);
 
 	mvprintw(0, 0, "%s", notification_text.c_str());
 	notification_text.clear();
@@ -113,19 +127,11 @@ int Console::see_messages(Game & game)
 {
 	draw_game(game);
 	int ch = (game.done && game.messages.empty()) ? 0 : get_control();
-	while(!game.messages.empty()) {
-		if(game.messages.size() > 1) {
-			switch(ch) {
-				case ' ': game.messages.pop_front(); break;
-				default: break;
-			}
+	while(game.messages.size() > messages_seen) {
+		if(ch == ' ') {
 			draw_game(game);
-			ch = get_control();
-			continue;
-		} else if(game.messages.size() == 1) {
-			game.messages.pop_front();
 		}
-		break;
+		ch = get_control();
 	}
 	return ch;
 }
