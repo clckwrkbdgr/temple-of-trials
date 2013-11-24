@@ -126,9 +126,9 @@ void Game::close(Monster & someone, const Point & shift)
     message(format("{0} closed the door.", someone.name));
 }
 
-void Game::hit(Monster & someone, Monster & other)
+void Game::hit(Monster & someone, Monster & other, int damage)
 {
-	int received_damage = someone.damage() - other.worn_item().defence;
+	int received_damage = damage - other.worn_item().defence;
 	other.hp -= received_damage;
 	game_assert(other.is_dead(), format("{0} hit {1} for {2} hp.", someone.name, other.name, received_damage));
 	message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, received_damage));
@@ -158,7 +158,7 @@ void Game::swing(Monster & someone, const Point & shift)
     }
     Monster & monster = find_at(monsters, new_pos);
 	if(monster) {
-		hit(someone, monster);
+		hit(someone, monster, someone.damage());
 		return;
 	}
     Container & container = find_at(containers, new_pos);
@@ -197,6 +197,7 @@ void Game::fire(Monster & someone, const Point & shift)
 		if(monster) {
 			message(format("{0} hits {1}.", item.name, monster.name));
 			item.pos += shift;
+			hit(someone, monster, item.damage);
 			items.push_back(item);
 			break;
 		}

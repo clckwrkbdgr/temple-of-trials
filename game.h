@@ -52,6 +52,6 @@ struct Game {
 	void unwield(Monster & someone);
 	void wear(Monster & someone, int slot);
 	void take_off(Monster & someone);
-	void hit(Monster & someone, Monster & other);
+	void hit(Monster & someone, Monster & other, int damage);
 };
 
