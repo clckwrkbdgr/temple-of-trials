@@ -166,6 +166,44 @@ void Game::swing(Monster & someone, const Point & shift)
     message(format("{0} swing at nothing.", someone.name));
 }
 
+void Game::fire(Monster & someone, const Point & shift)
+{
+	game_assert(shift);
+	Item item = someone.wielded_item();
+	game_assert(item, format("{0} have nothing to throw.", someone.name));
+	someone.inventory[someone.wielded] = Item();
+	someone.wielded = -1;
+    item.pos = someone.pos;
+	message(format("{0} throw {1}.", someone.name, item.name));
+	while(true) {
+		if(!map.is_passable(item.pos + shift)) {
+			message(format("{0} hit wall.", item.name));
+			items.push_back(item);
+			break;
+		}
+		Door & door = find_at(doors, item.pos + shift);
+		if(door && !door.opened) {
+			message(format("{0} hit door.", item.name));
+			items.push_back(item);
+			break;
+		}
+		Container & container = find_at(containers, item.pos + shift);
+		if(container) {
+			message(format("{0} falls into {1}.", item.name, container.name));
+			container.items.push_back(item);
+			break;
+		}
+		Monster & monster = find_at(monsters, item.pos + shift);
+		if(monster) {
+			message(format("{0} hits {1}.", item.name, monster.name));
+			item.pos += shift;
+			items.push_back(item);
+			break;
+		}
+		item.pos += shift;
+	}
+}
+
 void Game::drop(Monster & someone, int slot)
 {
 	game_assert(slot > -1);

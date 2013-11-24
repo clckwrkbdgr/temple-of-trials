@@ -43,6 +43,7 @@ int main()
 					case Control::OPEN: game.open(monster, control.direction); break;
 					case Control::CLOSE: game.close(monster, control.direction); break;
 					case Control::SWING: game.swing(monster, control.direction); break;
+					case Control::FIRE: game.fire(monster, control.direction); break;
 					case Control::GRAB: game.grab(monster); break;
 					case Control::DROP: game.drop(monster, control.slot); break;
 					case Control::WIELD: game.wield(monster, control.slot); break;

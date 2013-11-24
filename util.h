@@ -71,6 +71,7 @@ struct Point {
 	Point(int _x, int _y);
 	Point();
 	bool operator==(const Point & other) const;
+	Point & operator+=(const Point & other);
 	operator bool() const;
 };
 Point operator+(const Point & a, const Point & b);
