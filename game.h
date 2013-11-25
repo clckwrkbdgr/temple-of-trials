@@ -42,6 +42,9 @@ struct Game {
 	const Monster & getPlayer() const;
 
 	void process_environment(Monster & someone);
+	void die(Monster & someone);
+	void hurt(Monster & someone, int damage);
+	void hit(Monster & someone, Monster & other, int damage);
 
 	void move(Monster & someone, const Point & shift);
 	void open(Monster & someone, const Point & shift);
@@ -54,6 +57,5 @@ struct Game {
 	void unwield(Monster & someone);
 	void wear(Monster & someone, int slot);
 	void take_off(Monster & someone);
-	void hit(Monster & someone, Monster & other, int damage);
 };
 

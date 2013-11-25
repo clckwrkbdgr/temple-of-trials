@@ -83,9 +83,41 @@ void Game::process_environment(Monster & someone)
 {
 	if(map.cell(someone.pos).hurts) {
 		message("It hurts!");
-		message(format("{0} loses {1} hp.", someone.name, 1));
-		someone.hp -= 1;
+		hurt(someone, 1);
 	}
+}
+
+void Game::die(Monster & someone)
+{
+	foreach(Item & item, someone.inventory) {
+		item.pos = someone.pos;
+		items.push_back(item);
+		message(format("{0} drops {1}.", someone.name, item.name));
+	}
+	someone.inventory.clear();
+	if(someone.ai == AI::PLAYER) {
+		message("You died.");
+		done = true;
+		player_died = true;
+	}
+}
+
+void Game::hurt(Monster & someone, int damage)
+{
+	int received_damage = damage - someone.worn_item().defence;
+	someone.hp -= received_damage;
+	game_assert(someone.is_dead(), format("{0} loses {1} hp.", someone.name, received_damage));
+	message(format("{0} loses {1} hp and dies.", someone.name, received_damage));
+	die(someone);
+}
+
+void Game::hit(Monster & someone, Monster & other, int damage)
+{
+	int received_damage = damage - other.worn_item().defence;
+	other.hp -= received_damage;
+	game_assert(other.is_dead(), format("{0} hit {1} for {2} hp.", someone.name, other.name, received_damage));
+	message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, received_damage));
+	die(other);
 }
 
 void Game::move(Monster & someone, const Point & shift)
@@ -133,25 +165,6 @@ void Game::close(Monster & someone, const Point & shift)
     game_assert(door.opened, "Door is already closed.");
     door.opened = false;
     message(format("{0} closed the door.", someone.name));
-}
-
-void Game::hit(Monster & someone, Monster & other, int damage)
-{
-	int received_damage = damage - other.worn_item().defence;
-	other.hp -= received_damage;
-	game_assert(other.is_dead(), format("{0} hit {1} for {2} hp.", someone.name, other.name, received_damage));
-	message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, received_damage));
-	foreach(Item & item, other.inventory) {
-		item.pos = other.pos;
-		items.push_back(item);
-		message(format("{0} drops {1}.", other.name, item.name));
-	}
-	other.inventory.clear();
-	if(other.ai == AI::PLAYER) {
-		message("You died.");
-		done = true;
-		player_died = true;
-	}
 }
 
 void Game::swing(Monster & someone, const Point & shift)
