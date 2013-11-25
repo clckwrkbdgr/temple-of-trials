@@ -34,25 +34,14 @@ const CellType & Map::cell(const Point & pos) const
 	return cell(pos.x, pos.y);
 }
 
+bool Map::valid(int x, int y) const
+{
+	return (x >= 0 && x < int(width) && y >= 0 && y < int(height));
+}
+
 bool Map::valid(const Point & pos) const
 {
 	return (pos.x >= 0 && pos.x < int(width) && pos.y >= 0 && pos.y < int(height));
-}
-
-bool Map::is_passable(const Point & pos) const
-{
-	if(!valid(pos)) {
-		return false;
-	}
-	return cell(pos).passable;
-}
-
-bool Map::is_transparent(const Point & pos) const
-{
-	if(!valid(pos)) {
-		return false;
-	}
-	return cell(pos).transparent;
 }
 
 void Map::fill(int celltype)
@@ -73,6 +62,11 @@ void Map::set_cell_type(const Point & pos, int value)
 
 int & Map::celltype(int x, int y)
 {
+	static int empty;
+	empty = 0;
+	if(!valid(x, y)) {
+		return empty;
+	}
 	return cells[x + y * width].type;
 }
 
@@ -83,6 +77,10 @@ int & Map::celltype(const Point & pos)
 
 int Map::celltype(int x, int y) const
 {
+	static int empty = 0;
+	if(!valid(x, y)) {
+		return empty;
+	}
 	return cells[x + y * width].type;
 }
 

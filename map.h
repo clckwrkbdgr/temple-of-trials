@@ -33,10 +33,9 @@ public:
 
 	Map(unsigned map_width, unsigned map_height);
 	bool valid(const Point & pos) const;
+	bool valid(int x, int y) const;
 	const CellType & cell(int x, int y) const;
 	const CellType & cell(const Point & pos) const;
-	bool is_passable(const Point & pos) const;
-	bool is_transparent(const Point & pos) const;
 
 	void fill(int celltype);
 	int add_cell_type(const CellType & celltype);

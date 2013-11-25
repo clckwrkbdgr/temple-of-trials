@@ -44,7 +44,7 @@ Point Game::find_random_free_cell() const
 	int counter = map.width * map.height;
 	while(--counter > 0) {
 		Point new_pos = Point(rand() % map.width, rand() % map.height);
-		if(!map.is_passable(new_pos)) {
+		if(!map.cell(new_pos).passable) {
 			continue;
 		}
 		if(find_at(doors, new_pos)) {
@@ -135,7 +135,7 @@ void Game::move(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
 	Point new_pos = someone.pos + shift;
-	game_assert(map.is_passable(new_pos), format("{0} bump into the wall.", someone.name));
+	game_assert(map.cell(new_pos).passable, format("{0} bump into the wall.", someone.name));
     Door & door = find_at(doors, new_pos);
 	game_assert(!door || door.opened, "Door is closed.");
     Container & container = find_at(containers, new_pos);
@@ -204,7 +204,7 @@ void Game::swing(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
     Point new_pos = someone.pos + shift;
-	game_assert(map.is_passable(new_pos), format("{0} hit wall.", someone.name));
+	game_assert(map.cell(new_pos).passable, format("{0} hit wall.", someone.name));
     Door & door = find_at(doors, new_pos);
     if(door && !door.opened) {
 		message(format("{0} swing at door.", someone.name));
@@ -231,7 +231,7 @@ void Game::fire(Monster & someone, const Point & shift)
     item.pos = someone.pos;
 	message(format("{0} throw {1}.", someone.name, item.name));
 	while(true) {
-		if(!map.is_transparent(item.pos + shift)) {
+		if(!map.cell(item.pos + shift).transparent) {
 			message(format("{0} hit wall.", item.name));
 			items.push_back(item);
 			break;
@@ -246,6 +246,11 @@ void Game::fire(Monster & someone, const Point & shift)
 		if(container) {
 			message(format("{0} falls into {1}.", item.name, container.name));
 			container.items.push_back(item);
+			break;
+		}
+		Fountain & fountain = find_at(fountains, item.pos + shift);
+		if(fountain) {
+			message(format("{0} falls into {1}. Forever lost.", item.name, fountain.name));
 			break;
 		}
 		Monster & monster = find_at(monsters, item.pos + shift);
