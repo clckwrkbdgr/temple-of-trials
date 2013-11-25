@@ -113,7 +113,7 @@ void Console::draw_game(const Game & game)
 	const Monster & player = game.getPlayer();
 	int row = 0;
 	print_stat(row++, format("Turns: {0}", game.turns));
-	print_stat(row++, format("HP   : {0}", player.hp));
+	print_stat(row++, format("HP   : {0}/{1}", player.hp, player.max_hp));
 	print_stat(row++, format("Items: {0}", player.inventory.size()));
 	print_stat(row++, format("Wield: {0}", player.wielded_item() ? player.wielded_item().name : "none"));
 	print_stat(row++, format("Wear : {0}", player.worn_item() ? player.worn_item().name : "none"));

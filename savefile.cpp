@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 2 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 3 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -47,6 +47,9 @@ SAVEFILE_STORE_EXT(Monster, monster)
 	savefile.store(monster.pos.x).store(monster.pos.y).store(monster.sprite);
 	savefile.store(monster.sight);
 	savefile.store(monster.hp);
+	if(savefile.version() >= 3) {
+		savefile.store(monster.max_hp);
+	}
 	savefile.store(monster.wielded);
 	savefile.store(monster.worn);
 	savefile.store(monster.hit_strength);

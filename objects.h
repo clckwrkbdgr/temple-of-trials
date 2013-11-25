@@ -7,7 +7,7 @@ struct Monster {
 	Sprite sprite;
 	int sight;
 	int ai;
-	int hp;
+	int max_hp, hp;
 	int hit_strength;
 	std::string name;
 	std::vector<Item> inventory;

@@ -1,7 +1,7 @@
 #include "objects.h"
 
 Monster::Monster()
-	: sprite(' '), sight(0), ai(0), hp(1), hit_strength(0), wielded(-1), worn(-1)
+	: sprite(' '), sight(0), ai(0), max_hp(1), hp(max_hp), hit_strength(0), wielded(-1), worn(-1)
 {
 }
 
@@ -100,7 +100,7 @@ Monster::Builder & Monster::Builder::pos(const Point & value) { result.pos = val
 Monster::Builder & Monster::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
 Monster::Builder & Monster::Builder::sight(int value) { result.sight = value; return *this; }
 Monster::Builder & Monster::Builder::ai(int value) { result.ai = value; return *this; }
-Monster::Builder & Monster::Builder::hp(int value) { result.hp = value; return *this; }
+Monster::Builder & Monster::Builder::hp(int value) { result.hp = result.max_hp = value; return *this; }
 Monster::Builder & Monster::Builder::name(const std::string & value) { result.name = value; return *this; }
 Monster::Builder & Monster::Builder::item(const Item & value) { result.inventory.push_back(value); return *this; }
 Monster::Builder & Monster::Builder::hit_strength(int value) { result.hit_strength = value; return *this; }
