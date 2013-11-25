@@ -1,33 +1,35 @@
 #include "map.h"
 #include "util.h"
 
-Cell::Cell(const Sprite & cell_sprite, bool is_passable)
+CellType::CellType(const Sprite & cell_sprite, bool is_passable)
 	: sprite(cell_sprite), passable(is_passable)
 {
 }
 
-Cell::Cell()
+CellType::CellType()
 	: sprite(' '), passable(false)
 {
 }
 
 
-Map::Map(unsigned map_width, unsigned map_height, Cell default_cell)
-	: width(map_width), height(map_height), cells(width * height, default_cell)
+Cell::Cell(int cell_type)
+	: type(cell_type)
 {
 }
 
-Cell & Map::cell(int x, int y)
+
+Map::Map(unsigned map_width, unsigned map_height)
+	: width(map_width), height(map_height), cells(width * height, Cell(0))
 {
-	return cells[x + y * width];
+	celltypes.push_back(CellType());
 }
 
-const Cell & Map::cell(int x, int y) const
+const CellType & Map::cell(int x, int y) const
 {
-	return cells[x + y * width];
+	return celltypes[celltype(x, y)];
 }
 
-const Cell & Map::cell(const Point & pos) const
+const CellType & Map::cell(const Point & pos) const
 {
 	return cell(pos.x, pos.y);
 }
@@ -44,3 +46,40 @@ bool Map::is_passable(const Point & pos) const
 	}
 	return cell(pos).passable;
 }
+
+void Map::fill(int celltype)
+{
+	cells = std::vector<Cell>(width * height, Cell(celltype));
+}
+
+int Map::add_cell_type(const CellType & celltype)
+{
+	celltypes.push_back(celltype);
+	return celltypes.size() - 1;
+}
+
+void Map::set_cell_type(const Point & pos, int value)
+{
+	celltype(pos) = value;
+}
+
+int & Map::celltype(int x, int y)
+{
+	return cells[x + y * width].type;
+}
+
+int & Map::celltype(const Point & pos)
+{
+	return celltype(pos.x, pos.y);
+}
+
+int Map::celltype(int x, int y) const
+{
+	return cells[x + y * width].type;
+}
+
+int Map::celltype(const Point & pos) const
+{
+	return celltype(pos.x, pos.y);
+}
+

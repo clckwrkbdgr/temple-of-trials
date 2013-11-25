@@ -19,8 +19,8 @@ public:
 	Reader(const std::string & filename);
 
 	Reader & newline();
-	Reader & version(int version);
-	int version() const { return actual_version; }
+	Reader & version(int major_version, int minor_version);
+	int version() const { return actual_minor_version; }
 	void check(const std::string & section);
 	
 	Reader & store(int & value);
@@ -50,7 +50,7 @@ public:
 		}
 	}
 private:
-	int actual_version;
+	int actual_minor_version;
 	std::ifstream in;
 };
 
@@ -63,8 +63,8 @@ public:
 	Writer(const std::string & filename);
 
 	Writer & newline();
-	Writer & version(int version);
-	int version() const { return actual_version; }
+	Writer & version(int major_version, int minor_version);
+	int version() const { return actual_minor_version; }
 	void check(const std::string & section);
 	
 	Writer & store(int value);
@@ -92,7 +92,7 @@ public:
 		}
 	}
 private:
-	int actual_version;
+	int actual_minor_version;
 	std::ofstream out;
 };
 

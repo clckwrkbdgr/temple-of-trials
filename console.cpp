@@ -64,8 +64,8 @@ void Console::notification(const std::string & text)
 void Console::draw_game(const Game & game)
 {
 	clear();
-	for(unsigned x = 0; x < game.map.get_width(); ++x) {
-		for(unsigned y = 0; y < game.map.get_height(); ++y) {
+	for(unsigned x = 0; x < game.map.width; ++x) {
+		for(unsigned y = 0; y < game.map.height; ++y) {
 			print_tile(x, y, game.map.cell(x, y).sprite);
 		}
 	}

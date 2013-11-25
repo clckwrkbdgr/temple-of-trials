@@ -2,28 +2,36 @@
 #include <vector>
 #include "util.h"
 
-struct Cell {
+struct CellType {
 	Sprite sprite;
 	bool passable;
+	explicit CellType(const Sprite & cell_sprite, bool is_passable = true);
+	CellType();
+};
 
-	explicit Cell(const Sprite & cell_sprite, bool is_passable = true);
-	Cell();
+struct Cell {
+	int type;
+	explicit Cell(int cell_type = 0);
 };
 
 class Map {
 public:
-	Map(unsigned map_width, unsigned map_height, Cell default_cell);
-	Cell & cell(int x, int y);
+	unsigned width, height;
+	std::vector<CellType> celltypes;
+	std::vector<Cell> cells;
+
+	Map(unsigned map_width, unsigned map_height);
 	bool valid(const Point & pos) const;
-	const Cell & cell(int x, int y) const;
-	const Cell & cell(const Point & pos) const;
-	unsigned get_width() const { return width; }
-	unsigned get_height() const { return height; }
+	const CellType & cell(int x, int y) const;
+	const CellType & cell(const Point & pos) const;
 	bool is_passable(const Point & pos) const;
 
-	void save(std::ofstream & out) const;
-private:
-	unsigned width, height;
-	std::vector<Cell> cells;
+	void fill(int celltype);
+	int add_cell_type(const CellType & celltype);
+	void set_cell_type(const Point & pos, int value);
+	int & celltype(const Point & pos);
+	int & celltype(int x, int y);
+	int celltype(const Point & pos) const;
+	int celltype(int x, int y) const;
 };
 

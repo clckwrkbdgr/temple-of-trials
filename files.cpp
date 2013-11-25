@@ -41,7 +41,7 @@ std::string escaped(const std::string & s, char quote = '"')
 }
 
 Reader::Reader(const std::string & filename)
-	: actual_version(0), in(filename.c_str(), std::ios::in)
+	: actual_minor_version(0), in(filename.c_str(), std::ios::in)
 {
 	if(!file_exists(filename)) {
 		throw Exception(format("File '{0}' doesn't exists!", filename));
@@ -56,14 +56,23 @@ Reader & Reader::newline()
 	return *this;
 }
 
-Reader & Reader::version(int version)
+Reader & Reader::version(int major_version, int minor_version)
 {
-	in >> actual_version;
-	check("version");
-	if(actual_version > version) {
+	int actual_major_version;
+	in >> actual_major_version;
+	check("major version");
+	if(actual_major_version != major_version) {
 		throw Exception(format(
-					"Savefile is of version {0}, which is incompatible with current program version {1}.",
-					actual_version, version
+					"Savefile has major version {0}, which is incompatible with current program savefile major version {1}.",
+					actual_major_version, major_version
+					));
+	}
+	in >> actual_minor_version;
+	check("minor version");
+	if(actual_minor_version > minor_version) {
+		throw Exception(format(
+					"Savefile is of minor_version {0}, which is incompatible with current program savefile minor version {1}.",
+					actual_minor_version, minor_version
 					));
 	}
 	return *this;
@@ -114,12 +123,12 @@ Reader & Reader::size_of(Map & map)
 {
 	unsigned width = 0, height = 0;
 	store(width).store(height);
-	map = Map(width, height, Cell());
+	map = Map(width, height);
 	return *this;
 }
 
 Writer::Writer(const std::string & filename)
-	: actual_version(0), out(filename.c_str(), std::ios::out)
+	: actual_minor_version(0), out(filename.c_str(), std::ios::out)
 {
 	if(!out) {
 		throw Exception(format("Cannot open file '{0}' for writing!", filename));
@@ -132,10 +141,11 @@ Writer & Writer::newline()
 	return *this;
 }
 
-Writer & Writer::version(int version)
+Writer & Writer::version(int major_version, int minor_version)
 {
-	out << version << ' ';
-	actual_version = version;
+	out << major_version << ' ';
+	out << minor_version << ' ';
+	actual_minor_version = minor_version;
 	return *this;
 }
 
@@ -178,6 +188,6 @@ Writer & Writer::store(const std::string & value)
 
 Writer & Writer::size_of(const Map & map)
 {
-	store(map.get_width()).store(map.get_height());
+	store(map.width).store(map.height);
 	return *this;
 }

@@ -5,14 +5,14 @@
 
 namespace World {
 
-Cell floor()
+CellType floor()
 {
-	return Cell('.');
+	return CellType('.');
 }
 
-Cell wall()
+CellType wall()
 {
-	return Cell('#', false);
+	return CellType('#', false);
 }
 
 Item money(const Point & pos = Point())
@@ -68,12 +68,15 @@ void generate(Game & game)
 	log("Generating new game...");
 	game.doors.clear();
 	game.monsters.clear();
-	game.map = Map(60, 23, World::floor());
-	game.monsters.push_back(World::player(game.find_random_free_cell()));
+	game.map = Map(60, 23);
+	int floor_type = game.map.add_cell_type(World::floor());
+	int wall_type = game.map.add_cell_type(World::wall());
+	game.map.fill(floor_type);
 	for(int i = 0; i < 10; ++i) {
-		Point point = game.find_random_free_cell();
-		game.map.cell(point.x, point.y) = World::wall();
+		game.map.set_cell_type(game.find_random_free_cell(), wall_type);
 	}
+
+	game.monsters.push_back(World::player(game.find_random_free_cell()));
 	for(int i = 0; i < 5; ++i) {
 		game.doors.push_back(World::door(game.find_random_free_cell()));
 	}

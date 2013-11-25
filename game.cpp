@@ -35,15 +35,15 @@ Control::Control(int control_value, int control_slot)
 
 
 Game::Game()
-	: map(1, 1, Cell()), done(false), player_died(false), turns(0)
+	: map(1, 1), done(false), player_died(false), turns(0)
 {
 }
 
 Point Game::find_random_free_cell() const
 {
-	int counter = map.get_width() * map.get_height();
+	int counter = map.width * map.height;
 	while(--counter > 0) {
-		Point new_pos = Point(rand() % map.get_width(), rand() % map.get_height());
+		Point new_pos = Point(rand() % map.width, rand() % map.height);
 		if(!map.is_passable(new_pos)) {
 			continue;
 		}
