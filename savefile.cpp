@@ -2,11 +2,14 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 0 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 1 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
 	savefile.store(celltype.sprite).store(celltype.passable);
+	if(savefile.version() > 0) {
+		savefile.store(celltype.hurts);
+	}
 }
 
 SAVEFILE_STORE_EXT(Item, item)

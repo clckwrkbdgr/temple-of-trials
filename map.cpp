@@ -2,12 +2,13 @@
 #include "util.h"
 
 CellType::CellType()
-	: sprite(' '), passable(false)
+	: sprite(' '), passable(false), hurts(false)
 {
 }
 
 CellType::Builder & CellType::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
 CellType::Builder & CellType::Builder::passable(bool value) { result.passable = value; return *this; }
+CellType::Builder & CellType::Builder::hurts(bool value) { result.hurts = value; return *this; }
 
 
 Cell::Cell(int cell_type)

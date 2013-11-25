@@ -15,6 +15,11 @@ CellType wall()
 	return CellType::Builder().sprite('#').passable(false);
 }
 
+CellType goo()
+{
+	return CellType::Builder().sprite(';').passable(true).hurts(true);
+}
+
 Item money(const Point & pos = Point())
 {
 	return Item::Builder().pos(pos).sprite('$').name("money");
@@ -69,11 +74,17 @@ void generate(Game & game)
 	game.doors.clear();
 	game.monsters.clear();
 	game.map = Map(60, 23);
+
 	int floor_type = game.map.add_cell_type(World::floor());
 	int wall_type = game.map.add_cell_type(World::wall());
+	int goo_type = game.map.add_cell_type(World::goo());
+
 	game.map.fill(floor_type);
 	for(int i = 0; i < 10; ++i) {
 		game.map.set_cell_type(game.find_random_free_cell(), wall_type);
+	}
+	for(int i = 0; i < 10; ++i) {
+		game.map.set_cell_type(game.find_random_free_cell(), goo_type);
 	}
 
 	game.monsters.push_back(World::player(game.find_random_free_cell()));

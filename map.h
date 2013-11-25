@@ -5,6 +5,7 @@
 struct CellType {
 	Sprite sprite;
 	bool passable;
+	bool hurts;
 	CellType();
 
 	struct Builder;
@@ -14,6 +15,7 @@ struct CellType::Builder {
 	operator CellType() { return result; }
 	Builder & sprite(const Sprite & sprite);
 	Builder & passable(bool value);
+	Builder & hurts(bool value);
 };
 
 struct Cell {
