@@ -40,6 +40,11 @@ Item jacket(const Point & pos = Point())
 	return Item::Builder().pos(pos).sprite('[').name("jacket").wearable().defence(1);
 }
 
+Item antidote(const Point & pos = Point())
+{
+	return Item::Builder().pos(pos).sprite('%').name("antidote").edible().antidote(5);
+}
+
 Monster player(const Point & monster_pos)
 {
 	return Monster::Builder().pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you").hit_strength(3);
@@ -102,6 +107,7 @@ void generate(Game & game)
 	game.containers.push_back(World::pot(game.find_random_free_cell()));
 	game.fountains.push_back(World::well(game.find_random_free_cell()));
 	game.items.push_back(World::spear(game.find_random_free_cell()));
+	game.items.push_back(World::antidote(game.find_random_free_cell()));
 	for(int i = 0; i < 5; ++i) {
 		int ai = AI::CALM_AND_STILL;
 		switch(rand() % 3) {

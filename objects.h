@@ -68,6 +68,8 @@ struct Item {
 	int damage;
 	bool wearable;
 	int defence;
+	bool edible;
+	int antidote;
 	Item();
 	operator bool() const;
 
@@ -82,6 +84,8 @@ struct Item::Builder {
 	Builder & damage(int damage);
 	Builder & wearable();
 	Builder & defence(int defence);
+	Builder & edible();
+	Builder & antidote(int value);
 };
 
 

@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 5 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 6 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -19,6 +19,9 @@ SAVEFILE_STORE_EXT(Item, item)
 	savefile.store(item.damage);
 	savefile.store(item.wearable);
 	savefile.store(item.defence);
+	if(savefile.version() >= 6) {
+		savefile.store(item.edible).store(item.antidote);
+	}
 }
 
 SAVEFILE_STORE_EXT(Container, container)

@@ -51,6 +51,7 @@ int main()
 					case Control::UNWIELD: game.unwield(monster); break;
 					case Control::WEAR: game.wear(monster, control.slot); break;
 					case Control::TAKE_OFF: game.take_off(monster); break;
+					case Control::EAT: game.eat(monster, control.slot); break;
 					case Control::WAIT: break;
 					default: log("Unknown control: {0}", control.control); break;
 				}

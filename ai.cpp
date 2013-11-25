@@ -61,6 +61,9 @@ Control player_control(Monster & player, Game & game)
 			return Control(Control::UNWIELD);
 		} else if(ch == 'T') {
 			return Control(Control::TAKE_OFF);
+		} else if(ch == 'e') {
+			int slot = console.get_inventory_slot(game, player);
+			return Control(Control::EAT, slot);
 		} else if(ch == 'd') {
 			int slot = console.get_inventory_slot(game, player);
 			return Control(Control::DROP, slot);

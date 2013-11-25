@@ -129,7 +129,7 @@ Door::Builder & Door::Builder::opened(bool value) { result.opened = value; retur
 
 
 Item::Item()
-	: sprite(' '), damage(0), wearable(false), defence(0)
+	: sprite(' '), damage(0), wearable(false), defence(0), edible(false), antidote(0)
 {
 }
 
@@ -144,6 +144,8 @@ Item::Builder & Item::Builder::name(const std::string & value) { result.name = v
 Item::Builder & Item::Builder::damage(int value) { result.damage = value; return *this; }
 Item::Builder & Item::Builder::wearable() { result.wearable = true; return *this; }
 Item::Builder & Item::Builder::defence(int value) { result.defence = value; return *this; }
+Item::Builder & Item::Builder::edible() { result.edible = true; return *this; }
+Item::Builder & Item::Builder::antidote(int value) { result.antidote = value; return *this; }
 
 
 Container::Container()

@@ -353,3 +353,26 @@ void Game::take_off(Monster & someone)
 	someone.worn = -1;
 }
 
+void Game::eat(Monster & someone, int slot)
+{
+	game_assert(slot > -1);
+	game_assert(!someone.inventory.empty(), format("{0} have nothing to eat.", someone.name));
+	game_assert(slot < int(someone.inventory.size()), "No such object.");
+	Item & item = someone.inventory[slot];
+	game_assert(item, "No such object.");
+	game_assert(item.edible, format("{0} isn't edible.", item.name));
+	if(someone.worn == slot) {
+		take_off(someone);
+	}
+	if(someone.wielded == slot) {
+		unwield(someone);
+	}
+	message(format("{0} eats {1}.", someone.name, item.name));
+	if(item.antidote > 0 && someone.poisoning > 0) {
+		someone.poisoning -= item.antidote;
+		someone.poisoning = std::max(0, someone.poisoning);
+		message(format("{0} cures poisoning.", item.name));
+	}
+	someone.inventory[slot] = Item();
+}
+
