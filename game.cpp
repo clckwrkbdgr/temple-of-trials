@@ -79,6 +79,15 @@ void Game::message(std::string text)
 	log("Message: " + text);
 }
 
+void Game::process_environment(Monster & someone)
+{
+	if(map.cell(someone.pos).hurts) {
+		message("It hurts!");
+		message(format("{0} loses {1} hp.", someone.name, 1));
+		someone.hp -= 1;
+	}
+}
+
 void Game::move(Monster & someone, const Point & shift)
 {
 	game_assert(shift);

@@ -56,6 +56,7 @@ int main()
 			} catch(const Game::Message & msg) {
 				game.message(msg.text);
 			}
+			game.process_environment(monster);
 			if(game.done) {
 				break;
 			}

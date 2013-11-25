@@ -41,6 +41,8 @@ struct Game {
 
 	const Monster & getPlayer() const;
 
+	void process_environment(Monster & someone);
+
 	void move(Monster & someone, const Point & shift);
 	void open(Monster & someone, const Point & shift);
 	void close(Monster & someone, const Point & shift);
