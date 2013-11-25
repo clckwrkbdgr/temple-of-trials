@@ -1,15 +1,13 @@
 #include "map.h"
 #include "util.h"
 
-CellType::CellType(const Sprite & cell_sprite, bool is_passable)
-	: sprite(cell_sprite), passable(is_passable)
-{
-}
-
 CellType::CellType()
 	: sprite(' '), passable(false)
 {
 }
+
+CellType::Builder & CellType::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+CellType::Builder & CellType::Builder::passable(bool value) { result.passable = value; return *this; }
 
 
 Cell::Cell(int cell_type)

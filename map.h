@@ -5,8 +5,15 @@
 struct CellType {
 	Sprite sprite;
 	bool passable;
-	explicit CellType(const Sprite & cell_sprite, bool is_passable = true);
 	CellType();
+
+	struct Builder;
+};
+struct CellType::Builder {
+	CellType result;
+	operator CellType() { return result; }
+	Builder & sprite(const Sprite & sprite);
+	Builder & passable(bool value);
 };
 
 struct Cell {

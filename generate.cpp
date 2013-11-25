@@ -7,12 +7,12 @@ namespace World {
 
 CellType floor()
 {
-	return CellType('.');
+	return CellType::Builder().sprite('.').passable(true);
 }
 
 CellType wall()
 {
-	return CellType('#', false);
+	return CellType::Builder().sprite('#').passable(false);
 }
 
 Item money(const Point & pos = Point())
