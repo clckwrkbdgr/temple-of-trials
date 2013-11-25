@@ -66,6 +66,11 @@ Container pot(const Point & pos)
 	return Container::Builder().pos(pos).sprite('^').name("pot").item(money()).item(jacket());
 }
 
+Fountain well(const Point & pos)
+{
+	return Fountain::Builder().pos(pos).sprite('}').name("well");
+}
+
 }
 
 void generate(Game & game)
@@ -95,6 +100,7 @@ void generate(Game & game)
 		game.items.push_back(World::money(game.find_random_free_cell()));
 	}
 	game.containers.push_back(World::pot(game.find_random_free_cell()));
+	game.fountains.push_back(World::well(game.find_random_free_cell()));
 	game.items.push_back(World::spear(game.find_random_free_cell()));
 	for(int i = 0; i < 5; ++i) {
 		int ai = AI::CALM_AND_STILL;

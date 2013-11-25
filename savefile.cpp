@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 1 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 2 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -27,6 +27,12 @@ SAVEFILE_STORE_EXT(Container, container)
 	savefile.store(container.sprite).store(container.name);
 	savefile.newline();
 	savefile.store(container.items, "container item");
+}
+
+SAVEFILE_STORE_EXT(Fountain, fountain)
+{
+	savefile.store(fountain.pos.x).store(fountain.pos.y);
+	savefile.store(fountain.sprite).store(fountain.name);
 }
 
 SAVEFILE_STORE_EXT(Door, door)
@@ -80,6 +86,11 @@ SAVEFILE_STORE_EXT(Game, game)
 
 	savefile.store(game.containers, "container");
 	savefile.newline();
+
+	if(savefile.version() >= 2) {
+		savefile.store(game.fountains, "fountain");
+		savefile.newline();
+	}
 
 	savefile.store(game.doors, "door");
 	savefile.newline();

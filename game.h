@@ -26,6 +26,7 @@ struct Game {
 	std::vector<Door> doors;
 	std::vector<Item> items;
 	std::vector<Container> containers;
+	std::vector<Fountain> fountains;
 	bool done, player_died;
 	std::vector<std::string> messages;
 	int turns;

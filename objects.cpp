@@ -159,3 +159,18 @@ Container::Builder & Container::Builder::pos(const Point & value) { result.pos =
 Container::Builder & Container::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
 Container::Builder & Container::Builder::name(const std::string & value) { result.name = value; return *this; }
 Container::Builder & Container::Builder::item(const Item & value) { result.items.push_back(value); return *this; }
+
+
+Fountain::Fountain()
+	: sprite(' ')
+{
+}
+
+Fountain::operator bool() const
+{
+	return bool(pos);
+}
+
+Fountain::Builder & Fountain::Builder::pos(const Point & value) { result.pos = value; return *this; }
+Fountain::Builder & Fountain::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+Fountain::Builder & Fountain::Builder::name(const std::string & value) { result.name = value; return *this; }

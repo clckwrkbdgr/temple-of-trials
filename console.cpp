@@ -75,6 +75,9 @@ void Console::draw_game(const Game & game)
 	foreach(const Container & container, game.containers) {
 		print_tile(container.pos.x, container.pos.y, container.sprite);
 	}
+	foreach(const Fountain & fountain, game.fountains) {
+		print_tile(fountain.pos.x, fountain.pos.y, fountain.sprite);
+	}
 	foreach(const Door & door, game.doors) {
 		print_tile(door.pos.x, door.pos.y, door.sprite());
 	}

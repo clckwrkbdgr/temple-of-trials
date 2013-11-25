@@ -101,3 +101,20 @@ struct Container::Builder {
 	Builder & item(const Item & value);
 };
 
+struct Fountain {
+	Point pos;
+	Sprite sprite;
+	std::string name;
+	Fountain();
+	operator bool() const;
+
+	struct Builder;
+};
+struct Fountain::Builder {
+	Fountain result;
+	operator Fountain() { return result; }
+	Builder & pos(const Point & value);
+	Builder & sprite(const Sprite & value);
+	Builder & name(const std::string & value);
+};
+
