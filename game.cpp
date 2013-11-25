@@ -150,7 +150,9 @@ void Game::drink(Monster & someone, const Point & shift)
 	game_assert(!container, format("Unfortunately, {0} is totally empty.", container.name));
 	Fountain & fountain = find_at(fountains, new_pos);
 	game_assert(fountain, "There is nothing to drink.");
+	game_assert(someone.hp < someone.max_hp, format("{0} drink from {1}.", someone.name, fountain.name));
 	someone.hp += 1;
+	someone.hp = std::min(someone.hp, someone.max_hp);
 	message(format("{0} drink from {1}. It helps a bit.", someone.name, fountain.name));
 }
 
