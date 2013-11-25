@@ -50,7 +50,7 @@ struct Game {
 
 	void process_environment(Monster & someone);
 	void die(Monster & someone);
-	void hurt(Monster & someone, int damage);
+	void hurt(Monster & someone, int damage, bool pierce_armour = false);
 	void hit(Monster & someone, Monster & other, int damage);
 
 	void move(Monster & someone, const Point & shift);

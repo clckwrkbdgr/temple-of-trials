@@ -14,6 +14,7 @@ struct Monster {
 	int wielded;
 	int worn;
 	bool poisonous;
+	int poisoning;
 	Monster();
 	operator bool() const;
 	bool is_dead() const { return hp <= 0; }

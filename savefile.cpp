@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 4 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 5 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -55,6 +55,9 @@ SAVEFILE_STORE_EXT(Monster, monster)
 	savefile.store(monster.hit_strength);
 	if(savefile.version() >= 4) {
 		savefile.store(monster.poisonous);
+	}
+	if(savefile.version() >= 5) {
+		savefile.store(monster.poisoning);
 	}
 	savefile.store(monster.ai);
 	savefile.store(monster.name);

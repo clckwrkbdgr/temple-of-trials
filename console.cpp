@@ -118,6 +118,10 @@ void Console::draw_game(const Game & game)
 	print_stat(row++, format("Wield: {0}", player.wielded_item() ? player.wielded_item().name : "none"));
 	print_stat(row++, format("Wear : {0}", player.worn_item() ? player.worn_item().name : "none"));
 	print_stat(row++, format("Dmg  : {0}", player.damage()));
+	row++;
+	if(player.poisoning > 0) {
+		print_stat(row++, "Poisoned");
+	}
 }
 
 int Console::draw_and_get_control(Game & game)

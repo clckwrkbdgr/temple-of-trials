@@ -85,6 +85,13 @@ void Game::process_environment(Monster & someone)
 		message("It hurts!");
 		hurt(someone, 1);
 	}
+	if(someone.poisoning > 0) {
+		message(format("{0} is poisoned.", someone.name));
+		--someone.poisoning;
+		hurt(someone, 1, true);
+	} else if(someone.poisoning < 0) {
+		someone.poisoning = 0;
+	}
 }
 
 void Game::die(Monster & someone)
@@ -102,9 +109,9 @@ void Game::die(Monster & someone)
 	}
 }
 
-void Game::hurt(Monster & someone, int damage)
+void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 {
-	int received_damage = damage - someone.worn_item().defence;
+	int received_damage = damage - (pierce_armour ? 0 : someone.worn_item().defence);
 	someone.hp -= received_damage;
 	game_assert(someone.is_dead(), format("{0} loses {1} hp.", someone.name, received_damage));
 	message(format("{0} loses {1} hp and dies.", someone.name, received_damage));
@@ -116,7 +123,8 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 	int received_damage = damage - other.worn_item().defence;
 	other.hp -= received_damage;
 	if(someone.poisonous) {
-		message(format("{0} is poisoned.", other.name));
+		message(format("{0} poisons {1}.", someone.name, other.name));
+		other.poisoning = std::min(5, std::max(5, other.poisoning));
 	}
 	game_assert(other.is_dead(), format("{0} hit {1} for {2} hp.", someone.name, other.name, received_damage));
 	message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, received_damage));
