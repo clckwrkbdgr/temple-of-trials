@@ -13,6 +13,7 @@ struct Monster {
 	std::vector<Item> inventory;
 	int wielded;
 	int worn;
+	bool poisonous;
 	Monster();
 	operator bool() const;
 	bool is_dead() const { return hp <= 0; }
@@ -35,6 +36,7 @@ struct Monster::Builder {
 	Builder & name(const std::string & value);
 	Builder & item(const Item & value);
 	Builder & hit_strength(int value);
+	Builder & poisonous(bool value);
 };
 
 

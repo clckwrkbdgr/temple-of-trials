@@ -53,7 +53,7 @@ Monster ant(int ai, const Point & monster_pos)
 Monster scorpion(int ai, const Point & monster_pos)
 {
 	return Monster::Builder().pos(monster_pos).sprite('S').sight(8).hp(5).ai(ai).name("scorpion").item(scorpion_tail()).
-		hit_strength(2);
+		hit_strength(2).poisonous(true);
 }
 
 Door door(const Point & pos)

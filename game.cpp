@@ -115,6 +115,9 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 {
 	int received_damage = damage - other.worn_item().defence;
 	other.hp -= received_damage;
+	if(someone.poisonous) {
+		message(format("{0} is poisoned.", other.name));
+	}
 	game_assert(other.is_dead(), format("{0} hit {1} for {2} hp.", someone.name, other.name, received_damage));
 	message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, received_damage));
 	die(other);
