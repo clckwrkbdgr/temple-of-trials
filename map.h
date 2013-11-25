@@ -5,6 +5,7 @@
 struct CellType {
 	Sprite sprite;
 	bool passable;
+	bool transparent;
 	bool hurts;
 	CellType();
 
@@ -15,6 +16,7 @@ struct CellType::Builder {
 	operator CellType() { return result; }
 	Builder & sprite(const Sprite & sprite);
 	Builder & passable(bool value);
+	Builder & transparent(bool value);
 	Builder & hurts(bool value);
 };
 
@@ -34,6 +36,7 @@ public:
 	const CellType & cell(int x, int y) const;
 	const CellType & cell(const Point & pos) const;
 	bool is_passable(const Point & pos) const;
+	bool is_transparent(const Point & pos) const;
 
 	void fill(int celltype);
 	int add_cell_type(const CellType & celltype);

@@ -7,7 +7,7 @@ namespace World {
 
 CellType floor()
 {
-	return CellType::Builder().sprite('.').passable(true);
+	return CellType::Builder().sprite('.').passable(true).transparent(true);
 }
 
 CellType wall()
@@ -15,9 +15,14 @@ CellType wall()
 	return CellType::Builder().sprite('#').passable(false);
 }
 
+CellType torch()
+{
+	return CellType::Builder().sprite('&').passable(false).transparent(true);
+}
+
 CellType goo()
 {
-	return CellType::Builder().sprite(';').passable(true).hurts(true);
+	return CellType::Builder().sprite(';').passable(true).hurts(true).transparent(true);
 }
 
 Item money(const Point & pos = Point())
@@ -88,6 +93,7 @@ void generate(Game & game)
 	int floor_type = game.map.add_cell_type(World::floor());
 	int wall_type = game.map.add_cell_type(World::wall());
 	int goo_type = game.map.add_cell_type(World::goo());
+	int torch_type = game.map.add_cell_type(World::torch());
 
 	game.map.fill(floor_type);
 	for(int i = 0; i < 10; ++i) {
@@ -95,6 +101,9 @@ void generate(Game & game)
 	}
 	for(int i = 0; i < 10; ++i) {
 		game.map.set_cell_type(game.find_random_free_cell(), goo_type);
+	}
+	for(int i = 0; i < 10; ++i) {
+		game.map.set_cell_type(game.find_random_free_cell(), torch_type);
 	}
 
 	game.monsters.push_back(World::player(game.find_random_free_cell()));

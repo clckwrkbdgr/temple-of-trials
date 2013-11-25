@@ -2,13 +2,14 @@
 #include "util.h"
 
 CellType::CellType()
-	: sprite(' '), passable(false), hurts(false)
+	: sprite(' '), passable(false), transparent(false), hurts(false)
 {
 }
 
 CellType::Builder & CellType::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
 CellType::Builder & CellType::Builder::passable(bool value) { result.passable = value; return *this; }
 CellType::Builder & CellType::Builder::hurts(bool value) { result.hurts = value; return *this; }
+CellType::Builder & CellType::Builder::transparent(bool value) { result.transparent = value; return *this; }
 
 
 Cell::Cell(int cell_type)
@@ -44,6 +45,14 @@ bool Map::is_passable(const Point & pos) const
 		return false;
 	}
 	return cell(pos).passable;
+}
+
+bool Map::is_transparent(const Point & pos) const
+{
+	if(!valid(pos)) {
+		return false;
+	}
+	return cell(pos).transparent;
 }
 
 void Map::fill(int celltype)

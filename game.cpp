@@ -231,7 +231,7 @@ void Game::fire(Monster & someone, const Point & shift)
     item.pos = someone.pos;
 	message(format("{0} throw {1}.", someone.name, item.name));
 	while(true) {
-		if(!map.is_passable(item.pos + shift)) {
+		if(!map.is_transparent(item.pos + shift)) {
 			message(format("{0} hit wall.", item.name));
 			items.push_back(item);
 			break;
