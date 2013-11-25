@@ -129,9 +129,29 @@ void Game::move(Monster & someone, const Point & shift)
 	game_assert(!door || door.opened, "Door is closed.");
     Container & container = find_at(containers, new_pos);
 	game_assert(!container, format("{0} bump into {1}.", someone.name, container.name));
+    Fountain & fountain = find_at(fountains, new_pos);
+	game_assert(!fountain, format("{0} bump into {1}.", someone.name, fountain.name));
     Monster & monster = find_at(monsters, new_pos);
 	game_assert(!monster, format("{0} bump into {1}.", someone.name, monster.name));
     someone.pos = new_pos;
+}
+
+void Game::drink(Monster & someone, const Point & shift)
+{
+	game_assert(shift);
+	Point new_pos = someone.pos + shift;
+    Monster & monster = find_at(monsters, new_pos);
+	game_assert(!monster, format("It is {1}. {0} is not a vampire to drink that.", someone.name, monster.name));
+    Container & container = find_at(containers, new_pos);
+	game_assert(
+			!(container && !container.items.empty()),
+			format("Unfortunately, {0} has no water left. But there is something else inside.", container.name)
+			);
+	game_assert(!container, format("Unfortunately, {0} is totally empty.", container.name));
+	Fountain & fountain = find_at(fountains, new_pos);
+	game_assert(fountain, "There is nothing to drink.");
+	someone.hp += 1;
+	message(format("{0} drink from {1}. It helps a bit.", someone.name, fountain.name));
 }
 
 void Game::open(Monster & someone, const Point & shift)

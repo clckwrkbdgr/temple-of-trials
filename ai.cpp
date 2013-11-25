@@ -68,6 +68,13 @@ Control player_control(Monster & player, Game & game)
 			return Control(Control::WAIT);
 		} else if(directions.count(ch) != 0) {
 			return Control(Control::MOVE, directions[ch]);
+		} else if(ch == 'D') {
+			ch = console.draw_and_get_control(game);
+			if(directions.count(ch) == 0) {
+				console.notification("This is not a direction.");
+				continue;
+			}
+			return Control(Control::DRINK, directions[ch]);
 		} else if(ch == 'f') {
 			ch = console.draw_and_get_control(game);
 			if(directions.count(ch) == 0) {
