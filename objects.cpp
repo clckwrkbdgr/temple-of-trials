@@ -179,3 +179,19 @@ Fountain::operator bool() const
 Fountain::Builder & Fountain::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Fountain::Builder & Fountain::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
 Fountain::Builder & Fountain::Builder::name(const std::string & value) { result.name = value; return *this; }
+
+
+Stairs::Stairs()
+	: sprite(' ')
+{
+}
+
+Stairs::operator bool() const
+{
+	return bool(pos);
+}
+
+Stairs::Builder & Stairs::Builder::pos(const Point & value) { result.pos = value; return *this; }
+Stairs::Builder & Stairs::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+Stairs::Builder & Stairs::Builder::name(const std::string & value) { result.name = value; return *this; }
+

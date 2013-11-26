@@ -129,3 +129,20 @@ struct Fountain::Builder {
 	Builder & name(const std::string & value);
 };
 
+struct Stairs {
+	Point pos;
+	Sprite sprite;
+	std::string name;
+	Stairs();
+	operator bool() const;
+
+	struct Builder;
+};
+struct Stairs::Builder {
+	Stairs result;
+	operator Stairs() { return result; }
+	Builder & pos(const Point & value);
+	Builder & sprite(const Sprite & value);
+	Builder & name(const std::string & value);
+};
+

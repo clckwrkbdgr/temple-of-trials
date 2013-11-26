@@ -91,6 +91,11 @@ Fountain well(const Point & pos)
 	return Fountain::Builder().pos(pos).sprite('}').name("well");
 }
 
+Stairs gate(const Point & pos)
+{
+	return Stairs::Builder().pos(pos).sprite('<').name("gate");
+}
+
 }
 
 void generate(Game & game)
@@ -116,7 +121,9 @@ void generate(Game & game)
 		game.map.set_cell_type(game.find_random_free_cell(), torch_type);
 	}
 
-	game.monsters.push_back(World::player(game.find_random_free_cell()));
+	Point player_pos = game.find_random_free_cell();
+	game.monsters.push_back(World::player(player_pos));
+	game.stairs.push_back(World::gate(player_pos));
 	for(int i = 0; i < 5; ++i) {
 		game.doors.push_back(World::door(game.find_random_free_cell()));
 	}
