@@ -136,7 +136,7 @@ int Console::draw_and_get_control(Game & game)
 int Console::see_messages(Game & game)
 {
 	draw_game(game);
-	int ch = (game.done && game.messages.size() == messages_seen) ? 0 : get_control();
+	int ch = (game.done && !game.completed && game.messages.size() == messages_seen) ? 0 : get_control();
 	while(game.messages.size() > messages_seen) {
 		if(ch == ' ') {
 			draw_game(game);

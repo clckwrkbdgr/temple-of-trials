@@ -35,7 +35,7 @@ Control::Control(int control_value, int control_slot)
 
 
 Game::Game()
-	: map(1, 1), done(false), player_died(false), turns(0)
+	: map(1, 1), done(false), player_died(false), completed(false), turns(0)
 {
 }
 
@@ -145,6 +145,16 @@ void Game::move(Monster & someone, const Point & shift)
     Monster & monster = find_at(monsters, new_pos);
 	game_assert(!monster, format("{0} bump into {1}.", someone.name, monster.name));
     someone.pos = new_pos;
+    Stairs & gate = find_at(stairs, someone.pos);
+	if(gate) {
+		foreach(const Item & item, someone.inventory) {
+			if(item.quest) {
+				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
+				done = true;
+				completed = true;
+			}
+		}
+	}
 }
 
 void Game::drink(Monster & someone, const Point & shift)

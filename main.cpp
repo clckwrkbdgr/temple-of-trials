@@ -73,7 +73,7 @@ int main()
 		++game.turns;
 	}
 	Console::instance().see_messages(game);
-	if(!game.player_died) {
+	if(!game.player_died && !game.completed) {
 		game.save(SAVEFILE);
 	}
 

@@ -34,7 +34,7 @@ struct Game {
 	std::vector<Container> containers;
 	std::vector<Fountain> fountains;
 	std::vector<Stairs> stairs;
-	bool done, player_died;
+	bool done, player_died, completed;
 	std::vector<std::string> messages;
 	int turns;
 
