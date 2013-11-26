@@ -16,6 +16,7 @@ Console::Console()
 	keypad(stdscr, TRUE);
 	noecho();
 	curs_set(0);
+	start_color();
 	
 	init_sprites();
 }
@@ -30,26 +31,32 @@ Console::~Console()
 
 void Console::init_sprites()
 {
-	sprites[Sprites::EMPTY] = ' ';
-	sprites[Sprites::FLOOR] = '.';
-	sprites[Sprites::WALL] = '#';
-	sprites[Sprites::TORCH] = '&';
-	sprites[Sprites::GOO] = '~';
-	sprites[Sprites::EXPLOSIVE] = '*';
-	sprites[Sprites::MONEY] = '$';
-	sprites[Sprites::SCORPION_TAIL] = '!';
-	sprites[Sprites::SPEAR] = '(';
-	sprites[Sprites::JACKET] = '[';
-	sprites[Sprites::ANTIDOTE] = '%';
-	sprites[Sprites::APPLE] = '%';
-	sprites[Sprites::PLAYER] = '@';
-	sprites[Sprites::ANT] = 'A';
-	sprites[Sprites::SCORPION] = 'S';
-	sprites[Sprites::DOOR_OPENED] = '-';
-	sprites[Sprites::DOOR_CLOSED] = '+';
-	sprites[Sprites::POT] = 'V';
-	sprites[Sprites::WELL] = '{';
-	sprites[Sprites::GATE] = '<';
+	for(int fore = 0; fore < 8; ++fore) {
+		if(fore == 0) {
+			continue;
+		}
+		init_pair(fore, fore, 0);
+	}
+	sprites[Sprites::EMPTY] = ' ' | COLOR_PAIR(0);
+	sprites[Sprites::FLOOR] = '.' | COLOR_PAIR(COLOR_WHITE);
+	sprites[Sprites::WALL] = '#' | COLOR_PAIR(COLOR_YELLOW);
+	sprites[Sprites::TORCH] = '&' | COLOR_PAIR(COLOR_RED) | A_BOLD;
+	sprites[Sprites::GOO] = '~' | COLOR_PAIR(COLOR_GREEN) | A_BOLD;
+	sprites[Sprites::EXPLOSIVE] = '*' | COLOR_PAIR(COLOR_WHITE) | A_BOLD;
+	sprites[Sprites::MONEY] = '$' | COLOR_PAIR(COLOR_YELLOW);
+	sprites[Sprites::SCORPION_TAIL] = '!' | COLOR_PAIR(COLOR_RED);
+	sprites[Sprites::SPEAR] = '(' | COLOR_PAIR(COLOR_BLUE) | A_BOLD;
+	sprites[Sprites::JACKET] = '[' | COLOR_PAIR(COLOR_BLUE) | A_BOLD;
+	sprites[Sprites::ANTIDOTE] = '%' | COLOR_PAIR(COLOR_MAGENTA);
+	sprites[Sprites::APPLE] = '%' | COLOR_PAIR(COLOR_GREEN);
+	sprites[Sprites::PLAYER] = '@' | COLOR_PAIR(COLOR_WHITE) | A_BOLD;
+	sprites[Sprites::ANT] = 'A' | COLOR_PAIR(COLOR_YELLOW) | A_BOLD;
+	sprites[Sprites::SCORPION] = 'S' | COLOR_PAIR(COLOR_RED) | A_BOLD;
+	sprites[Sprites::DOOR_OPENED] = '-' | COLOR_PAIR(COLOR_WHITE);
+	sprites[Sprites::DOOR_CLOSED] = '+' | COLOR_PAIR(COLOR_WHITE);
+	sprites[Sprites::POT] = 'V' | COLOR_PAIR(COLOR_YELLOW);
+	sprites[Sprites::WELL] = '{' | COLOR_PAIR(COLOR_YELLOW) | A_BOLD;
+	sprites[Sprites::GATE] = '<' | COLOR_PAIR(COLOR_WHITE) | A_BOLD;
 }
 
 void Console::print_tile(int x, int y, int sprite)

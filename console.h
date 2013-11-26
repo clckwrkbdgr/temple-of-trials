@@ -5,7 +5,7 @@ class Game;
 class Monster;
 
 struct Console {
-	typedef char Sprite;
+	typedef int Sprite;
 
 	void draw_game(const Game & game);
 	int draw_and_get_control(Game & game);
