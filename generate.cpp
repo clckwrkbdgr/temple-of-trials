@@ -1,99 +1,100 @@
 #include "generate.h"
 #include "ai.h"
 #include "game.h"
+#include "sprites.h"
 #include <cstdlib>
 
 namespace World {
 
 CellType floor()
 {
-	return CellType::Builder().sprite('.').passable(true).transparent(true);
+	return CellType::Builder().sprite(Sprites::FLOOR).passable(true).transparent(true);
 }
 
 CellType wall()
 {
-	return CellType::Builder().sprite('#').passable(false);
+	return CellType::Builder().sprite(Sprites::WALL).passable(false);
 }
 
 CellType torch()
 {
-	return CellType::Builder().sprite('&').passable(false).transparent(true);
+	return CellType::Builder().sprite(Sprites::TORCH).passable(false).transparent(true);
 }
 
 CellType goo()
 {
-	return CellType::Builder().sprite('~').passable(true).hurts(true).transparent(true);
+	return CellType::Builder().sprite(Sprites::GOO).passable(true).hurts(true).transparent(true);
 }
 
 Item explosive(const Point & pos = Point())
 {
-	return Item::Builder().pos(pos).sprite('*').name("explosive").quest();
+	return Item::Builder().pos(pos).sprite(Sprites::EXPLOSIVE).name("explosive").quest();
 }
 
 Item money(const Point & pos = Point())
 {
-	return Item::Builder().pos(pos).sprite('$').name("money");
+	return Item::Builder().pos(pos).sprite(Sprites::MONEY).name("money");
 }
 
 Item scorpion_tail(const Point & pos = Point())
 {
-	return Item::Builder().pos(pos).sprite('!').name("scorpion tail");
+	return Item::Builder().pos(pos).sprite(Sprites::SCORPION_TAIL).name("scorpion tail");
 }
 
 Item spear(const Point & pos = Point())
 {
-	return Item::Builder().pos(pos).sprite('(').name("spear").damage(5);
+	return Item::Builder().pos(pos).sprite(Sprites::SPEAR).name("spear").damage(5);
 }
 
 Item jacket(const Point & pos = Point())
 {
-	return Item::Builder().pos(pos).sprite('[').name("jacket").wearable().defence(1);
+	return Item::Builder().pos(pos).sprite(Sprites::JACKET).name("jacket").wearable().defence(1);
 }
 
 Item antidote(const Point & pos = Point())
 {
-	return Item::Builder().pos(pos).sprite('%').name("antidote").edible().antidote(5);
+	return Item::Builder().pos(pos).sprite(Sprites::ANTIDOTE).name("antidote").edible().antidote(5);
 }
 
 Item apple(const Point & pos = Point())
 {
-	return Item::Builder().pos(pos).sprite('%').name("apple").edible().healing(10);
+	return Item::Builder().pos(pos).sprite(Sprites::APPLE).name("apple").edible().healing(10);
 }
 
 Monster player(const Point & monster_pos)
 {
-	return Monster::Builder().pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you").hit_strength(3);
+	return Monster::Builder().pos(monster_pos).sprite(Sprites::PLAYER).sight(10).hp(20).ai(AI::PLAYER).name("you").hit_strength(3);
 }
 
 Monster ant(int ai, const Point & monster_pos)
 {
-	return Monster::Builder().pos(monster_pos).sprite('A').sight(6).hp(3).ai(ai).name("ant").hit_strength(1);
+	return Monster::Builder().pos(monster_pos).sprite(Sprites::ANT).sight(6).hp(3).ai(ai).name("ant").hit_strength(1);
 }
 
 Monster scorpion(int ai, const Point & monster_pos)
 {
-	return Monster::Builder().pos(monster_pos).sprite('S').sight(8).hp(5).ai(ai).name("scorpion").item(scorpion_tail()).
-		hit_strength(2).poisonous(true);
+	return Monster::Builder().pos(monster_pos).sprite(Sprites::SCORPION).sight(8).hp(5).ai(ai).name("scorpion").
+		item(scorpion_tail()).hit_strength(2).poisonous(true);
 }
 
 Door door(const Point & pos)
 {
-	return Door::Builder().pos(pos).opened_sprite('-').closed_sprite('+').opened(false);
+	return Door::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).opened(false);
 }
 
 Container pot(const Point & pos)
 {
-	return Container::Builder().pos(pos).sprite('^').name("pot").item(money()).item(antidote());
+	return Container::Builder().pos(pos).sprite(Sprites::POT).name("pot").item(money()).item(antidote());
 }
 
 Fountain well(const Point & pos)
 {
-	return Fountain::Builder().pos(pos).sprite('}').name("well");
+	return Fountain::Builder().pos(pos).sprite(Sprites::WELL).name("well");
 }
 
 Stairs gate(const Point & pos)
 {
-	return Stairs::Builder().pos(pos).sprite('<').name("gate");
+	return Stairs::Builder().pos(pos).sprite(Sprites::GATE).name("gate");
 }
 
 }

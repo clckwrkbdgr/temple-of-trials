@@ -6,7 +6,7 @@ CellType::CellType()
 {
 }
 
-CellType::Builder & CellType::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+CellType::Builder & CellType::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 CellType::Builder & CellType::Builder::passable(bool value) { result.passable = value; return *this; }
 CellType::Builder & CellType::Builder::hurts(bool value) { result.hurts = value; return *this; }
 CellType::Builder & CellType::Builder::transparent(bool value) { result.transparent = value; return *this; }

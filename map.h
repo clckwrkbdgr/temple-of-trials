@@ -3,7 +3,7 @@
 #include "util.h"
 
 struct CellType {
-	Sprite sprite;
+	int sprite;
 	bool passable;
 	bool transparent;
 	bool hurts;
@@ -14,7 +14,7 @@ struct CellType {
 struct CellType::Builder {
 	CellType result;
 	operator CellType() { return result; }
-	Builder & sprite(const Sprite & sprite);
+	Builder & sprite(const int & sprite);
 	Builder & passable(bool value);
 	Builder & transparent(bool value);
 	Builder & hurts(bool value);

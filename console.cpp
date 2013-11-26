@@ -1,5 +1,6 @@
 #include "console.h"
 #include "game.h"
+#include "sprites.h"
 #include <ncurses.h>
 
 enum {
@@ -15,6 +16,8 @@ Console::Console()
 	keypad(stdscr, TRUE);
 	noecho();
 	curs_set(0);
+	
+	init_sprites();
 }
 
 Console::~Console()
@@ -25,9 +28,35 @@ Console::~Console()
 	endwin();
 }
 
+void Console::init_sprites()
+{
+	sprites[Sprites::EMPTY] = ' ';
+	sprites[Sprites::FLOOR] = '.';
+	sprites[Sprites::WALL] = '#';
+	sprites[Sprites::TORCH] = '&';
+	sprites[Sprites::GOO] = '~';
+	sprites[Sprites::EXPLOSIVE] = '*';
+	sprites[Sprites::MONEY] = '$';
+	sprites[Sprites::SCORPION_TAIL] = '!';
+	sprites[Sprites::SPEAR] = '(';
+	sprites[Sprites::JACKET] = '[';
+	sprites[Sprites::ANTIDOTE] = '%';
+	sprites[Sprites::APPLE] = '%';
+	sprites[Sprites::PLAYER] = '@';
+	sprites[Sprites::ANT] = 'A';
+	sprites[Sprites::SCORPION] = 'S';
+	sprites[Sprites::DOOR_OPENED] = '-';
+	sprites[Sprites::DOOR_CLOSED] = '+';
+	sprites[Sprites::POT] = 'V';
+	sprites[Sprites::WELL] = '{';
+	sprites[Sprites::GATE] = '<';
+}
+
 void Console::print_tile(int x, int y, int sprite)
 {
-	mvaddch(y + 1, x, sprite);
+	if(sprites.count(sprite) > 0) {
+		mvaddch(y + 1, x, sprites[sprite]);
+	}
 }
 
 void Console::print_message(const std::string & text)
@@ -114,6 +143,9 @@ void Console::draw_game(const Game & game)
 	notification_text.clear();
 
 	const Monster & player = game.getPlayer();
+	if(!player) {
+		return;
+	}
 	int row = 0;
 	print_stat(row++, format("Turns: {0}", game.turns));
 	print_stat(row++, format("HP   : {0}/{1}", player.hp, player.max_hp));
@@ -136,7 +168,8 @@ int Console::draw_and_get_control(Game & game)
 int Console::see_messages(Game & game)
 {
 	draw_game(game);
-	int ch = (game.done && !game.completed && game.messages.size() == messages_seen) ? 0 : get_control();
+	bool ask_control = !game.done || game.completed || game.player_died;
+	int ch = (!ask_control && game.messages.size() == messages_seen) ? 0 : get_control();
 	while(game.messages.size() > messages_seen) {
 		if(ch == ' ') {
 			draw_game(game);

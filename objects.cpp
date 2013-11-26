@@ -1,7 +1,7 @@
 #include "objects.h"
 
 Monster::Monster()
-	: sprite(' '), sight(0), ai(0), max_hp(1), hp(max_hp), hit_strength(0), wielded(-1), worn(-1), poisonous(false), poisoning(0)
+	: sprite(0), sight(0), ai(0), max_hp(1), hp(max_hp), hit_strength(0), wielded(-1), worn(-1), poisonous(false), poisoning(0)
 {
 }
 
@@ -97,7 +97,7 @@ const Item & Monster::worn_item() const
 }
 
 Monster::Builder & Monster::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Monster::Builder & Monster::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+Monster::Builder & Monster::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Monster::Builder & Monster::Builder::sight(int value) { result.sight = value; return *this; }
 Monster::Builder & Monster::Builder::ai(int value) { result.ai = value; return *this; }
 Monster::Builder & Monster::Builder::hp(int value) { result.hp = result.max_hp = value; return *this; }
@@ -108,11 +108,11 @@ Monster::Builder & Monster::Builder::poisonous(bool value) { result.poisonous = 
 
 
 Door::Door()
-	: opened_sprite(' '), closed_sprite(' '), opened(false)
+	: opened_sprite(0), closed_sprite(0), opened(false)
 {
 }
 
-Sprite Door::sprite() const
+int Door::sprite() const
 {
 	return opened ? opened_sprite : closed_sprite;
 }
@@ -123,13 +123,13 @@ Door::operator bool() const
 }
 
 Door::Builder & Door::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Door::Builder & Door::Builder::opened_sprite(const Sprite & value) { result.opened_sprite = value; return *this; }
-Door::Builder & Door::Builder::closed_sprite(const Sprite & value) { result.closed_sprite = value; return *this; }
+Door::Builder & Door::Builder::opened_sprite(const int & value) { result.opened_sprite = value; return *this; }
+Door::Builder & Door::Builder::closed_sprite(const int & value) { result.closed_sprite = value; return *this; }
 Door::Builder & Door::Builder::opened(bool value) { result.opened = value; return *this; }
 
 
 Item::Item()
-	: sprite(' '), damage(0), wearable(false), defence(0), edible(false), antidote(0), healing(0), quest(false)
+	: sprite(0), damage(0), wearable(false), defence(0), edible(false), antidote(0), healing(0), quest(false)
 {
 }
 
@@ -139,7 +139,7 @@ Item::operator bool() const
 }
 
 Item::Builder & Item::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Item::Builder & Item::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+Item::Builder & Item::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Item::Builder & Item::Builder::name(const std::string & value) { result.name = value; return *this; }
 Item::Builder & Item::Builder::damage(int value) { result.damage = value; return *this; }
 Item::Builder & Item::Builder::wearable() { result.wearable = true; return *this; }
@@ -151,7 +151,7 @@ Item::Builder & Item::Builder::quest() { result.quest = true; return *this; }
 
 
 Container::Container()
-	: sprite(' ')
+	: sprite(0)
 {
 }
 
@@ -161,13 +161,13 @@ Container::operator bool() const
 }
 
 Container::Builder & Container::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Container::Builder & Container::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+Container::Builder & Container::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Container::Builder & Container::Builder::name(const std::string & value) { result.name = value; return *this; }
 Container::Builder & Container::Builder::item(const Item & value) { result.items.push_back(value); return *this; }
 
 
 Fountain::Fountain()
-	: sprite(' ')
+	: sprite(0)
 {
 }
 
@@ -177,12 +177,12 @@ Fountain::operator bool() const
 }
 
 Fountain::Builder & Fountain::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Fountain::Builder & Fountain::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+Fountain::Builder & Fountain::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Fountain::Builder & Fountain::Builder::name(const std::string & value) { result.name = value; return *this; }
 
 
 Stairs::Stairs()
-	: sprite(' ')
+	: sprite(0)
 {
 }
 
@@ -192,6 +192,6 @@ Stairs::operator bool() const
 }
 
 Stairs::Builder & Stairs::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Stairs::Builder & Stairs::Builder::sprite(const Sprite & value) { result.sprite = value; return *this; }
+Stairs::Builder & Stairs::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Stairs::Builder & Stairs::Builder::name(const std::string & value) { result.name = value; return *this; }
 

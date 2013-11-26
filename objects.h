@@ -4,7 +4,7 @@ class Item;
 
 struct Monster {
 	Point pos;
-	Sprite sprite;
+	int sprite;
 	int sight;
 	int ai;
 	int max_hp, hp;
@@ -30,7 +30,7 @@ struct Monster::Builder {
 	Monster result;
 	operator Monster() { return result; }
 	Builder & pos(const Point & value);
-	Builder & sprite(const Sprite & sprite);
+	Builder & sprite(const int & sprite);
 	Builder & sight(int value);
 	Builder & ai(int value);
 	Builder & hp(int value);
@@ -43,10 +43,10 @@ struct Monster::Builder {
 
 struct Door {
 	Point pos;
-	Sprite opened_sprite, closed_sprite;
+	int opened_sprite, closed_sprite;
 	bool opened;
 	Door();
-	Sprite sprite() const;
+	int sprite() const;
 	operator bool() const;
 
 	struct Builder;
@@ -55,15 +55,15 @@ struct Door::Builder {
 	Door result;
 	operator Door() { return result; }
 	Builder & pos(const Point & value);
-	Builder & opened_sprite(const Sprite & value);
-	Builder & closed_sprite(const Sprite & value);
+	Builder & opened_sprite(const int & value);
+	Builder & closed_sprite(const int & value);
 	Builder & opened(bool value);
 };
 
 
 struct Item {
 	Point pos;
-	Sprite sprite;
+	int sprite;
 	std::string name;
 	int damage;
 	bool wearable;
@@ -81,7 +81,7 @@ struct Item::Builder {
 	Item result;
 	operator Item() { return result; }
 	Builder & pos(const Point & value);
-	Builder & sprite(const Sprite & value);
+	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
 	Builder & damage(int damage);
 	Builder & wearable();
@@ -95,7 +95,7 @@ struct Item::Builder {
 
 struct Container {
 	Point pos;
-	Sprite sprite;
+	int sprite;
 	std::string name;
 	std::vector<Item> items;
 	Container();
@@ -107,14 +107,14 @@ struct Container::Builder {
 	Container result;
 	operator Container() { return result; }
 	Builder & pos(const Point & value);
-	Builder & sprite(const Sprite & value);
+	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
 	Builder & item(const Item & value);
 };
 
 struct Fountain {
 	Point pos;
-	Sprite sprite;
+	int sprite;
 	std::string name;
 	Fountain();
 	operator bool() const;
@@ -125,13 +125,13 @@ struct Fountain::Builder {
 	Fountain result;
 	operator Fountain() { return result; }
 	Builder & pos(const Point & value);
-	Builder & sprite(const Sprite & value);
+	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
 };
 
 struct Stairs {
 	Point pos;
-	Sprite sprite;
+	int sprite;
 	std::string name;
 	Stairs();
 	operator bool() const;
@@ -142,7 +142,7 @@ struct Stairs::Builder {
 	Stairs result;
 	operator Stairs() { return result; }
 	Builder & pos(const Point & value);
-	Builder & sprite(const Sprite & value);
+	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
 };
 

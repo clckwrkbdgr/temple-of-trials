@@ -1,9 +1,12 @@
 #pragma once
 #include <string>
+#include <map>
 class Game;
 class Monster;
 
 struct Console {
+	typedef char Sprite;
+
 	void draw_game(const Game & game);
 	int draw_and_get_control(Game & game);
 	int see_messages(Game & game);
@@ -21,6 +24,9 @@ struct Console {
 private:
 	unsigned messages_seen;
 	std::string notification_text;
+	std::map<int, Sprite> sprites;
+
 	Console();
 	~Console();
+	void init_sprites();
 };
