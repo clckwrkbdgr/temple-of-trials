@@ -22,7 +22,7 @@ CellType torch()
 
 CellType goo()
 {
-	return CellType::Builder().sprite(';').passable(true).hurts(true).transparent(true);
+	return CellType::Builder().sprite('~').passable(true).hurts(true).transparent(true);
 }
 
 Item explosive(const Point & pos = Point())
@@ -83,7 +83,7 @@ Door door(const Point & pos)
 
 Container pot(const Point & pos)
 {
-	return Container::Builder().pos(pos).sprite('^').name("pot").item(money()).item(jacket());
+	return Container::Builder().pos(pos).sprite('^').name("pot").item(money()).item(antidote());
 }
 
 Fountain well(const Point & pos)
@@ -101,54 +101,78 @@ Stairs gate(const Point & pos)
 void generate(Game & game)
 {
 	log("Generating new game...");
-	game.doors.clear();
-	game.monsters.clear();
+	game = Game();
+
+	std::vector<std::string> level;
+	level.push_back("############################################################");
+	level.push_back("#                                     #~~~~~~~~~~#         #");
+	level.push_back("#        # a #%(%# a #                #~~ {  &$~~#  #&S&#  #");
+	level.push_back("#                              #      #~~  [( $~~#  S * S  #");
+	level.push_back("#     ###################      #      #~~~~~~~~~~#  #&S&#  #");
+	level.push_back("#           #                  #      #~   ~ ~~  #         #");
+	level.push_back("#  A        #              S   #  A   #~ ~ a###$ #####+#####");
+	level.push_back("#      %    #     #            #      #   ~ $~ # #         #");
+	level.push_back("#           #     #     ########      # ~ ~ ~    #  #   #  #");
+	level.push_back("########    #     #         A     ^   # ~$~~  #  #  A &    #");
+	level.push_back("#           #     #                  $# a~ # a~  #   &&&A  #");
+	level.push_back("#    a      #     ##################### ~#~  #~  #    &    #");
+	level.push_back("#           #                        $#  # $~    #^ #   #  #");
+	level.push_back("#######+#####     ########     #      #   ~a~  # #       $$#");
+	level.push_back("#   a       #          $#      #   A  # ~#   ~ ~ ###+###+###");
+	level.push_back("#           #       a% $#   S  #      #  ~#~~    #         #");
+	level.push_back("#           #          $#      #      #  #~~~ ~  #   A     #");
+	level.push_back("####+####################      #      #####+######         #");
+	level.push_back("#       #    %   #          &  #      #          #   A  S  #");
+	level.push_back("#       #    ^   +             #             A   +         #");
+	level.push_back("#   @   #$   (   #          S  #                 #         #");
+	level.push_back("#  <<<  #$$$     #             #                 #         #");
+	level.push_back("############################################################");
+
 	game.map = Map(60, 23);
+
+	for(unsigned y = 0; y < game.map.height; ++y) {
+		for(unsigned x = 0; x < game.map.width; ++x) {
+			switch(level[y][x]) {
+				case '@' : game.monsters.push_back(World::player(Point(x, y))); break;
+			}
+		}
+	}
 
 	int floor_type = game.map.add_cell_type(World::floor());
 	int wall_type = game.map.add_cell_type(World::wall());
 	int goo_type = game.map.add_cell_type(World::goo());
 	int torch_type = game.map.add_cell_type(World::torch());
 
-	game.map.fill(floor_type);
-	for(int i = 0; i < 10; ++i) {
-		game.map.set_cell_type(game.find_random_free_cell(), wall_type);
-	}
-	for(int i = 0; i < 10; ++i) {
-		game.map.set_cell_type(game.find_random_free_cell(), goo_type);
-	}
-	for(int i = 0; i < 10; ++i) {
-		game.map.set_cell_type(game.find_random_free_cell(), torch_type);
+	for(unsigned y = 0; y < game.map.height; ++y) {
+		for(unsigned x = 0; x < game.map.width; ++x) {
+			char cell = level[y][x];
+			Point pos(x, y);
+			game.map.set_cell_type(pos, floor_type);
+			switch(cell) {
+				case '#' : game.map.set_cell_type(pos, wall_type); break;
+				case '~' : game.map.set_cell_type(pos, goo_type); break;
+				case ' ' : game.map.set_cell_type(pos, floor_type); break;
+				case '&' : game.map.set_cell_type(pos, torch_type); break;
+
+				case '$' : game.items.push_back(World::money(pos)); break;
+				case '%' : game.items.push_back(World::apple(pos)); break;
+				case '(' : game.items.push_back(World::spear(pos)); break;
+				case '*' : game.items.push_back(World::explosive(pos)); break;
+				case '[' : game.items.push_back(World::jacket(pos)); break;
+
+				case '{' : game.fountains.push_back(World::well(pos)); break;
+				case '+' : game.doors.push_back(World::door(pos)); break;
+				case '<' : game.stairs.push_back(World::gate(pos)); break;
+				case '^' : game.containers.push_back(World::pot(pos)); break;
+
+				case 'a' : game.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;
+				case 'A' : game.monsters.push_back(World::ant(AI::ANGRY_AND_WANDER, pos)); break;
+				case 'S' : game.monsters.push_back(World::scorpion(AI::ANGRY_AND_STILL, pos)); break;
+				default: log("Unknown cell in level: '{0}' at {1},{2}.", cell, x, y);
+			}
+		}
 	}
 
-	Point player_pos = game.find_random_free_cell();
-	game.monsters.push_back(World::player(player_pos));
-	game.stairs.push_back(World::gate(player_pos));
-	for(int i = 0; i < 5; ++i) {
-		game.doors.push_back(World::door(game.find_random_free_cell()));
-	}
-	for(int i = 0; i < 5; ++i) {
-		game.items.push_back(World::money(game.find_random_free_cell()));
-	}
-	for(int i = 0; i < 10; ++i) {
-		game.items.push_back(World::apple(game.find_random_free_cell()));
-	}
-	game.containers.push_back(World::pot(game.find_random_free_cell()));
-	game.fountains.push_back(World::well(game.find_random_free_cell()));
-	game.items.push_back(World::spear(game.find_random_free_cell()));
-	game.items.push_back(World::explosive(game.find_random_free_cell()));
-	game.items.push_back(World::antidote(game.find_random_free_cell()));
-	for(int i = 0; i < 5; ++i) {
-		int ai = AI::CALM_AND_STILL;
-		switch(rand() % 3) {
-			case 0: ai = AI::ANGRY_AND_WANDER; break;
-			case 1: ai = AI::ANGRY_AND_STILL; break;
-			case 2: ai = AI::CALM_AND_STILL; break;
-			default: break;
-		}
-		game.monsters.push_back(World::ant(ai, game.find_random_free_cell()));
-	}
-	game.monsters.push_back(World::scorpion(AI::ANGRY_AND_WANDER, game.find_random_free_cell()));
 	log("Done.");
 }
 
