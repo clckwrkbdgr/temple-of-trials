@@ -116,15 +116,16 @@ Control player_control(Monster & player, Game & game)
 Control angry_and_wander(Monster & monster, Game & game)
 {
 	const Monster & player = game.getPlayer();
+	bool sees_player = game.map.cell_properties(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 			sign(player.pos.x - monster.pos.x),
 			sign(player.pos.y - monster.pos.y)
 			);
-	if(1 < d && d <= monster.sight) {
+	if(sees_player && 1 < d && d <= monster.sight) {
 		return Control(Control::MOVE, shift);
 	}
-	if(d == 1) {
+	if(sees_player && d == 1) {
 		return Control(Control::SWING, shift);
 	}
 	return Control(Control::MOVE, Point(rand() % 3 - 1, rand() % 3 - 1));
@@ -133,15 +134,16 @@ Control angry_and_wander(Monster & monster, Game & game)
 Control angry_and_still(Monster & monster, Game & game)
 {
 	const Monster & player = game.getPlayer();
+	bool sees_player = game.map.cell_properties(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 		sign(player.pos.x - monster.pos.x),
 		sign(player.pos.y - monster.pos.y)
 		);
-	if(1 < d && d <= monster.sight) {
+	if(sees_player && 1 < d && d <= monster.sight) {
 		return Control(Control::MOVE, shift);
 	}
-	if(d == 1) {
+	if(sees_player && d == 1) {
 		return Control(Control::SWING, shift);
 	}
 	return Control(Control::WAIT);
@@ -150,12 +152,13 @@ Control angry_and_still(Monster & monster, Game & game)
 Control calm_and_still(Monster & monster, Game & game)
 {
 	const Monster & player = game.getPlayer();
+	bool sees_player = game.map.cell_properties(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 		sign(player.pos.x - monster.pos.x),
 		sign(player.pos.y - monster.pos.y)
 		);
-	if(d == 1) {
+	if(sees_player && d == 1) {
 		return Control(Control::SWING, shift);
 	}
 	return Control(Control::WAIT);
