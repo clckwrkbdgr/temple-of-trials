@@ -80,6 +80,16 @@ void Game::message(std::string text)
 	log("Message: " + text);
 }
 
+bool Game::transparent(int x, int y) const
+{
+	foreach(const Door & door, doors) {
+		if(door.pos == Point(x, y) && !door.opened) {
+			return false;
+		}
+	}
+	return map.cell(x, y).transparent;
+}
+
 void Game::invalidate_fov(Monster & monster)
 {
 	for(unsigned x = 0; x < map.width; ++x) {
@@ -106,7 +116,7 @@ void Game::invalidate_fov(Monster & monster)
 					double delta_error = std::abs(double(deltay) / double(deltax));
 					int cy = monster.pos.y;
 					for(int cx = monster.pos.x; cx != x; cx += ix) {
-						if(!map.cell(cx, cy).transparent) {
+						if(!transparent(cx, cy)) {
 							can_see = false;
 							break;
 						}
@@ -121,7 +131,7 @@ void Game::invalidate_fov(Monster & monster)
 					double delta_error = std::abs(double(deltax) / double(deltay));
 					int cx = monster.pos.x;
 					for(int cy = monster.pos.y; cy != y; cy += iy) {
-						if(!map.cell(cx, cy).transparent) {
+						if(!transparent(cx, cy)) {
 							can_see = false;
 							break;
 						}

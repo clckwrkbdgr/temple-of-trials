@@ -49,6 +49,8 @@ struct Game {
 
 	const Monster & getPlayer() const;
 
+	bool transparent(int x, int y) const;
+
 	void invalidate_fov(Monster & monster);
 	void process_environment(Monster & someone);
 	void die(Monster & someone);
