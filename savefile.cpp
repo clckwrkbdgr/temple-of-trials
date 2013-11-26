@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 10 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 11 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -12,6 +12,14 @@ SAVEFILE_STORE_EXT(CellType, celltype)
 	}
 	if(savefile.version() >= 7) {
 		savefile.store(celltype.transparent);
+	}
+}
+
+SAVEFILE_STORE_EXT(Cell, cell)
+{
+	savefile.store(cell.type);
+	if(savefile.version() >= 11) {
+		savefile.store(cell.seen_sprite);
 	}
 }
 
@@ -98,7 +106,7 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.check("map size");
 	for(unsigned y = 0; y < game.map.height; ++y) {
 		for(unsigned x = 0; x < game.map.width; ++x) {
-			savefile.store(game.map.celltype(x, y));
+			store_ext(savefile, game.map.cell_properties(x, y));
 			savefile.check("map cell");
 		}
 		savefile.newline();

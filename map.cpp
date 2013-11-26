@@ -26,7 +26,7 @@ Map::Map(unsigned map_width, unsigned map_height)
 
 const CellType & Map::cell(int x, int y) const
 {
-	return celltypes[celltype(x, y)];
+	return celltypes[cell_properties(x, y).type];
 }
 
 const CellType & Map::cell(const Point & pos) const
@@ -57,27 +57,7 @@ int Map::add_cell_type(const CellType & celltype)
 
 void Map::set_cell_type(const Point & pos, int value)
 {
-	celltype(pos) = value;
-}
-
-int & Map::celltype(int x, int y)
-{
-	return cell_properties(x, y).type;
-}
-
-int & Map::celltype(const Point & pos)
-{
-	return celltype(pos.x, pos.y);
-}
-
-int Map::celltype(int x, int y) const
-{
-	return cell_properties(x, y).type;
-}
-
-int Map::celltype(const Point & pos) const
-{
-	return celltype(pos.x, pos.y);
+	cell_properties(pos).type = value;
 }
 
 Cell & Map::cell_properties(int x, int y)

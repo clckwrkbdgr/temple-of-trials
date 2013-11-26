@@ -46,9 +46,5 @@ public:
 	void fill(int celltype);
 	int add_cell_type(const CellType & celltype);
 	void set_cell_type(const Point & pos, int value);
-	int & celltype(const Point & pos);
-	int & celltype(int x, int y);
-	int celltype(const Point & pos) const;
-	int celltype(int x, int y) const;
 };
 
