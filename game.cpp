@@ -90,6 +90,46 @@ bool Game::transparent(int x, int y) const
 	return map.cell(x, y).transparent;
 }
 
+int Game::get_sprite_at(int x, int y) const
+{
+	return get_sprite_at(Point(x, y));
+}
+
+int Game::get_sprite_at(const Point & pos) const
+{
+	foreach(const Monster & monster, monsters) {
+		if(monster.pos == pos) {
+			return monster.sprite;
+		}
+	}
+	foreach(const Item & item, items) {
+		if(item.pos == pos) {
+			return item.sprite;
+		}
+	}
+	foreach(const Container & container, containers) {
+		if(container.pos == pos) {
+			return container.sprite;
+		}
+	}
+	foreach(const Fountain & fountain, fountains) {
+		if(fountain.pos == pos) {
+			return fountain.sprite;
+		}
+	}
+	foreach(const Stairs & stair, stairs) {
+		if(stair.pos == pos) {
+			return stair.sprite;
+		}
+	}
+	foreach(const Door & door, doors) {
+		if(door.pos == pos) {
+			return door.sprite();
+		}
+	}
+	return map.cell(pos).sprite;
+}
+
 void Game::invalidate_fov(Monster & monster)
 {
 	for(unsigned x = 0; x < map.width; ++x) {
@@ -145,8 +185,8 @@ void Game::invalidate_fov(Monster & monster)
 				}
 			}
 			map.cell_properties(x, y).visible = can_see;
-			if(can_see) {
-				map.cell_properties(x, y).seen = true;
+			if(can_see && monster.ai == AI::PLAYER) {
+				map.cell_properties(x, y).seen_sprite = get_sprite_at(x, y);
 			}
 		}
 	}

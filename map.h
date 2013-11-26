@@ -23,7 +23,7 @@ struct CellType::Builder {
 struct Cell {
 	int type;
 	bool visible;
-	bool seen;
+	int seen_sprite;
 	explicit Cell(int cell_type = 0);
 };
 

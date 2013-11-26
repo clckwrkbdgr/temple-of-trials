@@ -50,6 +50,8 @@ struct Game {
 	const Monster & getPlayer() const;
 
 	bool transparent(int x, int y) const;
+	int get_sprite_at(int x, int y) const;
+	int get_sprite_at(const Point & pos) const;
 
 	void invalidate_fov(Monster & monster);
 	void process_environment(Monster & someone);

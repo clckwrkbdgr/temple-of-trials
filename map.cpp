@@ -13,7 +13,7 @@ CellType::Builder & CellType::Builder::transparent(bool value) { result.transpar
 
 
 Cell::Cell(int cell_type)
-	: type(cell_type), visible(false), seen(false)
+	: type(cell_type), visible(false), seen_sprite(0)
 {
 }
 

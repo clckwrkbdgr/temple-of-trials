@@ -5,8 +5,6 @@ class Game;
 class Monster;
 
 struct Console {
-	typedef int Sprite;
-
 	void draw_game(const Game & game);
 	int draw_and_get_control(Game & game);
 	int see_messages(Game & game);
@@ -15,6 +13,7 @@ struct Console {
 	void notification(const std::string & text);
 
 	void print_tile(int x, int y, int sprite);
+	void print_fow(int x, int y, int sprite);
 	void print_message(const std::string & text);
 	void print_stat(int row, const std::string & text);
 	void clear();
@@ -24,7 +23,7 @@ struct Console {
 private:
 	unsigned messages_seen;
 	std::string notification_text;
-	std::map<int, Sprite> sprites;
+	std::map<int, std::pair<char, int> > sprites;
 
 	Console();
 	~Console();
