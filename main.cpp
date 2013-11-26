@@ -31,6 +31,7 @@ int main()
 			if(monster.is_dead()) {
 				continue;
 			}
+			game.invalidate_fov(monster);
 			Controller controller = get_controller(monster.ai);
 			if(!controller) {
 				log(format("No controller found for AI #{0}!", monster.ai));

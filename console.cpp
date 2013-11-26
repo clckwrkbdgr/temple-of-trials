@@ -38,7 +38,7 @@ void Console::init_sprites()
 		init_pair(fore, fore, 0);
 	}
 	sprites[Sprites::EMPTY] = ' ' | COLOR_PAIR(0);
-	sprites[Sprites::FLOOR] = '.' | COLOR_PAIR(COLOR_WHITE);
+	sprites[Sprites::FLOOR] = '.' | COLOR_PAIR(COLOR_YELLOW);
 	sprites[Sprites::WALL] = '#' | COLOR_PAIR(COLOR_YELLOW);
 	sprites[Sprites::TORCH] = '&' | COLOR_PAIR(COLOR_RED) | A_BOLD;
 	sprites[Sprites::GOO] = '~' | COLOR_PAIR(COLOR_GREEN) | A_BOLD;
@@ -52,8 +52,8 @@ void Console::init_sprites()
 	sprites[Sprites::PLAYER] = '@' | COLOR_PAIR(COLOR_WHITE) | A_BOLD;
 	sprites[Sprites::ANT] = 'A' | COLOR_PAIR(COLOR_YELLOW) | A_BOLD;
 	sprites[Sprites::SCORPION] = 'S' | COLOR_PAIR(COLOR_RED) | A_BOLD;
-	sprites[Sprites::DOOR_OPENED] = '-' | COLOR_PAIR(COLOR_WHITE);
-	sprites[Sprites::DOOR_CLOSED] = '+' | COLOR_PAIR(COLOR_WHITE);
+	sprites[Sprites::DOOR_OPENED] = '-' | COLOR_PAIR(COLOR_WHITE) | A_BOLD;
+	sprites[Sprites::DOOR_CLOSED] = '+' | COLOR_PAIR(COLOR_WHITE) | A_BOLD;
 	sprites[Sprites::POT] = 'V' | COLOR_PAIR(COLOR_YELLOW);
 	sprites[Sprites::WELL] = '{' | COLOR_PAIR(COLOR_YELLOW) | A_BOLD;
 	sprites[Sprites::GATE] = '<' | COLOR_PAIR(COLOR_WHITE) | A_BOLD;
@@ -97,31 +97,50 @@ void Console::notification(const std::string & text)
 	notification_text = text;
 }
 
+int get_sprite_at(const Game & game, const Point & pos)
+{
+	foreach(const Monster & monster, game.monsters) {
+		if(monster.pos == pos) {
+			return monster.sprite;
+		}
+	}
+	foreach(const Item & item, game.items) {
+		if(item.pos == pos) {
+			return item.sprite;
+		}
+	}
+	foreach(const Container & container, game.containers) {
+		if(container.pos == pos) {
+			return container.sprite;
+		}
+	}
+	foreach(const Fountain & fountain, game.fountains) {
+		if(fountain.pos == pos) {
+			return fountain.sprite;
+		}
+	}
+	foreach(const Stairs & stair, game.stairs) {
+		if(stair.pos == pos) {
+			return stair.sprite;
+		}
+	}
+	foreach(const Door & door, game.doors) {
+		if(door.pos == pos) {
+			return door.sprite();
+		}
+	}
+	return game.map.cell(pos).sprite;
+}
+
 void Console::draw_game(const Game & game)
 {
 	clear();
 	for(unsigned x = 0; x < game.map.width; ++x) {
 		for(unsigned y = 0; y < game.map.height; ++y) {
-			print_tile(x, y, game.map.cell(x, y).sprite);
+			if(game.map.cell_properties(x, y).visible) {
+				print_tile(x, y, get_sprite_at(game, Point(x, y)));
+			}
 		}
-	}
-	foreach(const Item & item, game.items) {
-		print_tile(item.pos.x, item.pos.y, item.sprite);
-	}
-	foreach(const Container & container, game.containers) {
-		print_tile(container.pos.x, container.pos.y, container.sprite);
-	}
-	foreach(const Fountain & fountain, game.fountains) {
-		print_tile(fountain.pos.x, fountain.pos.y, fountain.sprite);
-	}
-	foreach(const Stairs & stair, game.stairs) {
-		print_tile(stair.pos.x, stair.pos.y, stair.sprite);
-	}
-	foreach(const Door & door, game.doors) {
-		print_tile(door.pos.x, door.pos.y, door.sprite());
-	}
-	foreach(const Monster & monster, game.monsters) {
-		print_tile(monster.pos.x, monster.pos.y, monster.sprite);
 	}
 
 	if(game.messages.size() > messages_seen) {

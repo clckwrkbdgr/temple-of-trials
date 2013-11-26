@@ -22,6 +22,8 @@ struct CellType::Builder {
 
 struct Cell {
 	int type;
+	bool visible;
+	bool seen;
 	explicit Cell(int cell_type = 0);
 };
 
@@ -36,6 +38,10 @@ public:
 	bool valid(int x, int y) const;
 	const CellType & cell(int x, int y) const;
 	const CellType & cell(const Point & pos) const;
+	Cell & cell_properties(int x, int y);
+	Cell & cell_properties(const Point & pos);
+	const Cell & cell_properties(int x, int y) const;
+	const Cell & cell_properties(const Point & pos) const;
 
 	void fill(int celltype);
 	int add_cell_type(const CellType & celltype);

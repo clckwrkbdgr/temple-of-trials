@@ -13,7 +13,7 @@ CellType::Builder & CellType::Builder::transparent(bool value) { result.transpar
 
 
 Cell::Cell(int cell_type)
-	: type(cell_type)
+	: type(cell_type), visible(false), seen(false)
 {
 }
 
@@ -62,12 +62,7 @@ void Map::set_cell_type(const Point & pos, int value)
 
 int & Map::celltype(int x, int y)
 {
-	static int empty;
-	empty = 0;
-	if(!valid(x, y)) {
-		return empty;
-	}
-	return cells[x + y * width].type;
+	return cell_properties(x, y).type;
 }
 
 int & Map::celltype(const Point & pos)
@@ -77,15 +72,40 @@ int & Map::celltype(const Point & pos)
 
 int Map::celltype(int x, int y) const
 {
-	static int empty = 0;
-	if(!valid(x, y)) {
-		return empty;
-	}
-	return cells[x + y * width].type;
+	return cell_properties(x, y).type;
 }
 
 int Map::celltype(const Point & pos) const
 {
 	return celltype(pos.x, pos.y);
+}
+
+Cell & Map::cell_properties(int x, int y)
+{
+	static Cell empty;
+	empty = Cell();
+	if(!valid(x, y)) {
+		return empty;
+	}
+	return cells[x + y * width];
+}
+
+Cell & Map::cell_properties(const Point & pos)
+{
+	return cell_properties(pos.x, pos.y);
+}
+
+const Cell & Map::cell_properties(int x, int y) const
+{
+	static Cell empty;
+	if(!valid(x, y)) {
+		return empty;
+	}
+	return cells[x + y * width];
+}
+
+const Cell & Map::cell_properties(const Point & pos) const
+{
+	return cell_properties(pos.x, pos.y);
 }
 

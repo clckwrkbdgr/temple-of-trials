@@ -49,6 +49,7 @@ struct Game {
 
 	const Monster & getPlayer() const;
 
+	void invalidate_fov(Monster & monster);
 	void process_environment(Monster & someone);
 	void die(Monster & someone);
 	void hurt(Monster & someone, int damage, bool pierce_armour = false);
