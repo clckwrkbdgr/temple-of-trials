@@ -376,7 +376,16 @@ void Game::eat(Monster & someone, int slot)
 	if(item.antidote > 0 && someone.poisoning > 0) {
 		someone.poisoning -= item.antidote;
 		someone.poisoning = std::max(0, someone.poisoning);
-		message(format("{0} cures poisoning.", item.name));
+		if(someone.poisoning > 0) {
+			message(format("{0} cures poisoning a little.", item.name));
+		} else {
+			message(format("{0} cures poisoning.", item.name));
+		}
+	}
+	if(item.healing > 0 && someone.hp < someone.max_hp) {
+		someone.hp += item.healing;
+		someone.hp = std::min(someone.hp, someone.max_hp);
+		message(format("{0} heals {1}.", item.name, someone.name));
 	}
 	someone.inventory[slot] = Item();
 }

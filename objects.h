@@ -70,6 +70,7 @@ struct Item {
 	int defence;
 	bool edible;
 	int antidote;
+	int healing;
 	Item();
 	operator bool() const;
 
@@ -86,6 +87,7 @@ struct Item::Builder {
 	Builder & defence(int defence);
 	Builder & edible();
 	Builder & antidote(int value);
+	Builder & healing(int value);
 };
 
 

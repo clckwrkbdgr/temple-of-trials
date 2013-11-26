@@ -50,6 +50,11 @@ Item antidote(const Point & pos = Point())
 	return Item::Builder().pos(pos).sprite('%').name("antidote").edible().antidote(5);
 }
 
+Item apple(const Point & pos = Point())
+{
+	return Item::Builder().pos(pos).sprite('%').name("apple").edible().healing(10);
+}
+
 Monster player(const Point & monster_pos)
 {
 	return Monster::Builder().pos(monster_pos).sprite('@').sight(10).hp(20).ai(AI::PLAYER).name("you").hit_strength(3);
@@ -112,6 +117,9 @@ void generate(Game & game)
 	}
 	for(int i = 0; i < 5; ++i) {
 		game.items.push_back(World::money(game.find_random_free_cell()));
+	}
+	for(int i = 0; i < 10; ++i) {
+		game.items.push_back(World::apple(game.find_random_free_cell()));
 	}
 	game.containers.push_back(World::pot(game.find_random_free_cell()));
 	game.fountains.push_back(World::well(game.find_random_free_cell()));
