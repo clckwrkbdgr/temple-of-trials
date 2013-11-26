@@ -129,7 +129,7 @@ Door::Builder & Door::Builder::opened(bool value) { result.opened = value; retur
 
 
 Item::Item()
-	: sprite(' '), damage(0), wearable(false), defence(0), edible(false), antidote(0), healing(0)
+	: sprite(' '), damage(0), wearable(false), defence(0), edible(false), antidote(0), healing(0), quest(false)
 {
 }
 
@@ -147,6 +147,7 @@ Item::Builder & Item::Builder::defence(int value) { result.defence = value; retu
 Item::Builder & Item::Builder::edible() { result.edible = true; return *this; }
 Item::Builder & Item::Builder::antidote(int value) { result.antidote = value; return *this; }
 Item::Builder & Item::Builder::healing(int value) { result.healing = value; return *this; }
+Item::Builder & Item::Builder::quest() { result.quest = true; return *this; }
 
 
 Container::Container()

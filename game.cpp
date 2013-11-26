@@ -303,6 +303,9 @@ void Game::grab(Monster & someone)
 	}
 	items.erase(item_index);
 	message(format("{0} picked up {1} from the floor.", someone.name, item.name));
+	if(item.quest) {
+		message("Now bring it back to the surface!");
+	}
 }
 
 void Game::wield(Monster & someone, int slot)

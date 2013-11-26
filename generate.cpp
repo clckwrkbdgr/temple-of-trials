@@ -25,6 +25,11 @@ CellType goo()
 	return CellType::Builder().sprite(';').passable(true).hurts(true).transparent(true);
 }
 
+Item explosive(const Point & pos = Point())
+{
+	return Item::Builder().pos(pos).sprite('*').name("explosive").quest();
+}
+
 Item money(const Point & pos = Point())
 {
 	return Item::Builder().pos(pos).sprite('$').name("money");
@@ -124,6 +129,7 @@ void generate(Game & game)
 	game.containers.push_back(World::pot(game.find_random_free_cell()));
 	game.fountains.push_back(World::well(game.find_random_free_cell()));
 	game.items.push_back(World::spear(game.find_random_free_cell()));
+	game.items.push_back(World::explosive(game.find_random_free_cell()));
 	game.items.push_back(World::antidote(game.find_random_free_cell()));
 	for(int i = 0; i < 5; ++i) {
 		int ai = AI::CALM_AND_STILL;
