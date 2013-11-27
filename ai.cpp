@@ -53,6 +53,7 @@ Control player_control(Monster & player, Game & game)
 		} else if(ch == 'Q') {
 			game.done = true;
 			game.player_died = true;
+			game.message("You commited suicide.");
 		} else if(ch == 'x') {
 			Point target = player.pos;
 			ch = console.draw_target_mode(game, target);

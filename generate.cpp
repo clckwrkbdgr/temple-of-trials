@@ -99,11 +99,8 @@ Stairs gate(const Point & pos)
 
 }
 
-void generate(Game & game)
+void predefined_demo_level(Game & game)
 {
-	log("Generating new game...");
-	game = Game();
-
 	std::vector<std::string> level;
 	level.push_back("############################################################");
 	level.push_back("#                                     #~~~~~~~~~~#         #");
@@ -173,6 +170,14 @@ void generate(Game & game)
 			}
 		}
 	}
+}
+
+void generate(Game & game)
+{
+	log("Generating new game...");
+	game = Game();
+
+	predefined_demo_level(game);
 
 	log("Done.");
 }
