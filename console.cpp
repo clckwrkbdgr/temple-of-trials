@@ -105,7 +105,7 @@ void Console::notification(const std::string & text)
 }
 
 struct NCursesUpdate {
-	NCursesUpdate() { clear(); }
+	NCursesUpdate() { erase(); }
 	~NCursesUpdate() { refresh(); }
 };
 
