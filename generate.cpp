@@ -197,7 +197,7 @@ Point random_pos(const Game & game, const std::pair<Point, Point> & room)
 	return room.first;
 }
 
-void connect_rooms(Map & map, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, int type)
+void connect_rooms(Game & game, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, int type)
 {
 	Point a_center = a.first + (a.second - a.first) / 2;
 	Point b_center = b.first + (b.second - b.first) / 2;
@@ -207,17 +207,21 @@ void connect_rooms(Map & map, const std::pair<Point, Point> & a, const std::pair
 		int stop_y = std::min(a.second.y, b.second.y);
 		int way = start_y + rand() % (stop_y - start_y);
 		for(int x = a.second.x + 1; x != b.first.x; ++x) {
-			map.set_cell_type(Point(x, way), type);
+			game.map.set_cell_type(Point(x, way), type);
 		}
+		game.doors.push_back(World::door(Point(a.second.x + 1, way)));
+		game.doors.push_back(World::door(Point(b.first.x - 1, way)));
 		return;
 	}
 	if(a.first.x > b.first.x) {
 		int start_y = std::max(a.first.y, b.first.y);
 		int stop_y = std::min(a.second.y, b.second.y);
 		int way = start_y + rand() % (stop_y - start_y);
-		for(int x = b.first.x + 1; x != a.second.x; ++x) {
-			map.set_cell_type(Point(x, way), type);
+		for(int x = b.second.x + 1; x != a.first.x; ++x) {
+			game.map.set_cell_type(Point(x, way), type);
 		}
+		game.doors.push_back(World::door(Point(b.second.x + 1, way)));
+		game.doors.push_back(World::door(Point(a.first.x - 1, way)));
 		return;
 	}
 	if(a.first.y < b.first.y) {
@@ -225,17 +229,21 @@ void connect_rooms(Map & map, const std::pair<Point, Point> & a, const std::pair
 		int stop_x = std::min(a.second.x, b.second.x);
 		int wax = start_x + rand() % (stop_x - start_x);
 		for(int y = a.second.y + 1; y != b.first.y; ++y) {
-			map.set_cell_type(Point(wax, y), type);
+			game.map.set_cell_type(Point(wax, y), type);
 		}
+		game.doors.push_back(World::door(Point(wax, a.second.y + 1)));
+		game.doors.push_back(World::door(Point(wax, b.first.y - 1)));
 		return;
 	}
 	if(a.first.y > b.first.y) {
 		int start_x = std::max(a.first.x, b.first.x);
 		int stop_x = std::min(a.second.x, b.second.x);
 		int wax = start_x + rand() % (stop_x - start_x);
-		for(int y = b.first.y + 1; y != a.second.y; ++y) {
-			map.set_cell_type(Point(wax, y), type);
+		for(int y = b.second.y + 1; y != a.first.y; ++y) {
+			game.map.set_cell_type(Point(wax, y), type);
 		}
+		game.doors.push_back(World::door(Point(wax, b.second.y + 1)));
+		game.doors.push_back(World::door(Point(wax, a.first.y - 1)));
 		return;
 	}
 }
@@ -317,7 +325,7 @@ void generate_level(Game & game)
 			}
 		}
 		if(i > 0) {
-			connect_rooms(game.map, rooms[i], rooms[i - 1], floor_type);
+			connect_rooms(game, rooms[i], rooms[i - 1], floor_type);
 		}
 	}
 	if(!game.monsters.empty()) {
