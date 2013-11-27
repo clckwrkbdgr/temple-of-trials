@@ -250,11 +250,46 @@ void connect_rooms(Game & game, const std::pair<Point, Point> & a, const std::pa
 
 std::vector<std::pair<Point, Point> > random_transmutation(const std::vector<std::pair<Point, Point> > & rooms)
 {
-	static int a[] = {
-		0, 1, 2,
-		5, 4, 3,
-		6, 7, 8,
+	static int a00[] = { 8, 1, 2, 7, 0, 3, 6, 5, 4, };
+	static int a01[] = { 6, 7, 8, 5, 0, 1, 4, 3, 2, };
+	static int a02[] = { 4, 5, 6, 3, 0, 7, 2, 1, 8, };
+	static int a03[] = { 2, 3, 4, 1, 0, 5, 8, 7, 6, };
+	static int a04[] = { 2, 1, 8, 3, 0, 7, 4, 5, 6, };
+	static int a05[] = { 8, 7, 6, 1, 0, 5, 2, 3, 4, };
+	static int a06[] = { 6, 5, 4, 7, 0, 3, 8, 1, 2, };
+	static int a07[] = { 4, 3, 2, 5, 0, 1, 6, 7, 8, };
+	static int a08[] = { 0, 1, 2, 5, 4, 3, 6, 7, 8, };
+	static int a09[] = { 0, 1, 2, 7, 6, 3, 8, 5, 4, };
+	static int a10[] = { 0, 1, 2, 7, 8, 3, 6, 5, 4, };
+	static int a11[] = { 0, 5, 6, 1, 4, 7, 2, 3, 8, };
+	static int a12[] = { 0, 7, 8, 1, 6, 5, 2, 3, 4, };
+	static int a13[] = { 0, 7, 6, 1, 8, 5, 2, 3, 4, };
+	static int a14[] = { 6, 7, 8, 5, 4, 3, 0, 1, 2, };
+	static int a15[] = { 8, 5, 4, 7, 6, 3, 0, 1, 2, };
+	static int a16[] = { 6, 5, 4, 7, 8, 3, 0, 1, 2, };
+	static int a17[] = { 2, 3, 8, 1, 4, 7, 0, 5, 6, };
+	static int a18[] = { 2, 3, 4, 1, 6, 5, 0, 7, 8, };
+	static int a19[] = { 2, 3, 4, 1, 8, 5, 0, 7, 6, };
+	static int a20[] = { 2, 1, 0, 3, 4, 5, 8, 7, 6, };
+	static int a21[] = { 2, 1, 0, 3, 6, 7, 4, 5, 8, };
+	static int a22[] = { 2, 1, 0, 3, 8, 7, 4, 5, 6, };
+	static int a23[] = { 6, 5, 0, 7, 4, 1, 8, 3, 2, };
+	static int a24[] = { 8, 7, 0, 5, 6, 1, 4, 3, 2, };
+	static int a25[] = { 6, 7, 0, 5, 8, 1, 4, 3, 2, };
+	static int a26[] = { 8, 7, 6, 3, 4, 5, 2, 1, 0, };
+	static int a27[] = { 4, 5, 8, 3, 6, 7, 2, 1, 0, };
+	static int a28[] = { 4, 5, 6, 3, 8, 7, 2, 1, 0, };
+	static int a29[] = { 8, 3, 2, 7, 4, 1, 6, 5, 0, };
+	static int a30[] = { 4, 3, 2, 5, 6, 1, 8, 7, 0, };
+	static int a31[] = { 4, 3, 2, 5, 8, 1, 6, 7, 0, };
+	static int * layouts[] = {
+		a00, a01, a02, a03, a04, a05, a06, a07,
+		a08, a09, a10, a11, a12, a13, a14, a15,
+		a16, a17, a18, a19, a20, a21, a22, a23,
+		a24, a25, a26, a27, a28, a29, a30, a31,
 	};
+	int * a = layouts[rand() % 32];
+
 	std::vector<std::pair<Point, Point> > new_rooms(9);
 	for(unsigned i = 0; i < rooms.size(); ++i) {
 		new_rooms[a[i]] = rooms[i];
