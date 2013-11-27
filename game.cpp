@@ -130,6 +130,41 @@ int Game::get_sprite_at(const Point & pos) const
 	return map.cell(pos).sprite;
 }
 
+std::string Game::name_at(const Point & pos) const
+{
+	foreach(const Monster & monster, monsters) {
+		if(monster.pos == pos) {
+			return monster.name;
+		}
+	}
+	foreach(const Item & item, items) {
+		if(item.pos == pos) {
+			return item.name;
+		}
+	}
+	foreach(const Container & container, containers) {
+		if(container.pos == pos) {
+			return container.name;
+		}
+	}
+	foreach(const Fountain & fountain, fountains) {
+		if(fountain.pos == pos) {
+			return fountain.name;
+		}
+	}
+	foreach(const Stairs & stair, stairs) {
+		if(stair.pos == pos) {
+			return stair.name;
+		}
+	}
+	foreach(const Door & door, doors) {
+		if(door.pos == pos) {
+			return door.name;
+		}
+	}
+	return map.cell(pos).name;
+}
+
 void Game::invalidate_fov(Monster & monster)
 {
 	for(unsigned x = 0; x < map.width; ++x) {

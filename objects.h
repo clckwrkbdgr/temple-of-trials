@@ -44,6 +44,7 @@ struct Monster::Builder {
 struct Door {
 	Point pos;
 	int opened_sprite, closed_sprite;
+	std::string name;
 	bool opened;
 	Door();
 	int sprite() const;
@@ -57,6 +58,7 @@ struct Door::Builder {
 	Builder & pos(const Point & value);
 	Builder & opened_sprite(const int & value);
 	Builder & closed_sprite(const int & value);
+	Builder & name(const std::string & value);
 	Builder & opened(bool value);
 };
 

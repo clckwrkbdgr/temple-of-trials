@@ -161,6 +161,9 @@ void Console::draw_game(const Game & game)
 
 int Console::draw_target_mode(Game & game, const Point & target)
 {
+	if(game.map.valid(target)) {
+		notification(format("You see: {0}", game.name_at(target)));
+	}
 	draw_game(game);
 	if(game.map.valid(target)) {
 		int ch = mvinch(target.y + 1, target.x);

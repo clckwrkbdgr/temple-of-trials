@@ -125,6 +125,7 @@ Door::operator bool() const
 Door::Builder & Door::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Door::Builder & Door::Builder::opened_sprite(const int & value) { result.opened_sprite = value; return *this; }
 Door::Builder & Door::Builder::closed_sprite(const int & value) { result.closed_sprite = value; return *this; }
+Door::Builder & Door::Builder::name(const std::string & value) { result.name = value; return *this; }
 Door::Builder & Door::Builder::opened(bool value) { result.opened = value; return *this; }
 
 

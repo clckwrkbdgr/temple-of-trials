@@ -10,6 +10,7 @@ CellType::Builder & CellType::Builder::sprite(const int & value) { result.sprite
 CellType::Builder & CellType::Builder::passable(bool value) { result.passable = value; return *this; }
 CellType::Builder & CellType::Builder::hurts(bool value) { result.hurts = value; return *this; }
 CellType::Builder & CellType::Builder::transparent(bool value) { result.transparent = value; return *this; }
+CellType::Builder & CellType::Builder::name(const std::string & value) { result.name = value; return *this; }
 
 
 Cell::Cell(int cell_type)

@@ -8,22 +8,22 @@ namespace World {
 
 CellType floor()
 {
-	return CellType::Builder().sprite(Sprites::FLOOR).passable(true).transparent(true);
+	return CellType::Builder().sprite(Sprites::FLOOR).name("floor").passable(true).transparent(true);
 }
 
 CellType wall()
 {
-	return CellType::Builder().sprite(Sprites::WALL).passable(false);
+	return CellType::Builder().sprite(Sprites::WALL).name("wall").passable(false);
 }
 
 CellType torch()
 {
-	return CellType::Builder().sprite(Sprites::TORCH).passable(false).transparent(true);
+	return CellType::Builder().sprite(Sprites::TORCH).name("torch").passable(false).transparent(true);
 }
 
 CellType goo()
 {
-	return CellType::Builder().sprite(Sprites::GOO).passable(true).hurts(true).transparent(true);
+	return CellType::Builder().sprite(Sprites::GOO).name("goo").passable(true).hurts(true).transparent(true);
 }
 
 Item explosive(const Point & pos = Point())
@@ -79,7 +79,7 @@ Monster scorpion(int ai, const Point & monster_pos)
 
 Door door(const Point & pos)
 {
-	return Door::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).opened(false);
+	return Door::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).name("door").opened(false);
 }
 
 Container pot(const Point & pos)
