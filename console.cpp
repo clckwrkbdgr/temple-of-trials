@@ -104,9 +104,15 @@ void Console::notification(const std::string & text)
 	notification_text = text;
 }
 
+struct NCursesUpdate {
+	NCursesUpdate() { clear(); }
+	~NCursesUpdate() { refresh(); }
+};
+
 void Console::draw_game(const Game & game)
 {
-	clear();
+	NCursesUpdate upd;
+
 	for(unsigned x = 0; x < game.map.width; ++x) {
 		for(unsigned y = 0; y < game.map.height; ++y) {
 			if(game.map.cell_properties(x, y).visible) {

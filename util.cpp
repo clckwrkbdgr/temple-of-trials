@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <unistd.h>
 
 std::string now()
 {
@@ -108,3 +109,7 @@ void subs_arg_str(std::string & result, int index, const std::string & value)
 	}
 }
 
+void delay(int msec)
+{
+	usleep(msec * 1000);
+}

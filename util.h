@@ -64,6 +64,8 @@ template<class T0, class T1, class T2>
 #define TRACE(x) do { log(format(#x "={0}", (x))); } while(0);
 
 
+void delay(int msec);
+
 template<typename T>
 int sign(T val)
 {

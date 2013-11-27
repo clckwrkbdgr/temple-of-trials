@@ -40,6 +40,8 @@ Control player_control(Monster & player, Game & game)
 	Console & console = Console::instance();
 	while(!game.done) {
 		if(!player.plan.empty()) {
+			console.draw_game(game);
+			delay(100);
 			Control control = player.plan.front();
 			player.plan.pop_front();
 			return control;
