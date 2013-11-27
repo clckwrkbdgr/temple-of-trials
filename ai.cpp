@@ -41,7 +41,7 @@ Control player_control(Monster & player, Game & game)
 	while(!game.done) {
 		if(!player.plan.empty()) {
 			console.draw_game(game);
-			delay(100);
+			delay(10);
 			Control control = player.plan.front();
 			player.plan.pop_front();
 			return control;
@@ -100,6 +100,24 @@ Control player_control(Monster & player, Game & game)
 		} else if(ch == '.') {
 			return Control(Control::WAIT);
 		} else if(directions.count(ch) != 0) {
+			Point new_pos = player.pos + directions[ch];
+			Door & door = find_at(game.doors, new_pos);
+			if(door && !door.opened) {
+				player.plan.push_front(Control(Control::MOVE, directions[ch]));
+				return Control(Control::OPEN, directions[ch]);
+			}
+			Container & container = find_at(game.containers, new_pos);
+			if(container) {
+				return Control(Control::OPEN, directions[ch]);
+			}
+			Fountain & fountain = find_at(game.fountains, new_pos);
+			if(fountain) {
+				return Control(Control::DRINK, directions[ch]);
+			}
+			Monster & monster = find_at(game.monsters, new_pos);
+			if(monster) {
+				return Control(Control::SWING, directions[ch]);
+			}
 			return Control(Control::MOVE, directions[ch]);
 		} else if(ch == 'D') {
 			ch = console.draw_and_get_control(game);
