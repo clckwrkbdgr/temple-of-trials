@@ -81,6 +81,8 @@ struct Point {
 	operator bool() const;
 };
 Point operator+(const Point & a, const Point & b);
+Point operator-(const Point & a, const Point & b);
+Point operator/(const Point & a, int factor);
 
 template<class T>
 const T & find_at(const std::vector<T> & container, const Point & pos, typename std::vector<T>::const_iterator * index = 0)
