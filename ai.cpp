@@ -1,5 +1,6 @@
 #include "ai.h"
 #include "console.h"
+#include "pathfinding.h"
 #include "game.h"
 #include "objects.h"
 #include <cstdlib>
@@ -38,6 +39,11 @@ Control player_control(Monster & player, Game & game)
 
 	Console & console = Console::instance();
 	while(!game.done) {
+		if(!player.plan.empty()) {
+			Control control = player.plan.front();
+			player.plan.pop_front();
+			return control;
+		}
 		int ch = console.draw_and_get_control(game);
 
 		if(ch == 'q') {
@@ -48,7 +54,7 @@ Control player_control(Monster & player, Game & game)
 		} else if(ch == 'x') {
 			Point target = player.pos;
 			ch = console.draw_target_mode(game, target);
-			while(ch != 'x' && ch != 27) {
+			while(ch != 'x' && ch != 27 && ch != '.') {
 				if(directions.count(ch) != 0) {
 					Point new_target = target + directions[ch];
 					if(game.map.valid(new_target)) {
@@ -56,6 +62,10 @@ Control player_control(Monster & player, Game & game)
 					}
 				}
 				ch = console.draw_target_mode(game, target);
+			}
+			if(ch == '.') {
+				Game::MapPassabilityDetector detector(game);
+				player.plan = find_path(player.pos, target, &detector);
 			}
 			continue;
 		} else if(ch == 'g') {

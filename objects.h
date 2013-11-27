@@ -1,5 +1,7 @@
 #pragma once
 #include "util.h"
+#include <list>
+class Control;
 class Item;
 
 struct Monster {
@@ -15,6 +17,7 @@ struct Monster {
 	int worn;
 	bool poisonous;
 	int poisoning;
+	std::list<Control> plan;
 	Monster();
 	operator bool() const;
 	bool is_dead() const { return hp <= 0; }

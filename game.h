@@ -1,5 +1,6 @@
 #pragma once
 #include "map.h"
+#include "pathfinding.h"
 #include "objects.h"
 #include <map>
 #include <list>
@@ -27,6 +28,16 @@ struct Game {
 		Message(const std::string & message_text) : text(message_text) {}
 		Message() {}
 	};
+
+	class MapPassabilityDetector : public PassabilityDetector {
+	public:
+		MapPassabilityDetector(const Game & _game);
+		virtual ~MapPassabilityDetector() {}
+		virtual bool is_passable(int x, int y) const;
+	private:
+		const Game & game;
+	};
+
 	Map map;
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;

@@ -91,6 +91,11 @@ std::string to_string(const std::string & value)
     return value;
 }
 
+std::string to_string(const Point & value)
+{
+    return format("({0}, {1})", value.x, value.y);
+}
+
 void subs_arg_str(std::string & result, int index, const std::string & value)
 {
 	std::ostringstream out;
@@ -102,3 +107,4 @@ void subs_arg_str(std::string & result, int index, const std::string & value)
 		pos = result.find(placeholder, pos + 1);
 	}
 }
+

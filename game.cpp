@@ -35,6 +35,37 @@ Control::Control(int control_value, int control_slot)
 }
 
 
+Game::MapPassabilityDetector::MapPassabilityDetector(const Game & _game)
+	: game(_game)
+{
+}
+
+bool Game::MapPassabilityDetector::is_passable(int x, int y) const
+{
+	Point new_pos(x, y);
+	if(!game.map.cell(new_pos).passable) {
+		return false;
+	}
+    const Door & door = find_at(game.doors, new_pos);
+	if(door && !door.opened) {
+		return false;
+	}
+    const Container & container = find_at(game.containers, new_pos);
+	if(container) {
+		return false;
+	}
+    const Fountain & fountain = find_at(game.fountains, new_pos);
+	if(fountain) {
+		return false;
+	}
+    const Monster & monster = find_at(game.monsters, new_pos);
+	if(monster) {
+		return false;
+	}
+	return true;
+}
+
+
 Game::Game()
 	: map(1, 1), done(false), player_died(false), completed(false), turns(0)
 {

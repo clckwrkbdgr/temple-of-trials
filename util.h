@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+class Point;
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #if GCC_VERSION < 403000
@@ -30,6 +31,7 @@ std::string to_string(unsigned value);
 std::string to_string(long unsigned value);
 std::string to_string(char value);
 std::string to_string(const std::string & value);
+std::string to_string(const Point & value);
 
 void subs_arg_str(std::string & result, int index, const std::string & value);
 template<class T>
