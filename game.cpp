@@ -314,9 +314,9 @@ void Game::move(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
 	Point new_pos = someone.pos + shift;
-	game_assert(map.cell(new_pos).passable, format("{0} bump into the wall.", someone.name));
+	game_assert(map.cell(new_pos).passable, format("{0} bump into the {1}.", someone.name, map.cell(new_pos).name));
     Door & door = find_at(doors, new_pos);
-	game_assert(!door || door.opened, "Door is closed.");
+	game_assert(!door || door.opened, format("{0} is closed.", door.name));
     Container & container = find_at(containers, new_pos);
 	game_assert(!container, format("{0} bump into {1}.", someone.name, container.name));
     Fountain & fountain = find_at(fountains, new_pos);
@@ -362,9 +362,9 @@ void Game::open(Monster & someone, const Point & shift)
     Point new_pos = someone.pos + shift;
     Door & door = find_at(doors, new_pos);
     if(door) {
-		game_assert(!door.opened, "Door is already opened.");
+		game_assert(!door.opened, format("{0} is already opened.", door.name));
 		door.opened = true;
-		message(format("{0} opened the door.", someone.name));
+		message(format("{0} opened the {1}.", someone.name, door.name));
 		return;
     }
 	Container & container = find_at(containers, new_pos);
@@ -384,19 +384,19 @@ void Game::close(Monster & someone, const Point & shift)
     Point new_pos = someone.pos + shift;
     Door & door = find_at(doors, new_pos);
     game_assert(door, "There is nothing to close there.");
-    game_assert(door.opened, "Door is already closed.");
+    game_assert(door.opened, format("{0} is already closed.", door.name));
     door.opened = false;
-    message(format("{0} closed the door.", someone.name));
+    message(format("{0} closed the {1}.", someone.name, door.name));
 }
 
 void Game::swing(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
     Point new_pos = someone.pos + shift;
-	game_assert(map.cell(new_pos).passable, format("{0} hit wall.", someone.name));
+	game_assert(map.cell(new_pos).passable, format("{0} hit {1}.", someone.name, map.cell(new_pos).name));
     Door & door = find_at(doors, new_pos);
     if(door && !door.opened) {
-		message(format("{0} swing at door.", someone.name));
+		message(format("{0} swing at {1}.", someone.name, door.name));
 		open(someone, shift);
 		return;
     }
@@ -421,13 +421,13 @@ void Game::fire(Monster & someone, const Point & shift)
 	message(format("{0} throw {1}.", someone.name, item.name));
 	while(true) {
 		if(!map.cell(item.pos + shift).transparent) {
-			message(format("{0} hit wall.", item.name));
+			message(format("{0} hit {1}.", item.name, map.cell(item.pos + shift).name));
 			items.push_back(item);
 			break;
 		}
 		Door & door = find_at(doors, item.pos + shift);
 		if(door && !door.opened) {
-			message(format("{0} hit door.", item.name));
+			message(format("{0} hit {1}.", item.name, door.name));
 			items.push_back(item);
 			break;
 		}
@@ -470,7 +470,7 @@ void Game::drop(Monster & someone, int slot)
 	someone.inventory[slot] = Item();
 	item.pos = someone.pos;
 	items.push_back(item);
-	message(format("{0} dropped {1} on the floor.", someone.name, item.name));
+	message(format("{0} dropped {1} on the {2}.", someone.name, item.name, map.cell(someone.pos).name));
 }
 
 void Game::grab(Monster & someone)
@@ -491,7 +491,7 @@ void Game::grab(Monster & someone)
 		*empty_slot = item;
 	}
 	items.erase(item_index);
-	message(format("{0} picked up {1} from the floor.", someone.name, item.name));
+	message(format("{0} picked up {1} from the {2}.", someone.name, item.name, map.cell(someone.pos).name));
 	if(item.quest) {
 		message("Now bring it back to the surface!");
 	}
