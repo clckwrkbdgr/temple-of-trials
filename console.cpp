@@ -162,7 +162,13 @@ void Console::draw_game(const Game & game)
 int Console::draw_target_mode(Game & game, const Point & target)
 {
 	if(game.map.valid(target)) {
-		notification(format("You see: {0}", game.name_at(target)));
+		if(game.map.cell_properties(target).visible) {
+			notification(format("You see {0}.", game.name_at(target)));
+		} else if(game.map.cell_properties(target).seen_sprite) {
+			notification(format("You recall {0}.", game.name_at(target)));
+		} else {
+			notification("You cannot see there.");
+		}
 	}
 	draw_game(game);
 	if(game.map.valid(target)) {

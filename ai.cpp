@@ -64,8 +64,12 @@ Control player_control(Monster & player, Game & game)
 				ch = console.draw_target_mode(game, target);
 			}
 			if(ch == '.') {
-				Game::MapPassabilityDetector detector(game);
-				player.plan = find_path(player.pos, target, &detector);
+				if(game.map.cell_properties(target).seen_sprite == 0) {
+					console.notification("You don't know how to get there.");
+				} else {
+					Game::MapPassabilityDetector detector(game);
+					player.plan = find_path(player.pos, target, &detector);
+				}
 			}
 			continue;
 		} else if(ch == 'g') {
