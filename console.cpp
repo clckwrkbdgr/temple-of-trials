@@ -159,6 +159,25 @@ void Console::draw_game(const Game & game)
 	}
 }
 
+int Console::draw_target_mode(Game & game, const Point & target)
+{
+	draw_game(game);
+	if(game.map.valid(target)) {
+		int ch = mvinch(target.y + 1, target.x);
+		mvaddch(target.y + 1, target.x, ch ^ A_BLINK);
+	}
+	int ch = get_control();
+	if(ch == 27) {
+		nodelay(stdscr, TRUE);
+		ch = getch();
+		nodelay(stdscr, FALSE);
+		if(ch == ERR || ch == 27) {
+			return 27;
+		}
+	}
+	return ch;
+}
+
 int Console::draw_and_get_control(Game & game)
 {
 	int ch = see_messages(game);

@@ -45,6 +45,19 @@ Control player_control(Monster & player, Game & game)
 		} else if(ch == 'Q') {
 			game.done = true;
 			game.player_died = true;
+		} else if(ch == 'x') {
+			Point target = player.pos;
+			ch = console.draw_target_mode(game, target);
+			while(ch != 'x' && ch != 27) {
+				if(directions.count(ch) != 0) {
+					Point new_target = target + directions[ch];
+					if(game.map.valid(new_target)) {
+						target = new_target;
+					}
+				}
+				ch = console.draw_target_mode(game, target);
+			}
+			continue;
 		} else if(ch == 'g') {
 			return Control(Control::GRAB);
 		} else if(ch == 'i') {
