@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 13 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 14 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -106,6 +106,9 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
 	savefile.newline();
 
+	if(savefile.version() >= 14) {
+		savefile.store(game.current_level);
+	}
 	savefile.store(game.turns);
 	savefile.newline();
 

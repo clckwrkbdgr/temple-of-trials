@@ -67,7 +67,7 @@ bool Game::MapPassabilityDetector::is_passable(int x, int y) const
 
 
 Game::Game(MapGenerator * map_generator)
-	: map(1, 1), generator(map_generator), done(false), player_died(false), completed(false), turns(0)
+	: map(1, 1), current_level(0), generator(map_generator), done(false), player_died(false), completed(false), turns(0)
 {
 }
 
@@ -75,6 +75,7 @@ void Game::generate(int level)
 {
 	if(generator) {
 		generator->generate(*this, level);
+		current_level = level;
 	}
 }
 

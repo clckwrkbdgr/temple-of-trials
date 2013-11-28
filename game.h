@@ -47,6 +47,7 @@ struct Game {
 	};
 
 	Map map;
+	int current_level;
 	MapGenerator * generator;
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;

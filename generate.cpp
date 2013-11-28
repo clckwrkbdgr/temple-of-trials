@@ -371,9 +371,20 @@ void generate_level(Game & game, int level)
 				case '+' : game.doors.push_back(World::door(pos)); break;
 				case 'V' : game.containers.push_back(World::pot(pos)); break;
 				case '^' : game.stairs.push_back(World::gate(pos)); break;
-				case '>' : game.stairs.push_back(World::stairs_down(pos, level + 1)); break;
-				case '<' : game.stairs.push_back(level == 1 ? World::gate(pos) : World::stairs_up(pos, level - 1)); break;
-
+				case '>' :
+					if(level == 3) {
+						game.items.push_back(World::explosive(pos));
+					} else {
+						game.stairs.push_back(World::stairs_down(pos, level + 1));
+					}
+					break;
+				case '<' :
+					if(level == 1) {
+						game.stairs.push_back(World::gate(pos)); break;
+					} else {
+						game.stairs.push_back(World::stairs_up(pos, level - 1)); break;
+					}
+					break;
 				case '@' : game.monsters.push_back(World::player(pos)); break;
 				case 'a' : game.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;
 				case 'A' : game.monsters.push_back(World::ant(AI::ANGRY_AND_WANDER, pos)); break;
