@@ -236,6 +236,7 @@ std::vector<std::pair<Point, Point> > random_transmutation(const std::vector<std
 
 void generate_level(Game & game, int level)
 {
+	Monster player = game.getPlayer();
 	game.monsters.clear();
 	game.doors.clear();
 	game.items.clear();
@@ -312,7 +313,14 @@ void generate_level(Game & game, int level)
 						game.stairs.push_back(World::stairs_up(pos, level - 1)); break;
 					}
 					break;
-				case '@' : game.monsters.push_back(World::player(pos)); break;
+				case '@' :
+					if(player) {
+						player.pos = pos;
+						game.monsters.push_back(player);
+					} else {
+						game.monsters.push_back(World::player(pos));
+					}
+					break;
 				case 'a' : game.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;
 				case 'A' : game.monsters.push_back(World::ant(AI::ANGRY_AND_WANDER, pos)); break;
 				case 'S' : game.monsters.push_back(World::scorpion(AI::ANGRY_AND_STILL, pos)); break;

@@ -55,7 +55,7 @@ struct Game {
 	std::vector<Container> containers;
 	std::vector<Fountain> fountains;
 	std::vector<Stairs> stairs;
-	bool done, player_died, completed;
+	bool done, player_died, completed, turn_ended;
 	std::vector<std::string> messages;
 	int turns;
 

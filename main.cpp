@@ -28,6 +28,7 @@ int main()
 	}
 
 	while(!game.done) {
+		game.turn_ended = false;
 		foreach(Monster & monster, game.monsters) {
 			if(monster.is_dead()) {
 				continue;
@@ -61,6 +62,9 @@ int main()
 				}
 			} catch(const Game::Message & msg) {
 				game.message(msg.text);
+			}
+			if(game.turn_ended) {
+				break;
 			}
 
 			try {
