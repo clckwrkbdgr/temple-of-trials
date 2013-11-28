@@ -57,6 +57,8 @@ void Console::init_sprites()
 	sprites[Sprites::POT]           = std::make_pair('V', COLOR_PAIR(COLOR_YELLOW));
 	sprites[Sprites::WELL]          = std::make_pair('{', COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
 	sprites[Sprites::GATE]          = std::make_pair('<', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
+	sprites[Sprites::STAIRS_UP]     = std::make_pair('<', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
+	sprites[Sprites::STAIRS_DOWN]   = std::make_pair('>', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
 }
 
 void Console::print_tile(int x, int y, int sprite)

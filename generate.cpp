@@ -97,6 +97,16 @@ Stairs gate(const Point & pos)
 	return Stairs::Builder().pos(pos).sprite(Sprites::GATE).name("gate").up_destination(-1);
 }
 
+Stairs stairs_up(const Point & pos, int destination)
+{
+	return Stairs::Builder().pos(pos).sprite(Sprites::STAIRS_UP).name("stairs").up_destination(destination);
+}
+
+Stairs stairs_down(const Point & pos, int destination)
+{
+	return Stairs::Builder().pos(pos).sprite(Sprites::STAIRS_DOWN).name("stairs").down_destination(destination);
+}
+
 }
 
 void predefined_demo_level(Game & game)
@@ -329,7 +339,7 @@ void generate_level(Game & game)
 	room_content.push_back("&&%SAA");
 	room_content.push_back("&&%SS");
 	room_content.push_back("[SSS~~~~~~~");
-	room_content.push_back("##SSSS*~~~~~~~");
+	room_content.push_back("##SSSS>~~~~~~~");
 
 	for(unsigned i = 0; i < rooms.size(); ++i) {
 		fill_room(game.map, rooms[i], floor_type);
@@ -351,6 +361,8 @@ void generate_level(Game & game)
 				case '+' : game.doors.push_back(World::door(pos)); break;
 				case 'V' : game.containers.push_back(World::pot(pos)); break;
 				case '^' : game.stairs.push_back(World::gate(pos)); break;
+				case '>' : game.stairs.push_back(World::stairs_down(pos, 2)); break;
+				case '<' : game.stairs.push_back(World::stairs_up(pos, 1)); break;
 
 				case '@' : game.monsters.push_back(World::player(pos)); break;
 				case 'a' : game.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;

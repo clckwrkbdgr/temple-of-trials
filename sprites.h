@@ -23,6 +23,8 @@ enum {
 	POT,
 	WELL,
 	GATE,
+	STAIRS_UP,
+	STAIRS_DOWN,
 
 	COUNT
 };
