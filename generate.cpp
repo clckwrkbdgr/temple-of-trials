@@ -267,15 +267,36 @@ void generate_level(Level & level, int level_index)
 	log("Rooms arranged.");
 
 	std::vector<std::string> room_content;
-	room_content.push_back("&@<>");
-	room_content.push_back("####&%a");
-	room_content.push_back("##&aA%");
-	room_content.push_back("##&(A");
-	room_content.push_back("&&aAA{V");
-	room_content.push_back("&&%SAA");
-	room_content.push_back("&&%SS");
-	room_content.push_back("[SSS~~~~~~~");
-	room_content.push_back("##SSSS>~~~~~~~");
+	switch(level_index) {
+		case 1:
+			room_content
+				<< "@<" << "a" << "%a"
+				<< "####Aa" << "%Aa" << "&%AAa"
+				<< "&&(AAA" << "&&&&%A%A" << "####AAAA>"
+				;
+			break;
+		case 2:
+			room_content
+				<< "&@<%" << "AAAV" << "########S%%"
+				<< "(SaAAA" << "%%%V" << "AAASS"
+				<< "&&&&~~~~~~~~~~~~{%" << "[VSSSAA%" << "####SSSSAAAA>"
+				;
+			break;
+		case 3:
+			room_content
+				<< "####&@<%%(" << "~~~~~~~~SSSSV" << "####AAASSS%%"
+				<< "####~~~~SSSAAAAA%%" << "####~~~~VSSSSS%" << "####~~~~VVSSSSSSSAAA%%%"
+				<< "####~~~~VVSSSSSSSSSS" << "####VVV%%%%%%%(" << "SSSSSSSSAAAAAAAA~~~~~~~~~~~~>"
+				;
+			break;
+		default:
+			room_content
+				<< "@<" << std::string(32, '~') << std::string(32, '~')
+				<< std::string(32, '~') << std::string(32, '~') << std::string(32, '~')
+				<< std::string(32, '~') << std::string(32, '~') << std::string(32, '~')
+				;
+			break;
+	}
 
 	for(unsigned i = 0; i < rooms.size(); ++i) {
 		fill_room(level.map, rooms[i], floor_type);

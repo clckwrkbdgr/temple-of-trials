@@ -117,5 +117,14 @@ T & find_at(std::vector<T> & container, const Point & pos, typename std::vector<
     return empty;
 }
 
+template<class T>
+std::vector<T> & operator<<(std::vector<T> & out, const T & t)
+{
+	out.push_back(t);
+	return out;
+}
+
+std::vector<std::string> & operator<<(std::vector<std::string> & out, const char * t);
+
 int distance(const Point & a, const Point & b);
 
