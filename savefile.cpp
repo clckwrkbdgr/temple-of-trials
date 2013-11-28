@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 14 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 15 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -139,6 +139,35 @@ SAVEFILE_STORE_EXT(Level, level)
 	savefile.store(level.doors, "door");
 }
 
+void store_ext(Writer & savefile, const std::map<int, Level> & saved_levels)
+{
+	savefile.store(unsigned(saved_levels.size()));
+	savefile.newline();
+	std::map<int, Level>::const_iterator i;
+	for(i = saved_levels.begin(); i != saved_levels.end(); ++i) {
+		int level_index = i->first;
+		const Level & level = i->second;
+		savefile.store(level_index);
+		savefile.newline();
+		store_ext(savefile, level);
+		savefile.newline();
+	}
+}
+
+void store_ext(Reader & savefile, std::map<int, Level> & saved_levels)
+{
+	int count;
+	savefile.store(count);
+	savefile.newline();
+	while(count --> 0) {
+		int level_index;
+		savefile.store(level_index);
+		savefile.newline();
+		store_ext(savefile, saved_levels[level_index]);
+		savefile.newline();
+	}
+}
+
 SAVEFILE_STORE_EXT(Game, game)
 {
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
@@ -151,6 +180,11 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.newline();
 
 	store_ext(savefile, game.level);
+	savefile.newline();
+
+	if(savefile.version() >= 15) {
+		store_ext(savefile, game.saved_levels);
+	}
 	savefile.newline();
 }
 

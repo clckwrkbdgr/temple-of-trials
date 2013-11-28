@@ -51,6 +51,7 @@ void Game::generate(int level_index)
 	Monster player = level.get_player();
 	if(saved_levels.count(level_index) > 0) {
 		level = saved_levels[level_index];
+		saved_levels.erase(level_index);
 	} else if(generator) {
 		generator->generate(level, level_index);
 	} else {

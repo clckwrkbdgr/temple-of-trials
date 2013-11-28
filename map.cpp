@@ -2,7 +2,7 @@
 #include "util.h"
 
 CellType::CellType()
-	: sprite(' '), passable(false), transparent(false), hurts(false)
+	: sprite(0), passable(false), transparent(false), hurts(false)
 {
 }
 
