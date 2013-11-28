@@ -5,6 +5,7 @@ class Control;
 class Item;
 
 struct Monster {
+	bool godmode;
 	Point pos;
 	int sprite;
 	int sight;
@@ -138,6 +139,7 @@ struct Stairs {
 	Point pos;
 	int sprite;
 	std::string name;
+	int up_destination, down_destination;
 	Stairs();
 	operator bool() const;
 
@@ -149,5 +151,7 @@ struct Stairs::Builder {
 	Builder & pos(const Point & value);
 	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
+	Builder & up_destination(int value);
+	Builder & down_destination(int value);
 };
 

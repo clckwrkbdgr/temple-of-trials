@@ -94,7 +94,7 @@ Fountain well(const Point & pos)
 
 Stairs gate(const Point & pos)
 {
-	return Stairs::Builder().pos(pos).sprite(Sprites::GATE).name("gate");
+	return Stairs::Builder().pos(pos).sprite(Sprites::GATE).name("gate").up_destination(-1);
 }
 
 }
@@ -321,7 +321,7 @@ void generate_level(Game & game)
 	rooms = random_transmutation(rooms);
 
 	std::vector<std::string> room_content;
-	room_content.push_back("&@<");
+	room_content.push_back("&@^");
 	room_content.push_back("####&%a");
 	room_content.push_back("##&aA%");
 	room_content.push_back("##&(A");
@@ -350,7 +350,7 @@ void generate_level(Game & game)
 				case '{' : game.fountains.push_back(World::well(pos)); break;
 				case '+' : game.doors.push_back(World::door(pos)); break;
 				case 'V' : game.containers.push_back(World::pot(pos)); break;
-				case '<' : game.stairs.push_back(World::gate(pos)); break;
+				case '^' : game.stairs.push_back(World::gate(pos)); break;
 
 				case '@' : game.monsters.push_back(World::player(pos)); break;
 				case 'a' : game.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;

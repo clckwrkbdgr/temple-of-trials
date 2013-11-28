@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 12 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 13 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -62,6 +62,10 @@ SAVEFILE_STORE_EXT(Stairs, stairs)
 {
 	savefile.store(stairs.pos.x).store(stairs.pos.y);
 	savefile.store(stairs.sprite).store(stairs.name);
+	if(savefile.version() >= 13) {
+		savefile.store(stairs.up_destination);
+		savefile.store(stairs.down_destination);
+	}
 }
 
 SAVEFILE_STORE_EXT(Door, door)

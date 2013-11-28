@@ -3,6 +3,7 @@
 #include "pathfinding.h"
 #include "game.h"
 #include "objects.h"
+#include <ncurses.h>
 #include <cstdlib>
 
 Controller get_controller(int ai)
@@ -54,6 +55,8 @@ Control player_control(Monster & player, Game & game)
 			game.done = true;
 			game.player_died = true;
 			game.message("You commited suicide.");
+		} else if(ch == KEY_F(1)) {
+			player.godmode = true;
 		} else if(ch == 'x') {
 			Point target = player.pos;
 			ch = console.draw_target_mode(game, target);
@@ -75,6 +78,10 @@ Control player_control(Monster & player, Game & game)
 				}
 			}
 			continue;
+		} else if(ch == '<') {
+			return Control(Control::GO_UP);
+		} else if(ch == '>') {
+			return Control(Control::GO_DOWN);
 		} else if(ch == 'g') {
 			return Control(Control::GRAB);
 		} else if(ch == 'i') {

@@ -11,6 +11,7 @@ struct Control {
 		OPEN, CLOSE, MOVE, SWING, WAIT,
 		GRAB, DROP, WIELD, UNWIELD, WEAR, TAKE_OFF, FIRE,
 		DRINK, EAT,
+		GO_UP, GO_DOWN,
 		COUNT
 	};
 	int control;
@@ -84,5 +85,7 @@ struct Game {
 	void wear(Monster & someone, int slot);
 	void take_off(Monster & someone);
 	void eat(Monster & someone, int slot);
+	void go_up(Monster & someone);
+	void go_down(Monster & someone);
 };
 

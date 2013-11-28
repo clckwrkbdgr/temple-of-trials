@@ -2,7 +2,8 @@
 #include "game.h"
 
 Monster::Monster()
-	: sprite(0), sight(0), ai(0), max_hp(1), hp(max_hp), hit_strength(0), wielded(-1), worn(-1), poisonous(false), poisoning(0)
+	: godmode(false), sprite(0), sight(0), ai(0), max_hp(1), hp(max_hp),
+	hit_strength(0), wielded(-1), worn(-1), poisonous(false), poisoning(0)
 {
 }
 
@@ -184,7 +185,7 @@ Fountain::Builder & Fountain::Builder::name(const std::string & value) { result.
 
 
 Stairs::Stairs()
-	: sprite(0)
+	: sprite(0), up_destination(0), down_destination(0)
 {
 }
 
@@ -196,4 +197,6 @@ Stairs::operator bool() const
 Stairs::Builder & Stairs::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Stairs::Builder & Stairs::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Stairs::Builder & Stairs::Builder::name(const std::string & value) { result.name = value; return *this; }
+Stairs::Builder & Stairs::Builder::up_destination(int value) { result.up_destination = value; return *this; }
+Stairs::Builder & Stairs::Builder::down_destination(int value) { result.down_destination = value; return *this; }
 

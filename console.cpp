@@ -63,6 +63,8 @@ void Console::print_tile(int x, int y, int sprite)
 {
 	if(sprites.count(sprite) > 0) {
 		mvaddch(y + 1, x, sprites[sprite].first | sprites[sprite].second);
+	} else {
+		log("Unknown sprite with code {0} at {1}", sprite, Point(x, y));
 	}
 }
 
@@ -70,6 +72,8 @@ void Console::print_fow(int x, int y, int sprite)
 {
 	if(sprites.count(sprite) > 0) {
 		mvaddch(y + 1, x, sprites[sprite].first);
+	} else {
+		log("Unknown fow sprite with code {0} at {1}", sprite, Point(x, y));
 	}
 }
 

@@ -291,7 +291,9 @@ void Game::die(Monster & someone)
 void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 {
 	int received_damage = damage - (pierce_armour ? 0 : someone.worn_item().defence);
-	someone.hp -= received_damage;
+	if(!someone.godmode) {
+		someone.hp -= received_damage;
+	}
 	game_assert(someone.is_dead(), format("{0} loses {1} hp.", someone.name, received_damage));
 	message(format("{0} loses {1} hp and dies.", someone.name, received_damage));
 	die(someone);
@@ -300,7 +302,9 @@ void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 void Game::hit(Monster & someone, Monster & other, int damage)
 {
 	int received_damage = damage - other.worn_item().defence;
-	other.hp -= received_damage;
+	if(!other.godmode) {
+		other.hp -= received_damage;
+	}
 	if(someone.poisonous) {
 		message(format("{0} poisons {1}.", someone.name, other.name));
 		other.poisoning = std::min(5, std::max(5, other.poisoning));
@@ -324,16 +328,6 @@ void Game::move(Monster & someone, const Point & shift)
     Monster & monster = find_at(monsters, new_pos);
 	game_assert(!monster, format("{0} bump into {1}.", someone.name, monster.name));
     someone.pos = new_pos;
-    Stairs & gate = find_at(stairs, someone.pos);
-	if(gate) {
-		foreach(const Item & item, someone.inventory) {
-			if(item.quest) {
-				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
-				done = true;
-				completed = true;
-			}
-		}
-	}
 }
 
 void Game::drink(Monster & someone, const Point & shift)
@@ -580,5 +574,41 @@ void Game::eat(Monster & someone, int slot)
 		message(format("{0} heals {1}.", item.name, someone.name));
 	}
 	someone.inventory[slot] = Item();
+}
+
+void Game::go_up(Monster & someone)
+{
+    Stairs & gate = find_at(stairs, someone.pos);
+	game_assert(gate && gate.up_destination, format("{0} cannot go up from there.", someone.name));
+	if(gate.up_destination < 0) {
+		foreach(const Item & item, someone.inventory) {
+			if(item.quest) {
+				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
+				done = true;
+				completed = true;
+				return;
+			}
+		}
+		message(format("{0} must complete mission in order to go back to the surface.", someone.name));
+		return;
+	}
+}
+
+void Game::go_down(Monster & someone)
+{
+    Stairs & gate = find_at(stairs, someone.pos);
+	game_assert(gate && gate.down_destination, format("{0} cannot go down from there.", someone.name));
+	if(gate.down_destination < 0) {
+		foreach(const Item & item, someone.inventory) {
+			if(item.quest) {
+				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
+				done = true;
+				completed = true;
+				return;
+			}
+		}
+		message(format("{0} must complete mission in order to go back to the surface.", someone.name));
+		return;
+	}
 }
 

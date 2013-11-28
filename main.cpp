@@ -53,6 +53,8 @@ int main()
 					case Control::WEAR: game.wear(monster, control.slot); break;
 					case Control::TAKE_OFF: game.take_off(monster); break;
 					case Control::EAT: game.eat(monster, control.slot); break;
+					case Control::GO_UP: game.go_up(monster); break;
+					case Control::GO_DOWN: game.go_down(monster); break;
 					case Control::WAIT: break;
 					default: log("Unknown control: {0}", control.control); break;
 				}
