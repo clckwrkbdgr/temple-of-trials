@@ -66,9 +66,16 @@ bool Game::MapPassabilityDetector::is_passable(int x, int y) const
 }
 
 
-Game::Game()
-	: map(1, 1), done(false), player_died(false), completed(false), turns(0)
+Game::Game(MapGenerator * map_generator)
+	: map(1, 1), generator(map_generator), done(false), player_died(false), completed(false), turns(0)
 {
+}
+
+void Game::generate(int level)
+{
+	if(generator) {
+		generator->generate(*this, level);
+	}
 }
 
 Point Game::find_random_free_cell() const
@@ -578,9 +585,9 @@ void Game::eat(Monster & someone, int slot)
 
 void Game::go_up(Monster & someone)
 {
-    Stairs & gate = find_at(stairs, someone.pos);
-	game_assert(gate && gate.up_destination, format("{0} cannot go up from there.", someone.name));
-	if(gate.up_destination < 0) {
+    Stairs & stair = find_at(stairs, someone.pos);
+	game_assert(stair && stair.up_destination, format("{0} cannot go up from there.", someone.name));
+	if(stair.up_destination < 0) {
 		foreach(const Item & item, someone.inventory) {
 			if(item.quest) {
 				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
@@ -592,13 +599,15 @@ void Game::go_up(Monster & someone)
 		message(format("{0} must complete mission in order to go back to the surface.", someone.name));
 		return;
 	}
+	message(format("{0} goes up.", someone.name));
+	generate(stair.up_destination);
 }
 
 void Game::go_down(Monster & someone)
 {
-    Stairs & gate = find_at(stairs, someone.pos);
-	game_assert(gate && gate.down_destination, format("{0} cannot go down from there.", someone.name));
-	if(gate.down_destination < 0) {
+    Stairs & stair = find_at(stairs, someone.pos);
+	game_assert(stair && stair.down_destination, format("{0} cannot go down from there.", someone.name));
+	if(stair.down_destination < 0) {
 		foreach(const Item & item, someone.inventory) {
 			if(item.quest) {
 				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
@@ -610,5 +619,7 @@ void Game::go_down(Monster & someone)
 		message(format("{0} must complete mission in order to go back to the surface.", someone.name));
 		return;
 	}
+	message(format("{0} goes down.", someone.name));
+	generate(stair.down_destination);
 }
 

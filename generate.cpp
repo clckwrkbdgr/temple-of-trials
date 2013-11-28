@@ -307,8 +307,16 @@ std::vector<std::pair<Point, Point> > random_transmutation(const std::vector<std
 	return new_rooms;
 }
 
-void generate_level(Game & game)
+void generate_level(Game & game, int level)
 {
+	game.monsters.clear();
+	game.doors.clear();
+	game.items.clear();
+	game.containers.clear();
+	game.fountains.clear();
+	game.stairs.clear();
+	log("Game cleared.");
+
 	game.map = Map(60, 23);
 
 	int floor_type = game.map.add_cell_type(World::floor());
@@ -317,6 +325,7 @@ void generate_level(Game & game)
 	int torch_type = game.map.add_cell_type(World::torch());
 
 	game.map.fill(wall_type);
+	log("Map filled.");
 
 	std::vector<std::pair<Point, Point> > rooms;
 	for(int y = 0; y < 3; ++y) {
@@ -329,9 +338,10 @@ void generate_level(Game & game)
 		}
 	}
 	rooms = random_transmutation(rooms);
+	log("Rooms arranged.");
 
 	std::vector<std::string> room_content;
-	room_content.push_back("&@^");
+	room_content.push_back("&@<>");
 	room_content.push_back("####&%a");
 	room_content.push_back("##&aA%");
 	room_content.push_back("##&(A");
@@ -361,8 +371,8 @@ void generate_level(Game & game)
 				case '+' : game.doors.push_back(World::door(pos)); break;
 				case 'V' : game.containers.push_back(World::pot(pos)); break;
 				case '^' : game.stairs.push_back(World::gate(pos)); break;
-				case '>' : game.stairs.push_back(World::stairs_down(pos, 2)); break;
-				case '<' : game.stairs.push_back(World::stairs_up(pos, 1)); break;
+				case '>' : game.stairs.push_back(World::stairs_down(pos, level + 1)); break;
+				case '<' : game.stairs.push_back(level == 1 ? World::gate(pos) : World::stairs_up(pos, level - 1)); break;
 
 				case '@' : game.monsters.push_back(World::player(pos)); break;
 				case 'a' : game.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;
@@ -375,21 +385,23 @@ void generate_level(Game & game)
 			connect_rooms(game, rooms[i], rooms[i - 1], floor_type);
 		}
 	}
+	log("Rooms filled.");
 	if(!game.monsters.empty()) {
 		foreach(Monster & monster, game.monsters) {
 			if(monster.ai == AI::PLAYER) {
 				std::swap(monster, game.monsters[0]);
+				log("Player found.");
 			}
 		}
 	}
+	log("Player popped.");
 }
 
-void generate(Game & game)
+void LinearGenerator::generate(Game & game, int level)
 {
-	log("Generating new game...");
-	game = Game();
+	log("Generating level {0}...", level);
 
-	generate_level(game);
+	generate_level(game, level);
 
 	log("Done.");
 }

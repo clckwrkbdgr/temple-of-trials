@@ -4,6 +4,7 @@
 #include "objects.h"
 #include <map>
 #include <list>
+class Game;
 
 struct Control {
 	enum {
@@ -23,6 +24,12 @@ struct Control {
 	bool done() const { return control != NONE; }
 };
 
+class MapGenerator {
+public:
+	virtual ~MapGenerator() {}
+	virtual void generate(Game & game, int level) = 0;
+};
+
 struct Game {
 	struct Message {
 		std::string text;
@@ -40,6 +47,7 @@ struct Game {
 	};
 
 	Map map;
+	MapGenerator * generator;
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;
 	std::vector<Item> items;
@@ -50,11 +58,13 @@ struct Game {
 	std::vector<std::string> messages;
 	int turns;
 
-	Game();
+	Game(MapGenerator * map_generator);
 	bool load(const std::string & filename);
 	bool save(const std::string & filename) const;
 	int get_message_count() const;
 	const std::string & get_top_message() const;
+
+	void generate(int level);
 
 	void message(std::string text);
 	Point find_random_free_cell() const;

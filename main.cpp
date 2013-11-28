@@ -16,14 +16,15 @@ int main()
 {
 	srand(time(0));
 	log("Log started: " + now());
-	Game game;
+	LinearGenerator generator;
+	Game game(&generator);
 	if(game.load(SAVEFILE)) {
 		if(remove(SAVEFILE.c_str()) != 0) {
 			log("Error: cannot delete savefile!");
 			return 1;
 		}
 	} else {
-		generate(game);
+		game.generate(1);
 	}
 
 	while(!game.done) {
