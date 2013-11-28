@@ -1,8 +1,8 @@
 #pragma once
 #include "game.h"
 
-class LinearGenerator : public MapGenerator {
+class LinearGenerator : public LevelGenerator {
 public:
 	virtual ~LinearGenerator() {}
-	virtual void generate(Game & game, int level);
+	virtual void generate(Level & level, int level_index);
 };

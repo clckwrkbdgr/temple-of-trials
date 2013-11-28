@@ -119,12 +119,14 @@ void Console::draw_game(const Game & game)
 {
 	NCursesUpdate upd;
 
-	for(unsigned x = 0; x < game.map.width; ++x) {
-		for(unsigned y = 0; y < game.map.height; ++y) {
-			if(game.map.cell_properties(x, y).visible) {
-				print_tile(x, y, game.get_sprite_at(Point(x, y)));
-			} else if(game.map.cell_properties(x, y).seen_sprite) {
-				print_fow(x, y, game.map.cell_properties(x, y).seen_sprite);
+	const Map & map = game.level.map;
+
+	for(unsigned x = 0; x < map.width; ++x) {
+		for(unsigned y = 0; y < map.height; ++y) {
+			if(map.cell_properties(x, y).visible) {
+				print_tile(x, y, game.level.get_sprite_at(Point(x, y)));
+			} else if(map.cell_properties(x, y).seen_sprite) {
+				print_fow(x, y, map.cell_properties(x, y).seen_sprite);
 			}
 		}
 	}
@@ -154,7 +156,7 @@ void Console::draw_game(const Game & game)
 	mvprintw(0, 0, "%s", notification_text.c_str());
 	notification_text.clear();
 
-	const Monster & player = game.getPlayer();
+	const Monster & player = game.level.get_player();
 	if(!player) {
 		return;
 	}
@@ -177,17 +179,17 @@ void Console::draw_game(const Game & game)
 
 int Console::draw_target_mode(Game & game, const Point & target)
 {
-	if(game.map.valid(target)) {
-		if(game.map.cell_properties(target).visible) {
-			notification(format("You see {0}.", game.name_at(target)));
-		} else if(game.map.cell_properties(target).seen_sprite) {
-			notification(format("You recall {0}.", game.name_at(target)));
+	if(game.level.map.valid(target)) {
+		if(game.level.map.cell_properties(target).visible) {
+			notification(format("You see {0}.", game.level.name_at(target)));
+		} else if(game.level.map.cell_properties(target).seen_sprite) {
+			notification(format("You recall {0}.", game.level.name_at(target)));
 		} else {
 			notification("You cannot see there.");
 		}
 	}
 	draw_game(game);
-	if(game.map.valid(target)) {
+	if(game.level.map.valid(target)) {
 		int ch = mvinch(target.y + 1, target.x);
 		mvaddch(target.y + 1, target.x, ch ^ A_BLINK);
 	}

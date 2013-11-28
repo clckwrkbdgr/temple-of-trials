@@ -35,81 +35,20 @@ Control::Control(int control_value, int control_slot)
 }
 
 
-Game::MapPassabilityDetector::MapPassabilityDetector(const Game & _game)
-	: game(_game)
-{
-}
-
-bool Game::MapPassabilityDetector::is_passable(int x, int y) const
-{
-	Point new_pos(x, y);
-	if(!game.map.cell(new_pos).passable) {
-		return false;
-	}
-    const Door & door = find_at(game.doors, new_pos);
-	if(door && !door.opened) {
-		return false;
-	}
-    const Container & container = find_at(game.containers, new_pos);
-	if(container) {
-		return false;
-	}
-    const Fountain & fountain = find_at(game.fountains, new_pos);
-	if(fountain) {
-		return false;
-	}
-    const Monster & monster = find_at(game.monsters, new_pos);
-	if(monster) {
-		return false;
-	}
-	return true;
-}
-
-
-Game::Game(MapGenerator * map_generator)
-	: map(1, 1), current_level(0), generator(map_generator),
+Game::Game(LevelGenerator * level_generator)
+	: current_level(0), generator(level_generator),
 	done(false), player_died(false), completed(false), turn_ended(false),
 	turns(0)
 {
 }
 
-void Game::generate(int level)
+void Game::generate(int level_index)
 {
 	if(generator) {
-		generator->generate(*this, level);
-		current_level = level;
+		generator->generate(level, level_index);
+		current_level = level_index;
 		turn_ended = true;
 	}
-}
-
-Point Game::find_random_free_cell() const
-{
-	int counter = map.width * map.height;
-	while(--counter > 0) {
-		Point new_pos = Point(rand() % map.width, rand() % map.height);
-		if(!map.cell(new_pos).passable) {
-			continue;
-		}
-		if(find_at(doors, new_pos)) {
-			continue;
-		}
-		if(find_at(monsters, new_pos)) {
-			continue;
-		}
-		return new_pos;
-	}
-	return Point();
-}
-
-const Monster & Game::getPlayer() const
-{
-	foreach(const Monster & monster, monsters) {
-		if(monster.ai == AI::PLAYER) {
-			return monster;
-		}
-	}
-	static Monster empty;
-	return empty;
 }
 
 void Game::message(std::string text)
@@ -122,156 +61,9 @@ void Game::message(std::string text)
 	log("Message: " + text);
 }
 
-bool Game::transparent(int x, int y) const
-{
-	foreach(const Door & door, doors) {
-		if(door.pos == Point(x, y) && !door.opened) {
-			return false;
-		}
-	}
-	return map.cell(x, y).transparent;
-}
-
-int Game::get_sprite_at(int x, int y) const
-{
-	return get_sprite_at(Point(x, y));
-}
-
-int Game::get_sprite_at(const Point & pos) const
-{
-	foreach(const Monster & monster, monsters) {
-		if(monster.pos == pos) {
-			return monster.sprite;
-		}
-	}
-	foreach(const Item & item, items) {
-		if(item.pos == pos) {
-			return item.sprite;
-		}
-	}
-	foreach(const Container & container, containers) {
-		if(container.pos == pos) {
-			return container.sprite;
-		}
-	}
-	foreach(const Fountain & fountain, fountains) {
-		if(fountain.pos == pos) {
-			return fountain.sprite;
-		}
-	}
-	foreach(const Stairs & stair, stairs) {
-		if(stair.pos == pos) {
-			return stair.sprite;
-		}
-	}
-	foreach(const Door & door, doors) {
-		if(door.pos == pos) {
-			return door.sprite();
-		}
-	}
-	return map.cell(pos).sprite;
-}
-
-std::string Game::name_at(const Point & pos) const
-{
-	foreach(const Monster & monster, monsters) {
-		if(monster.pos == pos) {
-			return monster.name;
-		}
-	}
-	foreach(const Item & item, items) {
-		if(item.pos == pos) {
-			return item.name;
-		}
-	}
-	foreach(const Container & container, containers) {
-		if(container.pos == pos) {
-			return container.name;
-		}
-	}
-	foreach(const Fountain & fountain, fountains) {
-		if(fountain.pos == pos) {
-			return fountain.name;
-		}
-	}
-	foreach(const Stairs & stair, stairs) {
-		if(stair.pos == pos) {
-			return stair.name;
-		}
-	}
-	foreach(const Door & door, doors) {
-		if(door.pos == pos) {
-			return door.name;
-		}
-	}
-	return map.cell(pos).name;
-}
-
-void Game::invalidate_fov(Monster & monster)
-{
-	for(unsigned x = 0; x < map.width; ++x) {
-		for(unsigned y = 0; y < map.height; ++y) {
-			map.cell_properties(x, y).visible = false;
-		}
-	}
-	for(int x = monster.pos.x - monster.sight; x <= monster.pos.x + monster.sight; ++x) {
-		for(int y = monster.pos.y - monster.sight; y <= monster.pos.y + monster.sight; ++y) {
-			if(!map.valid(x, y)) {
-				continue;
-			}
-			int dx = std::abs(x - monster.pos.x);
-			int dy = std::abs(y - monster.pos.y);
-			int distance = int(std::sqrt(dx * dx + dy * dy));
-			bool can_see = distance <= monster.sight;
-			if(can_see) {
-				int deltax = x - monster.pos.x;
-				int deltay = y - monster.pos.y;
-				double error = 0.0;
-				int iy = deltay > 0 ? 1 : -1;
-				int ix = deltax > 0 ? 1 : -1;
-				if(dx > dy) {
-					double delta_error = std::abs(double(deltay) / double(deltax));
-					int cy = monster.pos.y;
-					for(int cx = monster.pos.x; cx != x; cx += ix) {
-						if(!transparent(cx, cy)) {
-							can_see = false;
-							break;
-						}
-
-						error += delta_error;
-						if(error > 0.5) {
-							cy += iy;
-							error -= 1.0;
-						}
-					}
-				} else {
-					double delta_error = std::abs(double(deltax) / double(deltay));
-					int cx = monster.pos.x;
-					for(int cy = monster.pos.y; cy != y; cy += iy) {
-						if(!transparent(cx, cy)) {
-							can_see = false;
-							break;
-						}
-
-						error += delta_error;
-						if(error > 0.5) {
-							cx += ix;
-							error -= 1.0;
-						}
-					}
-				}
-			}
-			map.cell_properties(x, y).visible = can_see;
-			if(can_see && monster.ai == AI::PLAYER) {
-				map.cell_properties(x, y).seen_sprite = get_sprite_at(x, y);
-			}
-		}
-	}
-}
-
 void Game::process_environment(Monster & someone)
 {
-	if(map.cell(someone.pos).hurts) {
+	if(level.map.cell(someone.pos).hurts) {
 		message("It hurts!");
 		hurt(someone, 1);
 	}
@@ -288,7 +80,7 @@ void Game::die(Monster & someone)
 {
 	foreach(Item & item, someone.inventory) {
 		item.pos = someone.pos;
-		items.push_back(item);
+		level.items.push_back(item);
 		message(format("{0} drops {1}.", someone.name, item.name));
 	}
 	someone.inventory.clear();
@@ -329,14 +121,14 @@ void Game::move(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
 	Point new_pos = someone.pos + shift;
-	game_assert(map.cell(new_pos).passable, format("{0} bump into the {1}.", someone.name, map.cell(new_pos).name));
-    Door & door = find_at(doors, new_pos);
+	game_assert(level.map.cell(new_pos).passable, format("{0} bump into the {1}.", someone.name, level.map.cell(new_pos).name));
+    Door & door = find_at(level.doors, new_pos);
 	game_assert(!door || door.opened, format("{0} is closed.", door.name));
-    Container & container = find_at(containers, new_pos);
+    Container & container = find_at(level.containers, new_pos);
 	game_assert(!container, format("{0} bump into {1}.", someone.name, container.name));
-    Fountain & fountain = find_at(fountains, new_pos);
+    Fountain & fountain = find_at(level.fountains, new_pos);
 	game_assert(!fountain, format("{0} bump into {1}.", someone.name, fountain.name));
-    Monster & monster = find_at(monsters, new_pos);
+    Monster & monster = find_at(level.monsters, new_pos);
 	game_assert(!monster, format("{0} bump into {1}.", someone.name, monster.name));
     someone.pos = new_pos;
 }
@@ -345,15 +137,15 @@ void Game::drink(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
 	Point new_pos = someone.pos + shift;
-    Monster & monster = find_at(monsters, new_pos);
+    Monster & monster = find_at(level.monsters, new_pos);
 	game_assert(!monster, format("It is {1}. {0} is not a vampire to drink that.", someone.name, monster.name));
-    Container & container = find_at(containers, new_pos);
+    Container & container = find_at(level.containers, new_pos);
 	game_assert(
 			!(container && !container.items.empty()),
 			format("Unfortunately, {0} has no water left. But there is something else inside.", container.name)
 			);
 	game_assert(!container, format("Unfortunately, {0} is totally empty.", container.name));
-	Fountain & fountain = find_at(fountains, new_pos);
+	Fountain & fountain = find_at(level.fountains, new_pos);
 	game_assert(fountain, "There is nothing to drink.");
 	game_assert(someone.hp < someone.max_hp, format("{0} drink from {1}.", someone.name, fountain.name));
 	someone.hp += 1;
@@ -365,19 +157,19 @@ void Game::open(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
     Point new_pos = someone.pos + shift;
-    Door & door = find_at(doors, new_pos);
+    Door & door = find_at(level.doors, new_pos);
     if(door) {
 		game_assert(!door.opened, format("{0} is already opened.", door.name));
 		door.opened = true;
 		message(format("{0} opened the {1}.", someone.name, door.name));
 		return;
     }
-	Container & container = find_at(containers, new_pos);
+	Container & container = find_at(level.containers, new_pos);
 	game_assert(container, "There is nothing to open there.");
 	game_assert(!container.items.empty(), format("{0} is empty.", container.name));
 	foreach(Item & item, container.items) {
 		item.pos = someone.pos;
-		items.push_back(item);
+		level.items.push_back(item);
 		message(format("{0} took up a {1} from {2}.", someone.name, item.name, container.name));
 	}
 	container.items.clear();
@@ -387,7 +179,7 @@ void Game::close(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
     Point new_pos = someone.pos + shift;
-    Door & door = find_at(doors, new_pos);
+    Door & door = find_at(level.doors, new_pos);
     game_assert(door, "There is nothing to close there.");
     game_assert(door.opened, format("{0} is already closed.", door.name));
     door.opened = false;
@@ -398,19 +190,19 @@ void Game::swing(Monster & someone, const Point & shift)
 {
 	game_assert(shift);
     Point new_pos = someone.pos + shift;
-	game_assert(map.cell(new_pos).passable, format("{0} hit {1}.", someone.name, map.cell(new_pos).name));
-    Door & door = find_at(doors, new_pos);
+	game_assert(level.map.cell(new_pos).passable, format("{0} hit {1}.", someone.name, level.map.cell(new_pos).name));
+    Door & door = find_at(level.doors, new_pos);
     if(door && !door.opened) {
 		message(format("{0} swing at {1}.", someone.name, door.name));
 		open(someone, shift);
 		return;
     }
-    Monster & monster = find_at(monsters, new_pos);
+    Monster & monster = find_at(level.monsters, new_pos);
 	if(monster) {
 		hit(someone, monster, someone.damage());
 		return;
 	}
-    Container & container = find_at(containers, new_pos);
+    Container & container = find_at(level.containers, new_pos);
 	game_assert(!container, format("{0} swing at {1}.", someone.name, container.name));
     message(format("{0} swing at nothing.", someone.name));
 }
@@ -425,34 +217,34 @@ void Game::fire(Monster & someone, const Point & shift)
     item.pos = someone.pos;
 	message(format("{0} throw {1}.", someone.name, item.name));
 	while(true) {
-		if(!map.cell(item.pos + shift).transparent) {
-			message(format("{0} hit {1}.", item.name, map.cell(item.pos + shift).name));
-			items.push_back(item);
+		if(!level.map.cell(item.pos + shift).transparent) {
+			message(format("{0} hit {1}.", item.name, level.map.cell(item.pos + shift).name));
+			level.items.push_back(item);
 			break;
 		}
-		Door & door = find_at(doors, item.pos + shift);
+		Door & door = find_at(level.doors, item.pos + shift);
 		if(door && !door.opened) {
 			message(format("{0} hit {1}.", item.name, door.name));
-			items.push_back(item);
+			level.items.push_back(item);
 			break;
 		}
-		Container & container = find_at(containers, item.pos + shift);
+		Container & container = find_at(level.containers, item.pos + shift);
 		if(container) {
 			message(format("{0} falls into {1}.", item.name, container.name));
 			container.items.push_back(item);
 			break;
 		}
-		Fountain & fountain = find_at(fountains, item.pos + shift);
+		Fountain & fountain = find_at(level.fountains, item.pos + shift);
 		if(fountain) {
 			message(format("{0} falls into {1}. Forever lost.", item.name, fountain.name));
 			break;
 		}
-		Monster & monster = find_at(monsters, item.pos + shift);
+		Monster & monster = find_at(level.monsters, item.pos + shift);
 		if(monster) {
 			message(format("{0} hits {1}.", item.name, monster.name));
 			item.pos += shift;
 			hit(someone, monster, item.damage);
-			items.push_back(item);
+			level.items.push_back(item);
 			break;
 		}
 		item.pos += shift;
@@ -474,14 +266,14 @@ void Game::drop(Monster & someone, int slot)
 	Item item = someone.inventory[slot];
 	someone.inventory[slot] = Item();
 	item.pos = someone.pos;
-	items.push_back(item);
-	message(format("{0} dropped {1} on the {2}.", someone.name, item.name, map.cell(someone.pos).name));
+	level.items.push_back(item);
+	message(format("{0} dropped {1} on the {2}.", someone.name, item.name, level.map.cell(someone.pos).name));
 }
 
 void Game::grab(Monster & someone)
 {
 	std::vector<Item>::iterator item_index;
-	Item item = find_at(items, someone.pos, &item_index);
+	Item item = find_at(level.items, someone.pos, &item_index);
 	game_assert(item, "Nothing here to pick up.");
 	std::vector<Item>::iterator empty_slot;
 	for(empty_slot = someone.inventory.begin(); empty_slot != someone.inventory.end(); ++empty_slot) {
@@ -495,8 +287,8 @@ void Game::grab(Monster & someone)
 	} else {
 		*empty_slot = item;
 	}
-	items.erase(item_index);
-	message(format("{0} picked up {1} from the {2}.", someone.name, item.name, map.cell(someone.pos).name));
+	level.items.erase(item_index);
+	message(format("{0} picked up {1} from the {2}.", someone.name, item.name, level.map.cell(someone.pos).name));
 	if(item.quest) {
 		message("Now bring it back to the surface!");
 	}
@@ -589,7 +381,7 @@ void Game::eat(Monster & someone, int slot)
 
 void Game::go_up(Monster & someone)
 {
-    Stairs & stair = find_at(stairs, someone.pos);
+    Stairs & stair = find_at(level.stairs, someone.pos);
 	game_assert(stair && stair.up_destination, format("{0} cannot go up from there.", someone.name));
 	if(stair.up_destination < 0) {
 		foreach(const Item & item, someone.inventory) {
@@ -609,7 +401,7 @@ void Game::go_up(Monster & someone)
 
 void Game::go_down(Monster & someone)
 {
-    Stairs & stair = find_at(stairs, someone.pos);
+    Stairs & stair = find_at(level.stairs, someone.pos);
 	game_assert(stair && stair.down_destination, format("{0} cannot go down from there.", someone.name));
 	if(stair.down_destination < 0) {
 		foreach(const Item & item, someone.inventory) {

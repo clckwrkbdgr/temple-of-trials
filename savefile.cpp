@@ -101,6 +101,44 @@ SAVEFILE_STORE_EXT(Monster, monster)
 	savefile.store(monster.inventory, "inventory item");
 }
 
+SAVEFILE_STORE_EXT(Level, level)
+{
+	savefile.size_of(level.map);
+	savefile.newline();
+	savefile.store(level.map.celltypes, "celltype");
+	savefile.newline();
+	savefile.check("map size");
+	for(unsigned y = 0; y < level.map.height; ++y) {
+		for(unsigned x = 0; x < level.map.width; ++x) {
+			store_ext(savefile, level.map.cell_properties(x, y));
+			savefile.check("map cell");
+		}
+		savefile.newline();
+	}
+	savefile.newline();
+
+	savefile.store(level.monsters, "monster");
+	savefile.newline();
+
+	savefile.store(level.items, "item");
+	savefile.newline();
+
+	savefile.store(level.containers, "container");
+	savefile.newline();
+
+	if(savefile.version() >= 2) {
+		savefile.store(level.fountains, "fountain");
+		savefile.newline();
+	}
+
+	if(savefile.version() >= 10) {
+		savefile.store(level.stairs, "stairs");
+		savefile.newline();
+	}
+
+	savefile.store(level.doors, "door");
+}
+
 SAVEFILE_STORE_EXT(Game, game)
 {
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
@@ -112,40 +150,7 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.store(game.turns);
 	savefile.newline();
 
-	savefile.size_of(game.map);
-	savefile.newline();
-	savefile.store(game.map.celltypes, "celltype");
-	savefile.newline();
-	savefile.check("map size");
-	for(unsigned y = 0; y < game.map.height; ++y) {
-		for(unsigned x = 0; x < game.map.width; ++x) {
-			store_ext(savefile, game.map.cell_properties(x, y));
-			savefile.check("map cell");
-		}
-		savefile.newline();
-	}
-	savefile.newline();
-
-	savefile.store(game.monsters, "monster");
-	savefile.newline();
-
-	savefile.store(game.items, "item");
-	savefile.newline();
-
-	savefile.store(game.containers, "container");
-	savefile.newline();
-
-	if(savefile.version() >= 2) {
-		savefile.store(game.fountains, "fountain");
-		savefile.newline();
-	}
-
-	if(savefile.version() >= 10) {
-		savefile.store(game.stairs, "stairs");
-		savefile.newline();
-	}
-
-	savefile.store(game.doors, "door");
+	store_ext(savefile, game.level);
 	savefile.newline();
 }
 

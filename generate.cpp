@@ -1,6 +1,5 @@
 #include "generate.h"
 #include "ai.h"
-#include "game.h"
 #include "sprites.h"
 #include <cstdlib>
 
@@ -118,23 +117,22 @@ void fill_room(Map & map, const std::pair<Point, Point> & room, int type)
 	}
 }
 
-Point random_pos(const Game & game, const std::pair<Point, Point> & room)
+Point random_pos(const Level & level, const std::pair<Point, Point> & room)
 {
-	Game::MapPassabilityDetector detector(game);
 	int width = (room.second.x - room.first.x);
 	int height = (room.second.y - room.first.y);
 	int counter = width * height;
 	while(--counter > 0) {
 		int x = rand() % width + room.first.x;
 		int y = rand() % height + room.first.y;
-		if(detector.is_passable(x, y)) {
+		if(level.is_passable(x, y)) {
 			return Point(x, y);
 		}
 	}
 	return room.first;
 }
 
-void connect_rooms(Game & game, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, int type)
+void connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, int type)
 {
 	Point a_center = a.first + (a.second - a.first) / 2;
 	Point b_center = b.first + (b.second - b.first) / 2;
@@ -144,10 +142,10 @@ void connect_rooms(Game & game, const std::pair<Point, Point> & a, const std::pa
 		int stop_y = std::min(a.second.y, b.second.y);
 		int way = start_y + rand() % (stop_y - start_y);
 		for(int x = a.second.x + 1; x != b.first.x; ++x) {
-			game.map.set_cell_type(Point(x, way), type);
+			level.map.set_cell_type(Point(x, way), type);
 		}
-		game.doors.push_back(World::door(Point(a.second.x + 1, way)));
-		game.doors.push_back(World::door(Point(b.first.x - 1, way)));
+		level.doors.push_back(World::door(Point(a.second.x + 1, way)));
+		level.doors.push_back(World::door(Point(b.first.x - 1, way)));
 		return;
 	}
 	if(a.first.x > b.first.x) {
@@ -155,10 +153,10 @@ void connect_rooms(Game & game, const std::pair<Point, Point> & a, const std::pa
 		int stop_y = std::min(a.second.y, b.second.y);
 		int way = start_y + rand() % (stop_y - start_y);
 		for(int x = b.second.x + 1; x != a.first.x; ++x) {
-			game.map.set_cell_type(Point(x, way), type);
+			level.map.set_cell_type(Point(x, way), type);
 		}
-		game.doors.push_back(World::door(Point(b.second.x + 1, way)));
-		game.doors.push_back(World::door(Point(a.first.x - 1, way)));
+		level.doors.push_back(World::door(Point(b.second.x + 1, way)));
+		level.doors.push_back(World::door(Point(a.first.x - 1, way)));
 		return;
 	}
 	if(a.first.y < b.first.y) {
@@ -166,10 +164,10 @@ void connect_rooms(Game & game, const std::pair<Point, Point> & a, const std::pa
 		int stop_x = std::min(a.second.x, b.second.x);
 		int wax = start_x + rand() % (stop_x - start_x);
 		for(int y = a.second.y + 1; y != b.first.y; ++y) {
-			game.map.set_cell_type(Point(wax, y), type);
+			level.map.set_cell_type(Point(wax, y), type);
 		}
-		game.doors.push_back(World::door(Point(wax, a.second.y + 1)));
-		game.doors.push_back(World::door(Point(wax, b.first.y - 1)));
+		level.doors.push_back(World::door(Point(wax, a.second.y + 1)));
+		level.doors.push_back(World::door(Point(wax, b.first.y - 1)));
 		return;
 	}
 	if(a.first.y > b.first.y) {
@@ -177,10 +175,10 @@ void connect_rooms(Game & game, const std::pair<Point, Point> & a, const std::pa
 		int stop_x = std::min(a.second.x, b.second.x);
 		int wax = start_x + rand() % (stop_x - start_x);
 		for(int y = b.second.y + 1; y != a.first.y; ++y) {
-			game.map.set_cell_type(Point(wax, y), type);
+			level.map.set_cell_type(Point(wax, y), type);
 		}
-		game.doors.push_back(World::door(Point(wax, b.second.y + 1)));
-		game.doors.push_back(World::door(Point(wax, a.first.y - 1)));
+		level.doors.push_back(World::door(Point(wax, b.second.y + 1)));
+		level.doors.push_back(World::door(Point(wax, a.first.y - 1)));
 		return;
 	}
 }
@@ -234,32 +232,32 @@ std::vector<std::pair<Point, Point> > random_transmutation(const std::vector<std
 	return new_rooms;
 }
 
-void generate_level(Game & game, int level)
+void generate_level(Level & level, int level_index)
 {
-	Monster player = game.getPlayer();
-	game.monsters.clear();
-	game.doors.clear();
-	game.items.clear();
-	game.containers.clear();
-	game.fountains.clear();
-	game.stairs.clear();
+	Monster player = level.get_player();
+	level.monsters.clear();
+	level.doors.clear();
+	level.items.clear();
+	level.containers.clear();
+	level.fountains.clear();
+	level.stairs.clear();
 	log("Game cleared.");
 
-	game.map = Map(60, 23);
+	level.map = Map(60, 23);
 
-	int floor_type = game.map.add_cell_type(World::floor());
-	int wall_type = game.map.add_cell_type(World::wall());
-	int goo_type = game.map.add_cell_type(World::goo());
-	int torch_type = game.map.add_cell_type(World::torch());
+	int floor_type = level.map.add_cell_type(World::floor());
+	int wall_type = level.map.add_cell_type(World::wall());
+	int goo_type = level.map.add_cell_type(World::goo());
+	int torch_type = level.map.add_cell_type(World::torch());
 
-	game.map.fill(wall_type);
+	level.map.fill(wall_type);
 	log("Map filled.");
 
 	std::vector<std::pair<Point, Point> > rooms;
 	for(int y = 0; y < 3; ++y) {
 		for(int x = 0; x < 3; ++x) {
-			int cell_width = game.map.width / 3;
-			int cell_height = game.map.height / 3;
+			int cell_width = level.map.width / 3;
+			int cell_height = level.map.height / 3;
 			Point topleft = Point(x * cell_width + 2, y * cell_height + 2);
 			Point bottomright = Point(x * cell_width + cell_width - 2, y * cell_height + cell_height - 2);
 			rooms.push_back(std::make_pair(topleft, bottomright));
@@ -280,62 +278,62 @@ void generate_level(Game & game, int level)
 	room_content.push_back("##SSSS>~~~~~~~");
 
 	for(unsigned i = 0; i < rooms.size(); ++i) {
-		fill_room(game.map, rooms[i], floor_type);
+		fill_room(level.map, rooms[i], floor_type);
 		foreach(char cell, room_content[i]) {
-			Point pos = random_pos(game, rooms[i]);
+			Point pos = random_pos(level, rooms[i]);
 			switch(cell) {
-				case '#' : game.map.set_cell_type(pos, wall_type); break;
-				case '~' : game.map.set_cell_type(pos, goo_type); break;
-				case ' ' : game.map.set_cell_type(pos, floor_type); break;
-				case '&' : game.map.set_cell_type(pos, torch_type); break;
+				case '#' : level.map.set_cell_type(pos, wall_type); break;
+				case '~' : level.map.set_cell_type(pos, goo_type); break;
+				case ' ' : level.map.set_cell_type(pos, floor_type); break;
+				case '&' : level.map.set_cell_type(pos, torch_type); break;
 
-				case '$' : game.items.push_back(World::money(pos)); break;
-				case '%' : game.items.push_back(World::apple(pos)); break;
-				case '(' : game.items.push_back(World::spear(pos)); break;
-				case '*' : game.items.push_back(World::explosive(pos)); break;
-				case '[' : game.items.push_back(World::jacket(pos)); break;
+				case '$' : level.items.push_back(World::money(pos)); break;
+				case '%' : level.items.push_back(World::apple(pos)); break;
+				case '(' : level.items.push_back(World::spear(pos)); break;
+				case '*' : level.items.push_back(World::explosive(pos)); break;
+				case '[' : level.items.push_back(World::jacket(pos)); break;
 
-				case '{' : game.fountains.push_back(World::well(pos)); break;
-				case '+' : game.doors.push_back(World::door(pos)); break;
-				case 'V' : game.containers.push_back(World::pot(pos)); break;
-				case '^' : game.stairs.push_back(World::gate(pos)); break;
+				case '{' : level.fountains.push_back(World::well(pos)); break;
+				case '+' : level.doors.push_back(World::door(pos)); break;
+				case 'V' : level.containers.push_back(World::pot(pos)); break;
+				case '^' : level.stairs.push_back(World::gate(pos)); break;
 				case '>' :
-					if(level == 3) {
-						game.items.push_back(World::explosive(pos));
+					if(level_index == 3) {
+						level.items.push_back(World::explosive(pos));
 					} else {
-						game.stairs.push_back(World::stairs_down(pos, level + 1));
+						level.stairs.push_back(World::stairs_down(pos, level_index + 1));
 					}
 					break;
 				case '<' :
-					if(level == 1) {
-						game.stairs.push_back(World::gate(pos)); break;
+					if(level_index == 1) {
+						level.stairs.push_back(World::gate(pos)); break;
 					} else {
-						game.stairs.push_back(World::stairs_up(pos, level - 1)); break;
+						level.stairs.push_back(World::stairs_up(pos, level_index - 1)); break;
 					}
 					break;
 				case '@' :
 					if(player) {
 						player.pos = pos;
-						game.monsters.push_back(player);
+						level.monsters.push_back(player);
 					} else {
-						game.monsters.push_back(World::player(pos));
+						level.monsters.push_back(World::player(pos));
 					}
 					break;
-				case 'a' : game.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;
-				case 'A' : game.monsters.push_back(World::ant(AI::ANGRY_AND_WANDER, pos)); break;
-				case 'S' : game.monsters.push_back(World::scorpion(AI::ANGRY_AND_STILL, pos)); break;
+				case 'a' : level.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;
+				case 'A' : level.monsters.push_back(World::ant(AI::ANGRY_AND_WANDER, pos)); break;
+				case 'S' : level.monsters.push_back(World::scorpion(AI::ANGRY_AND_STILL, pos)); break;
 				default: log("Unknown cell: '{0}' in room {1}.", cell, i);
 			}
 		}
 		if(i > 0) {
-			connect_rooms(game, rooms[i], rooms[i - 1], floor_type);
+			connect_rooms(level, rooms[i], rooms[i - 1], floor_type);
 		}
 	}
 	log("Rooms filled.");
-	if(!game.monsters.empty()) {
-		foreach(Monster & monster, game.monsters) {
+	if(!level.monsters.empty()) {
+		foreach(Monster & monster, level.monsters) {
 			if(monster.ai == AI::PLAYER) {
-				std::swap(monster, game.monsters[0]);
+				std::swap(monster, level.monsters[0]);
 				log("Player found.");
 			}
 		}
@@ -343,11 +341,11 @@ void generate_level(Game & game, int level)
 	log("Player popped.");
 }
 
-void LinearGenerator::generate(Game & game, int level)
+void LinearGenerator::generate(Level & level, int level_index)
 {
-	log("Generating level {0}...", level);
+	log("Generating level {0}...", level_index);
 
-	generate_level(game, level);
+	generate_level(level, level_index);
 
 	log("Done.");
 }

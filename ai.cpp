@@ -1,7 +1,7 @@
 #include "ai.h"
 #include "console.h"
-#include "pathfinding.h"
 #include "game.h"
+#include "level.h"
 #include "objects.h"
 #include <ncurses.h>
 #include <cstdlib>
@@ -63,18 +63,17 @@ Control player_control(Monster & player, Game & game)
 			while(ch != 'x' && ch != 27 && ch != '.') {
 				if(directions.count(ch) != 0) {
 					Point new_target = target + directions[ch];
-					if(game.map.valid(new_target)) {
+					if(game.level.map.valid(new_target)) {
 						target = new_target;
 					}
 				}
 				ch = console.draw_target_mode(game, target);
 			}
 			if(ch == '.') {
-				if(game.map.cell_properties(target).seen_sprite == 0) {
+				if(game.level.map.cell_properties(target).seen_sprite == 0) {
 					console.notification("You don't know how to get there.");
 				} else {
-					Game::MapPassabilityDetector detector(game);
-					player.plan = find_path(player.pos, target, &detector);
+					player.plan = game.level.find_path(player.pos, target);
 				}
 			}
 			continue;
@@ -108,21 +107,18 @@ Control player_control(Monster & player, Game & game)
 			return Control(Control::WAIT);
 		} else if(directions.count(ch) != 0) {
 			Point new_pos = player.pos + directions[ch];
-			Door & door = find_at(game.doors, new_pos);
+			Door & door = find_at(game.level.doors, new_pos);
 			if(door && !door.opened) {
 				player.plan.push_front(Control(Control::MOVE, directions[ch]));
 				return Control(Control::OPEN, directions[ch]);
 			}
-			Container & container = find_at(game.containers, new_pos);
-			if(container) {
+			if(find_at(game.level.containers, new_pos)) {
 				return Control(Control::OPEN, directions[ch]);
 			}
-			Fountain & fountain = find_at(game.fountains, new_pos);
-			if(fountain) {
+			if(find_at(game.level.fountains, new_pos)) {
 				return Control(Control::DRINK, directions[ch]);
 			}
-			Monster & monster = find_at(game.monsters, new_pos);
-			if(monster) {
+			if(find_at(game.level.monsters, new_pos)) {
 				return Control(Control::SWING, directions[ch]);
 			}
 			return Control(Control::MOVE, directions[ch]);
@@ -170,8 +166,8 @@ Control player_control(Monster & player, Game & game)
 
 Control angry_and_wander(Monster & monster, Game & game)
 {
-	const Monster & player = game.getPlayer();
-	bool sees_player = game.map.cell_properties(player.pos).visible;
+	const Monster & player = game.level.get_player();
+	bool sees_player = game.level.map.cell_properties(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 			sign(player.pos.x - monster.pos.x),
@@ -188,8 +184,8 @@ Control angry_and_wander(Monster & monster, Game & game)
 
 Control angry_and_still(Monster & monster, Game & game)
 {
-	const Monster & player = game.getPlayer();
-	bool sees_player = game.map.cell_properties(player.pos).visible;
+	const Monster & player = game.level.get_player();
+	bool sees_player = game.level.map.cell_properties(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 		sign(player.pos.x - monster.pos.x),
@@ -206,8 +202,8 @@ Control angry_and_still(Monster & monster, Game & game)
 
 Control calm_and_still(Monster & monster, Game & game)
 {
-	const Monster & player = game.getPlayer();
-	bool sees_player = game.map.cell_properties(player.pos).visible;
+	const Monster & player = game.level.get_player();
+	bool sees_player = game.level.map.cell_properties(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 		sign(player.pos.x - monster.pos.x),

@@ -29,11 +29,11 @@ int main()
 
 	while(!game.done) {
 		game.turn_ended = false;
-		foreach(Monster & monster, game.monsters) {
+		foreach(Monster & monster, game.level.monsters) {
 			if(monster.is_dead()) {
 				continue;
 			}
-			game.invalidate_fov(monster);
+			game.level.invalidate_fov(monster);
 			Controller controller = get_controller(monster.ai);
 			if(!controller) {
 				log(format("No controller found for AI #{0}!", monster.ai));
@@ -77,7 +77,7 @@ int main()
 				break;
 			}
 		}
-		game.monsters.erase(std::remove_if(game.monsters.begin(), game.monsters.end(), std::mem_fun_ref(&Monster::is_dead)), game.monsters.end());
+		game.level.erase_dead_monsters();
 		++game.turns;
 	}
 	Console::instance().see_messages(game);

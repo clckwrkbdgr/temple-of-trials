@@ -1,7 +1,7 @@
 #pragma once
 #include "map.h"
-#include "pathfinding.h"
 #include "objects.h"
+#include "level.h"
 #include <map>
 #include <list>
 class Game;
@@ -24,12 +24,6 @@ struct Control {
 	bool done() const { return control != NONE; }
 };
 
-class MapGenerator {
-public:
-	virtual ~MapGenerator() {}
-	virtual void generate(Game & game, int level) = 0;
-};
-
 struct Game {
 	struct Message {
 		std::string text;
@@ -37,29 +31,14 @@ struct Game {
 		Message() {}
 	};
 
-	class MapPassabilityDetector : public PassabilityDetector {
-	public:
-		MapPassabilityDetector(const Game & _game);
-		virtual ~MapPassabilityDetector() {}
-		virtual bool is_passable(int x, int y) const;
-	private:
-		const Game & game;
-	};
-
-	Map map;
 	int current_level;
-	MapGenerator * generator;
-	std::vector<Monster> monsters;
-	std::vector<Door> doors;
-	std::vector<Item> items;
-	std::vector<Container> containers;
-	std::vector<Fountain> fountains;
-	std::vector<Stairs> stairs;
+	LevelGenerator * generator;
+	Level level;
 	bool done, player_died, completed, turn_ended;
 	std::vector<std::string> messages;
 	int turns;
 
-	Game(MapGenerator * map_generator);
+	Game(LevelGenerator * level_generator);
 	bool load(const std::string & filename);
 	bool save(const std::string & filename) const;
 	int get_message_count() const;
@@ -70,14 +49,6 @@ struct Game {
 	void message(std::string text);
 	Point find_random_free_cell() const;
 
-	const Monster & getPlayer() const;
-
-	bool transparent(int x, int y) const;
-	int get_sprite_at(int x, int y) const;
-	int get_sprite_at(const Point & pos) const;
-	std::string name_at(const Point & pos) const;
-
-	void invalidate_fov(Monster & monster);
 	void process_environment(Monster & someone);
 	void die(Monster & someone);
 	void hurt(Monster & someone, int damage, bool pierce_armour = false);
