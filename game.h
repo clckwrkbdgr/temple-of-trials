@@ -34,6 +34,7 @@ struct Game {
 	int current_level;
 	LevelGenerator * generator;
 	Level level;
+	std::map<int, Level> saved_levels;
 	bool done, player_died, completed, turn_ended;
 	std::vector<std::string> messages;
 	int turns;

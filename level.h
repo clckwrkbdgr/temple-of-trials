@@ -27,6 +27,7 @@ struct Level {
 	std::string name_at(const Point & pos) const;
 
 	const Monster & get_player() const;
+	Monster & get_player();
 
 	std::list<Control> find_path(const Point & player_pos, const Point & target);
 	void invalidate_fov(Monster & monster);

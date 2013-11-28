@@ -44,11 +44,24 @@ Game::Game(LevelGenerator * level_generator)
 
 void Game::generate(int level_index)
 {
-	if(generator) {
-		generator->generate(level, level_index);
-		current_level = level_index;
-		turn_ended = true;
+	if(current_level != 0) {
+		saved_levels[current_level] = level;
 	}
+
+	Monster player = level.get_player();
+	if(saved_levels.count(level_index) > 0) {
+		level = saved_levels[level_index];
+	} else if(generator) {
+		generator->generate(level, level_index);
+	} else {
+		return;
+	}
+	if(player) {
+		player.pos = level.get_player().pos;
+		level.get_player() = player;
+	}
+	current_level = level_index;
+	turn_ended = true;
 }
 
 void Game::message(std::string text)

@@ -20,6 +20,18 @@ const Monster & Level::get_player() const
 	return empty;
 }
 
+Monster & Level::get_player()
+{
+	foreach( Monster & monster, monsters) {
+		if(monster.ai == AI::PLAYER) {
+			return monster;
+		}
+	}
+	static Monster empty;
+	empty = Monster();
+	return empty;
+}
+
 bool Level::is_passable(int x, int y) const
 {
 	Point new_pos(x, y);
