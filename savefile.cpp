@@ -232,27 +232,12 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.newline();
 }
 
-bool Game::load(const std::string & filename)
+void load(Reader & savefile, Game & game)
 {
-	try {
-		Reader savefile(filename);
-		store_ext(savefile, *this);
-	} catch(const Reader::Exception & e) {
-		log(e.message);
-		return false;
-	}
-	return true;
+	store_ext(savefile, game);
 }
 
-bool Game::save(const std::string & filename) const
+void save(Writer & savefile, const Game & game)
 {
-	try {
-		Writer savefile(filename);
-		store_ext(savefile, *this);
-	} catch(const Writer::Exception & e) {
-		log(e.message);
-		return false;
-	}
-	return true;
+	store_ext(savefile, game);
 }
-

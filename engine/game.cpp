@@ -41,6 +41,64 @@ Game::Game(LevelGenerator * level_generator)
 {
 }
 
+void Game::run(ControllerFactory controller_factory)
+{
+	while(!done) {
+		turn_ended = false;
+		foreach(Monster & monster, level.monsters) {
+			if(monster.is_dead()) {
+				continue;
+			}
+			level.invalidate_fov(monster);
+			Controller controller = controller_factory(monster.ai);
+			if(!controller) {
+				log(format("No controller found for AI #{0}!", monster.ai));
+				continue;
+			}
+			Control control = controller(monster, *this);
+			try {
+				switch(control.control) {
+					case Control::SMART_MOVE: smart_move(monster, control.direction); break;
+					case Control::MOVE: move(monster, control.direction); break;
+					case Control::OPEN: open(monster, control.direction); break;
+					case Control::CLOSE: close(monster, control.direction); break;
+					case Control::SWING: swing(monster, control.direction); break;
+					case Control::FIRE: fire(monster, control.direction); break;
+					case Control::DRINK: drink(monster, control.direction); break;
+					case Control::GRAB: grab(monster); break;
+					case Control::DROP: drop(monster, control.slot); break;
+					case Control::WIELD: wield(monster, control.slot); break;
+					case Control::UNWIELD: unwield(monster); break;
+					case Control::WEAR: wear(monster, control.slot); break;
+					case Control::TAKE_OFF: take_off(monster); break;
+					case Control::EAT: eat(monster, control.slot); break;
+					case Control::GO_UP: go_up(monster); break;
+					case Control::GO_DOWN: go_down(monster); break;
+					case Control::WAIT: break;
+					default: log("Unknown control: {0}", control.control); break;
+				}
+			} catch(const Game::Message & msg) {
+				message(msg.text);
+			}
+			if(turn_ended) {
+				break;
+			}
+
+			try {
+				process_environment(monster);
+			} catch(const Game::Message & msg) {
+				message(msg.text);
+			}
+
+			if(done) {
+				break;
+			}
+		}
+		level.erase_dead_monsters();
+		++turns;
+	}
+}
+
 void Game::generate(int level_index)
 {
 	if(current_level != 0) {
@@ -140,6 +198,25 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 	game_assert(other.is_dead(), format("{0} hit {1} for {2} hp.", someone.name, other.name, received_damage));
 	message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, received_damage));
 	die(other);
+}
+
+void Game::smart_move(Monster & someone, const Point & shift)
+{
+	game_assert(shift);
+	Point new_pos = someone.pos + shift;
+	Door & door = find_at(level.doors, new_pos);
+	if(door && !door.opened) {
+		someone.plan.push_front(Control(Control::MOVE, shift));
+		open(someone, shift);
+	} else if(find_at(level.containers, new_pos)) {
+		open(someone, shift);
+	} else if(find_at(level.fountains, new_pos)) {
+		drink(someone, shift);
+	} else if(find_at(level.monsters, new_pos)) {
+		swing(someone, shift);
+	} else {
+		move(someone, shift);
+	}
 }
 
 void Game::move(Monster & someone, const Point & shift)
@@ -268,8 +345,8 @@ void Game::fire(Monster & someone, const Point & shift)
 		if(monster) {
 			message(format("{0} hits {1}.", item.name, monster.name));
 			item.pos += shift;
-			hit(someone, monster, item.damage);
 			level.items.push_back(item);
+			hit(someone, monster, item.damage);
 			break;
 		}
 		item.pos += shift;

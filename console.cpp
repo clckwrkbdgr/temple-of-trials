@@ -3,6 +3,8 @@
 #include "sprites.h"
 #include <ncurses.h>
 
+std::map<int, Point> Console::directions;
+
 enum {
 	MAP_WIDTH = 60,
 	MAP_HEIGHT = 1 + 23
@@ -19,6 +21,17 @@ Console::Console()
 	start_color();
 	
 	init_sprites();
+
+	if(directions.empty()) {
+		directions['h'] = Point(-1,  0);
+		directions['j'] = Point( 0, +1);
+		directions['k'] = Point( 0, -1);
+		directions['l'] = Point(+1,  0);
+		directions['y'] = Point(-1, -1);
+		directions['u'] = Point(+1, -1);
+		directions['b'] = Point(-1, +1);
+		directions['n'] = Point(+1, +1);
+	}
 }
 
 Console::~Console()
@@ -211,6 +224,16 @@ int Console::draw_and_get_control(Game & game)
 {
 	int ch = see_messages(game);
 	return ch;
+}
+
+Point Console::draw_and_get_direction(Game & game)
+{
+	int ch = see_messages(game);
+	while(directions.count(ch) == 0) {
+		notification("This is not a direction.");
+		ch = see_messages(game);
+	}
+	return directions[ch];
 }
 
 int Console::see_messages(Game & game)

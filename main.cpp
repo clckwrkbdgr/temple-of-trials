@@ -1,9 +1,11 @@
 #include "generate.h"
 #include "ai.h"
+#include "console.h"
+#include "savefile.h"
 #include "engine/game.h"
 #include "engine/map.h"
 #include "engine/objects.h"
-#include "console.h"
+#include "engine/files.h"
 #include "engine/util.h"
 #include <algorithm>
 #include <map>
@@ -18,71 +20,28 @@ int main()
 	log("Log started: " + now());
 	LinearGenerator generator;
 	Game game(&generator);
-	if(game.load(SAVEFILE)) {
+	try {
+		Reader savefile(SAVEFILE);
+		load(savefile, game);
 		if(remove(SAVEFILE.c_str()) != 0) {
 			log("Error: cannot delete savefile!");
 			return 1;
 		}
-	} else {
+	} catch(const Reader::Exception & e) {
+		log(e.message);
 		game.generate(1);
 	}
 
-	while(!game.done) {
-		game.turn_ended = false;
-		foreach(Monster & monster, game.level.monsters) {
-			if(monster.is_dead()) {
-				continue;
-			}
-			game.level.invalidate_fov(monster);
-			Controller controller = get_controller(monster.ai);
-			if(!controller) {
-				log(format("No controller found for AI #{0}!", monster.ai));
-				continue;
-			}
-			Control control = controller(monster, game);
-			try {
-				switch(control.control) {
-					case Control::MOVE: game.move(monster, control.direction); break;
-					case Control::OPEN: game.open(monster, control.direction); break;
-					case Control::CLOSE: game.close(monster, control.direction); break;
-					case Control::SWING: game.swing(monster, control.direction); break;
-					case Control::FIRE: game.fire(monster, control.direction); break;
-					case Control::DRINK: game.drink(monster, control.direction); break;
-					case Control::GRAB: game.grab(monster); break;
-					case Control::DROP: game.drop(monster, control.slot); break;
-					case Control::WIELD: game.wield(monster, control.slot); break;
-					case Control::UNWIELD: game.unwield(monster); break;
-					case Control::WEAR: game.wear(monster, control.slot); break;
-					case Control::TAKE_OFF: game.take_off(monster); break;
-					case Control::EAT: game.eat(monster, control.slot); break;
-					case Control::GO_UP: game.go_up(monster); break;
-					case Control::GO_DOWN: game.go_down(monster); break;
-					case Control::WAIT: break;
-					default: log("Unknown control: {0}", control.control); break;
-				}
-			} catch(const Game::Message & msg) {
-				game.message(msg.text);
-			}
-			if(game.turn_ended) {
-				break;
-			}
+	game.run(get_controller);
 
-			try {
-				game.process_environment(monster);
-			} catch(const Game::Message & msg) {
-				game.message(msg.text);
-			}
-
-			if(game.done) {
-				break;
-			}
-		}
-		game.level.erase_dead_monsters();
-		++game.turns;
-	}
 	Console::instance().see_messages(game);
 	if(!game.player_died && !game.completed) {
-		game.save(SAVEFILE);
+		try {
+			Writer savefile(SAVEFILE);
+			save(savefile, game);
+		} catch(const Writer::Exception & e) {
+			log(e.message);
+		}
 	}
 
 	log("Exiting.");

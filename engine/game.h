@@ -9,7 +9,7 @@ class Game;
 struct Control {
 	enum {
 		NONE,
-		OPEN, CLOSE, MOVE, SWING, WAIT,
+		OPEN, CLOSE, MOVE, SMART_MOVE, SWING, WAIT,
 		GRAB, DROP, WIELD, UNWIELD, WEAR, TAKE_OFF, FIRE,
 		DRINK, EAT,
 		GO_UP, GO_DOWN,
@@ -23,6 +23,9 @@ struct Control {
 	Control(int control, int slot);
 	bool done() const { return control != NONE; }
 };
+
+typedef Control (*Controller)(Monster&, Game&);
+typedef Controller (*ControllerFactory)(int ai);
 
 struct Game {
 	struct Message {
@@ -40,8 +43,8 @@ struct Game {
 	int turns;
 
 	Game(LevelGenerator * level_generator);
-	bool load(const std::string & filename);
-	bool save(const std::string & filename) const;
+	void run(ControllerFactory controller_factory);
+
 	int get_message_count() const;
 	const std::string & get_top_message() const;
 
@@ -55,6 +58,7 @@ struct Game {
 	void hurt(Monster & someone, int damage, bool pierce_armour = false);
 	void hit(Monster & someone, Monster & other, int damage);
 
+	void smart_move(Monster & someone, const Point & shift);
 	void move(Monster & someone, const Point & shift);
 	void open(Monster & someone, const Point & shift);
 	void close(Monster & someone, const Point & shift);

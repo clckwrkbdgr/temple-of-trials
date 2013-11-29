@@ -22,6 +22,7 @@ struct Level {
 	std::vector<Trap> traps;
 
 	Level();
+	Level(int map_width, int map_height);
 	bool is_passable(int x, int y) const;
 	bool is_transparent(int x, int y) const;
 	int get_sprite_at(int x, int y) const;
@@ -40,5 +41,11 @@ class LevelGenerator {
 public:
 	virtual ~LevelGenerator() {}
 	virtual void generate(Level & level, int level_index) = 0;
+protected:
+	void fill_room(Map & map, const std::pair<Point, Point> & room, int type);
+	Point random_pos(const Level & level, const std::pair<Point, Point> & room);
+	std::pair<Point, Point> connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, int type);
+	std::vector<std::pair<Point, Point> > shuffle_rooms(const std::vector<std::pair<Point, Point> > & rooms);
+	void pop_player_front(std::vector<Monster> & monsters);
 };
 

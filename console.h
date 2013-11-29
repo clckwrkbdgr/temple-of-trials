@@ -6,8 +6,11 @@ class Monster;
 class Point;
 
 struct Console {
+	static std::map<int, Point> directions;
+
 	void draw_game(const Game & game);
 	int draw_and_get_control(Game & game);
+	Point draw_and_get_direction(Game & game);
 	int draw_target_mode(Game & game, const Point & target);
 	int see_messages(Game & game);
 	void draw_inventory(const Game & game, const Monster & monster);
