@@ -1,4 +1,3 @@
-#include "ai.h"
 #include "game.h"
 #include <map>
 #include <cstdlib>
@@ -110,7 +109,7 @@ void Game::die(Monster & someone)
 		message(format("{0} drops {1}.", someone.name, item.name));
 	}
 	someone.inventory.clear();
-	if(someone.ai == AI::PLAYER) {
+	if(someone.faction == Monster::PLAYER) {
 		message("You died.");
 		done = true;
 		player_died = true;

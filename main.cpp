@@ -1,10 +1,10 @@
 #include "generate.h"
 #include "ai.h"
-#include "game.h"
-#include "map.h"
-#include "objects.h"
+#include "engine/game.h"
+#include "engine/map.h"
+#include "engine/objects.h"
 #include "console.h"
-#include "util.h"
+#include "engine/util.h"
 #include <algorithm>
 #include <map>
 #include <cstdlib>

@@ -1,5 +1,5 @@
 #pragma once
-#include "game.h"
+#include "engine/game.h"
 
 class LinearGenerator : public LevelGenerator {
 public:

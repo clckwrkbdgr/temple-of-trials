@@ -7,7 +7,7 @@ endif
 
 BIN = temple
 LIBS = -lncurses
-SOURCES = $(wildcard *.cpp)
+SOURCES = $(wildcard *.cpp) $(wildcard engine/*.cpp)
 OBJ = $(addprefix tmp/,$(SOURCES:.cpp=.o))
 CXXFLAGS = -MD -MP -Werror -Wall
 
@@ -28,5 +28,6 @@ clean:
 	$(RM) -rf tmp/* $(BIN)
 
 $(shell mkdir -p tmp)
+$(shell mkdir -p tmp/engine)
 -include $(OBJ:%.o=%.d)
 

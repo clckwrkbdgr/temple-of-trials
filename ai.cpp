@@ -1,8 +1,8 @@
 #include "ai.h"
 #include "console.h"
-#include "game.h"
-#include "level.h"
-#include "objects.h"
+#include "engine/game.h"
+#include "engine/level.h"
+#include "engine/objects.h"
 #include <ncurses.h>
 #include <cstdlib>
 

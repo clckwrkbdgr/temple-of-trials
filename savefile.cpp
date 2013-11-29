@@ -1,8 +1,8 @@
 #include "ai.h"
-#include "game.h"
-#include "files.h"
+#include "engine/game.h"
+#include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 18 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 19 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -90,6 +90,32 @@ SAVEFILE_STORE_EXT(Door, door)
 	savefile.store(door.opened);
 }
 
+void store_faction(Writer & savefile, const Monster & monster)
+{
+	if(savefile.version() >= 19) {
+		savefile.store(monster.faction);
+	} else {
+		if(monster.ai == AI::PLAYER) {
+			savefile.store(Monster::PLAYER);
+		} else {
+			savefile.store(Monster::MONSTER);
+		}
+	}
+}
+
+void store_faction(Reader & savefile, Monster & monster)
+{
+	if(savefile.version() >= 19) {
+		savefile.store(monster.faction);
+	} else {
+		if(monster.ai == AI::PLAYER) {
+			monster.faction = Monster::PLAYER;
+		} else {
+			monster.faction = Monster::MONSTER;
+		}
+	}
+}
+
 SAVEFILE_STORE_EXT(Monster, monster)
 {
 	savefile.store(monster.pos.x).store(monster.pos.y).store(monster.sprite);
@@ -109,6 +135,7 @@ SAVEFILE_STORE_EXT(Monster, monster)
 	}
 	savefile.store(monster.ai);
 	savefile.store(monster.name);
+	store_faction(savefile, monster);
 	savefile.newline();
 	savefile.store(monster.inventory, "inventory item");
 }

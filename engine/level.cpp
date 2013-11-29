@@ -1,6 +1,5 @@
 #include "level.h"
 #include "game.h"
-#include "ai.h"
 #include "objects.h"
 #include <cmath>
 
@@ -12,7 +11,7 @@ Level::Level()
 const Monster & Level::get_player() const
 {
 	foreach(const Monster & monster, monsters) {
-		if(monster.ai == AI::PLAYER) {
+		if(monster.faction == Monster::PLAYER) {
 			return monster;
 		}
 	}
@@ -23,7 +22,7 @@ const Monster & Level::get_player() const
 Monster & Level::get_player()
 {
 	foreach( Monster & monster, monsters) {
-		if(monster.ai == AI::PLAYER) {
+		if(monster.ai == Monster::PLAYER) {
 			return monster;
 		}
 	}
@@ -207,7 +206,7 @@ void Level::invalidate_fov(Monster & monster)
 				}
 			}
 			map.cell_properties(x, y).visible = can_see;
-			if(can_see && monster.ai == AI::PLAYER) {
+			if(can_see && monster.faction == Monster::PLAYER) {
 				map.cell_properties(x, y).seen_sprite = get_sprite_at(x, y);
 			}
 		}

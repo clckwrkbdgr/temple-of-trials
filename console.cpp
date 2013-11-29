@@ -1,5 +1,5 @@
 #include "console.h"
-#include "game.h"
+#include "engine/game.h"
 #include "sprites.h"
 #include <ncurses.h>
 

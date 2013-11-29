@@ -2,7 +2,7 @@
 #include "game.h"
 
 Monster::Monster()
-	: godmode(false), sprite(0), sight(0), ai(0), max_hp(1), hp(max_hp),
+	: faction(NEUTRAL), godmode(false), sprite(0), sight(0), ai(0), max_hp(1), hp(max_hp),
 	hit_strength(0), wielded(-1), worn(-1), poisonous(false), poisoning(0)
 {
 }
@@ -98,6 +98,7 @@ const Item & Monster::worn_item() const
 	return item;
 }
 
+Monster::Builder & Monster::Builder::faction(int value) { result.faction = value; return *this; }
 Monster::Builder & Monster::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Monster::Builder & Monster::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Monster::Builder & Monster::Builder::sight(int value) { result.sight = value; return *this; }

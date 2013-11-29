@@ -5,6 +5,9 @@ class Control;
 class Item;
 
 struct Monster {
+	enum { NEUTRAL, PLAYER, MONSTER };
+
+	int faction;
 	bool godmode;
 	Point pos;
 	int sprite;
@@ -33,6 +36,7 @@ struct Monster {
 struct Monster::Builder {
 	Monster result;
 	operator Monster() { return result; }
+	Builder & faction(int value);
 	Builder & pos(const Point & value);
 	Builder & sprite(const int & sprite);
 	Builder & sight(int value);
