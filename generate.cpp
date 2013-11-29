@@ -278,13 +278,13 @@ void generate_level(Level & level, int level_index)
 		case 2:
 			room_content
 				<< "&@<%" << "AAAV" << "########S%%"
-				<< "(SaAAA" << "%%%V" << "AAASS"
-				<< "&&&&~~~~~~~~~~~~{%" << "[VSSSAA%" << "####SSSSAAAA>"
+				<< "(SaAAA" << "V%%%" << "AAASS"
+				<< "&&&&~~~~~~~~~~~~{%" << "V[SSSAA%" << "####SSSSAAAA>"
 				;
 			break;
 		case 3:
 			room_content
-				<< "####&@<%%(" << "~~~~~~~~SSSSV" << "####AAASSS%%"
+				<< "####&@<%%(" << "~~~~~~~~VSSSS" << "####AAASSS%%"
 				<< "####~~~~SSSAAAAA%%" << "####~~~~VSSSSS%" << "####~~~~VVSSSSSSSAAA%%%"
 				<< "####~~~~VVSSSSSSSSSS" << "####VVV%%%%%%%(" << "SSSSSSSSAAAAAAAA~~~~~~~~~~~~>"
 				;
