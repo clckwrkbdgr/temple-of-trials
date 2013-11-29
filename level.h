@@ -8,6 +8,7 @@ class Item;
 class Container;
 class Fountain;
 class Stairs;
+class Trap;
 class Control;
 
 struct Level {
@@ -18,6 +19,7 @@ struct Level {
 	std::vector<Container> containers;
 	std::vector<Fountain> fountains;
 	std::vector<Stairs> stairs;
+	std::vector<Trap> traps;
 
 	Level();
 	bool is_passable(int x, int y) const;

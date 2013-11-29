@@ -155,3 +155,20 @@ struct Stairs::Builder {
 	Builder & down_destination(int value);
 };
 
+struct Trap {
+	Point pos;
+	int sprite;
+	std::string name;
+	Trap();
+	operator bool() const;
+
+	struct Builder;
+};
+struct Trap::Builder {
+	Trap result;
+	operator Trap() { return result; }
+	Builder & pos(const Point & value);
+	Builder & sprite(const int & value);
+	Builder & name(const std::string & value);
+};
+

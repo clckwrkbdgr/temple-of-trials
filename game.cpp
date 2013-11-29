@@ -81,6 +81,11 @@ void Game::process_environment(Monster & someone)
 		message("It hurts!");
 		hurt(someone, 1);
 	}
+	Trap & trap = find_at(level.traps, someone.pos);
+	if(trap) {
+		message(format("{0} trigger the {1}.", someone.name, trap.name));
+		hurt(someone, 1);
+	}
 	if(someone.poisoning > 0) {
 		message(format("{0} is poisoned.", someone.name));
 		--someone.poisoning;

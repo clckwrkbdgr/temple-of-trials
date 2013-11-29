@@ -104,6 +104,11 @@ int Level::get_sprite_at(const Point & pos) const
 			return door.sprite();
 		}
 	}
+	foreach(const Trap & trap, traps) {
+		if(trap.pos == pos) {
+			return trap.sprite;
+		}
+	}
 	return map.cell(pos).sprite;
 }
 
@@ -137,6 +142,11 @@ std::string Level::name_at(const Point & pos) const
 	foreach(const Door & door, doors) {
 		if(door.pos == pos) {
 			return door.name;
+		}
+	}
+	foreach(const Trap & trap, traps) {
+		if(trap.pos == pos) {
+			return trap.name;
 		}
 	}
 	return map.cell(pos).name;

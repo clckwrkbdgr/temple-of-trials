@@ -200,3 +200,18 @@ Stairs::Builder & Stairs::Builder::name(const std::string & value) { result.name
 Stairs::Builder & Stairs::Builder::up_destination(int value) { result.up_destination = value; return *this; }
 Stairs::Builder & Stairs::Builder::down_destination(int value) { result.down_destination = value; return *this; }
 
+
+Trap::Trap()
+	: sprite(0)
+{
+}
+
+Trap::operator bool() const
+{
+	return bool(pos);
+}
+
+Trap::Builder & Trap::Builder::pos(const Point & value) { result.pos = value; return *this; }
+Trap::Builder & Trap::Builder::sprite(const int & value) { result.sprite = value; return *this; }
+Trap::Builder & Trap::Builder::name(const std::string & value) { result.name = value; return *this; }
+

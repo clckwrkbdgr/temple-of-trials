@@ -106,6 +106,11 @@ Stairs stairs_down(const Point & pos, int destination)
 	return Stairs::Builder().pos(pos).sprite(Sprites::STAIRS_DOWN).name("stairs").down_destination(destination);
 }
 
+Trap trap(const Point & pos)
+{
+	return Trap::Builder().pos(pos).sprite(Sprites::TRAP).name("trap");
+}
+
 }
 
 void fill_room(Map & map, const std::pair<Point, Point> & room, int type)
@@ -270,23 +275,23 @@ void generate_level(Level & level, int level_index)
 	switch(level_index) {
 		case 1:
 			room_content
-				<< "@<" << "a" << "%a"
-				<< "####Aa" << "%Aa" << "&%AAa"
-				<< "&&(AAA" << "&&&&%A%A" << "####AAAA>"
+				<< "^@<" << "a" << "%a"
+				<< "####^Aa" << "%Aa" << "&%AAa"
+				<< "&&(AAA" << "&&&&^%A%A" << "####AAAA>"
 				;
 			break;
 		case 2:
 			room_content
-				<< "&@<%" << "AAAV" << "########S%%"
+				<< "&@<%" << "AAAV" << "########^^S%%"
 				<< "(SaAAA" << "V%%%" << "AAASS"
 				<< "&&&&~~~~~~~~~~~~{%" << "V[SSSAA%" << "####SSSSAAAA>"
 				;
 			break;
 		case 3:
 			room_content
-				<< "####&@<%%(" << "~~~~~~~~VSSSS" << "####AAASSS%%"
+				<< "####&^^@<%%(" << "~~~~~~~~^VSSSS" << "####AAASSS%%"
 				<< "####~~~~SSSAAAAA%%" << "####~~~~VSSSSS%" << "####~~~~VVSSSSSSSAAA%%%"
-				<< "####~~~~VVSSSSSSSSSS" << "####VVV%%%%%%%(" << "SSSSSSSSAAAAAAAA~~~~~~~~~~~~>"
+				<< "####~~~~VVSSSSSSSSSS" << "####VVV^^^%%%%%%%(" << "SSSSSSSSAAAAAAAA~~~~~~~~~~~~>"
 				;
 			break;
 		default:
@@ -317,7 +322,7 @@ void generate_level(Level & level, int level_index)
 				case '{' : level.fountains.push_back(World::well(pos)); break;
 				case '+' : level.doors.push_back(World::door(pos)); break;
 				case 'V' : level.containers.push_back(World::pot(pos)); break;
-				case '^' : level.stairs.push_back(World::gate(pos)); break;
+				case '^' : level.traps.push_back(World::trap(pos)); break;
 				case '>' :
 					if(level_index == 3) {
 						level.items.push_back(World::explosive(pos));

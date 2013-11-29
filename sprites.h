@@ -25,6 +25,7 @@ enum {
 	GATE,
 	STAIRS_UP,
 	STAIRS_DOWN,
+	TRAP,
 
 	COUNT
 };
