@@ -2,7 +2,7 @@
 #include "game.h"
 #include "files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 17 };
+enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 18 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -64,6 +64,9 @@ SAVEFILE_STORE_EXT(Trap, trap)
 	savefile.store(trap.sprite).store(trap.name);
 	if(savefile.version() >= 17) {
 		savefile.store(trap.triggered);
+	}
+	if(savefile.version() >= 18) {
+		store_ext(savefile, trap.bolt);
 	}
 }
 

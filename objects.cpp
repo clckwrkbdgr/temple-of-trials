@@ -214,4 +214,5 @@ Trap::operator bool() const
 Trap::Builder & Trap::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Trap::Builder & Trap::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Trap::Builder & Trap::Builder::name(const std::string & value) { result.name = value; return *this; }
+Trap::Builder & Trap::Builder::bolt(const Item & value) { result.bolt = value; return *this; }
 

@@ -88,6 +88,8 @@ void Game::process_environment(Monster & someone)
 		} else {
 			trap.triggered = true;
 			message(format("{0} trigger the {1}.", someone.name, trap.name));
+			trap.bolt.pos = trap.pos;
+			level.items.push_back(trap.bolt);
 			hurt(someone, 1);
 		}
 	}

@@ -160,6 +160,7 @@ struct Trap {
 	int sprite;
 	std::string name;
 	bool triggered;
+	Item bolt;
 	Trap();
 	operator bool() const;
 
@@ -171,5 +172,6 @@ struct Trap::Builder {
 	Builder & pos(const Point & value);
 	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
+	Builder & bolt(const Item & value);
 };
 

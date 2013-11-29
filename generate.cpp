@@ -45,6 +45,11 @@ Item spear(const Point & pos = Point())
 	return Item::Builder().pos(pos).sprite(Sprites::SPEAR).name("spear").damage(5);
 }
 
+Item sharpened_pole(const Point & pos = Point())
+{
+	return Item::Builder().pos(pos).sprite(Sprites::SHARPENED_POLE).name("sharpened pole").damage(1);
+}
+
 Item jacket(const Point & pos = Point())
 {
 	return Item::Builder().pos(pos).sprite(Sprites::JACKET).name("jacket").wearable().defence(1);
@@ -108,7 +113,7 @@ Stairs stairs_down(const Point & pos, int destination)
 
 Trap trap(const Point & pos)
 {
-	return Trap::Builder().pos(pos).sprite(Sprites::TRAP).name("trap");
+	return Trap::Builder().pos(pos).sprite(Sprites::TRAP).name("trap").bolt(sharpened_pole());
 }
 
 }
