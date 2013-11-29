@@ -159,6 +159,7 @@ struct Trap {
 	Point pos;
 	int sprite;
 	std::string name;
+	bool triggered;
 	Trap();
 	operator bool() const;
 

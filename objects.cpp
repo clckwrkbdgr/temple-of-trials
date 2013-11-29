@@ -202,7 +202,7 @@ Stairs::Builder & Stairs::Builder::down_destination(int value) { result.down_des
 
 
 Trap::Trap()
-	: sprite(0)
+	: sprite(0), triggered(false)
 {
 }
 
