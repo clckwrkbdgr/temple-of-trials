@@ -192,32 +192,54 @@ void Console::draw_game(const Game & game)
 	}
 }
 
-int Console::draw_target_mode(Game & game, const Point & target)
+Point Console::target_mode(Game & game, const Point & start)
 {
-	if(game.level.map.valid(target)) {
-		if(game.level.map.cell_properties(target).visible) {
-			notification(format("You see {0}.", game.level.name_at(target)));
-		} else if(game.level.map.cell_properties(target).seen_sprite) {
-			notification(format("You recall {0}.", game.level.name_at(target)));
+	Point target = start;
+	int ch = 0;
+	curs_set(1);
+	while(ch != 'x' && ch != 27 && ch != '.') {
+		if(game.level.map.valid(target)) {
+			if(game.level.map.cell_properties(target).visible) {
+				notification(format("You see {0}.", game.level.name_at(target)));
+			} else if(game.level.map.cell_properties(target).seen_sprite) {
+				notification(format("You recall {0}.", game.level.name_at(target)));
+			} else {
+				notification("You cannot see there.");
+			}
+		}
+		draw_game(game);
+		if(game.level.map.valid(target)) {
+			int ch = mvinch(target.y + 1, target.x);
+			mvaddch(target.y + 1, target.x, ch ^ A_BLINK);
+			move(target.y + 1, target.x);
+		}
+		ch = get_control();
+		if(ch == 27) {
+			nodelay(stdscr, TRUE);
+			ch = getch();
+			nodelay(stdscr, FALSE);
+			if(ch == ERR || ch == 27) {
+				ch = 27;
+				break;
+			}
+		}
+
+		if(directions.count(ch) != 0) {
+			Point new_target = target + directions[ch];
+			if(game.level.map.valid(new_target)) {
+				target = new_target;
+			}
+		}
+	}
+	curs_set(0);
+	if(ch == '.') {
+		if(game.level.map.cell_properties(target).seen_sprite == 0) {
+			notification("You don't know how to get there.");
 		} else {
-			notification("You cannot see there.");
+			return target;
 		}
 	}
-	draw_game(game);
-	if(game.level.map.valid(target)) {
-		int ch = mvinch(target.y + 1, target.x);
-		mvaddch(target.y + 1, target.x, ch ^ A_BLINK);
-	}
-	int ch = get_control();
-	if(ch == 27) {
-		nodelay(stdscr, TRUE);
-		ch = getch();
-		nodelay(stdscr, FALSE);
-		if(ch == ERR || ch == 27) {
-			return 27;
-		}
-	}
-	return ch;
+	return Point();
 }
 
 int Console::draw_and_get_control(Game & game)

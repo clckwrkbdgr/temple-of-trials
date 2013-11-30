@@ -223,7 +223,7 @@ void Level::invalidate_fov(Monster & monster)
 std::list<Control> Level::find_path(const Point & player_pos, const Point & target)
 {
 	std::list<Control> best_path;
-	if(!is_passable(target.x, target.y)) {
+	if(!target || !is_passable(target.x, target.y)) {
 		return best_path;
 	}
 

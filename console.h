@@ -12,6 +12,7 @@ struct Console {
 	int draw_and_get_control(Game & game);
 	Point draw_and_get_direction(Game & game);
 	int draw_target_mode(Game & game, const Point & target);
+	Point target_mode(Game & game, const Point & start);
 	int see_messages(Game & game);
 	void draw_inventory(const Game & game, const Monster & monster);
 	int get_inventory_slot(const Game & game, const Monster & monster);

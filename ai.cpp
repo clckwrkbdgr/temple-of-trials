@@ -18,73 +18,41 @@ Control player_control(Monster & player, Game & game)
 			return control;
 		}
 		int ch = console.draw_and_get_control(game);
-
-		if(ch == 'q') {
-			game.done = true;
-		} else if(ch == 'Q') {
-			game.done = true;
-			game.player_died = true;
-			game.message("You commited suicide.");
-		} else if(ch == KEY_F(1)) {
-			player.godmode = true;
-		} else if(ch == 'x') {
-			Point target = player.pos;
-			ch = console.draw_target_mode(game, target);
-			while(ch != 'x' && ch != 27 && ch != '.') {
-				if(console.directions.count(ch) != 0) {
-					Point new_target = target + console.directions[ch];
-					if(game.level.map.valid(new_target)) {
-						target = new_target;
-					}
-				}
-				ch = console.draw_target_mode(game, target);
-			}
-			if(ch == '.') {
-				if(game.level.map.cell_properties(target).seen_sprite == 0) {
-					console.notification("You don't know how to get there.");
-				} else {
-					player.plan = game.level.find_path(player.pos, target);
-				}
-			}
-			continue;
-		} else if(ch == '<') {
-			return Control(Control::GO_UP);
-		} else if(ch == '>') {
-			return Control(Control::GO_DOWN);
-		} else if(ch == 'g') {
-			return Control(Control::GRAB);
-		} else if(ch == 'i') {
-			console.draw_inventory(game, player);
-			console.get_control();
-			continue;
-		} else if(ch == 'w') {
-			return Control(Control::WIELD, console.get_inventory_slot(game, player));
-		} else if(ch == 'W') {
-			return Control(Control::WEAR, console.get_inventory_slot(game, player));
-		} else if(ch == 't') {
-			return Control(Control::UNWIELD);
-		} else if(ch == 'T') {
-			return Control(Control::TAKE_OFF);
-		} else if(ch == 'e') {
-			return Control(Control::EAT, console.get_inventory_slot(game, player));
-		} else if(ch == 'd') {
-			return Control(Control::DROP, console.get_inventory_slot(game, player));
-		} else if(ch == '.') {
-			return Control(Control::WAIT);
-		} else if(console.directions.count(ch) != 0) {
-			return Control(Control::SMART_MOVE, console.directions[ch]);
-		} else if(ch == 'D') {
-			return Control(Control::DRINK, console.draw_and_get_direction(game));
-		} else if(ch == 'f') {
-			return Control(Control::FIRE, console.draw_and_get_direction(game));
-		} else if(ch == 's') {
-			return Control(Control::SWING, console.draw_and_get_direction(game));
-		} else if(ch == 'o') {
-			return Control(Control::OPEN, console.draw_and_get_direction(game));
-		} else if(ch == 'c') {
-			return Control(Control::CLOSE, console.draw_and_get_direction(game));
-		} else {
-			console.notification(format("Unknown control '{0}'", char(ch)));
+		switch(ch) {
+			case 'Q':
+				game.player_died = true;
+				game.message("You commited suicide.");
+			case 'q':
+				game.done = true;
+				break;
+			case KEY_F(1):
+				player.godmode = true;
+				break;
+			case 'x':
+				player.plan = game.level.find_path(player.pos, console.target_mode(game, player.pos));
+				break;
+			case 'i':
+				console.draw_inventory(game, player);
+				console.get_control();
+				break;
+			case 'h': case 'j': case 'k': case 'l': case 'y': case 'u': case 'b': case 'n':
+				return Control(Control::SMART_MOVE, console.directions[ch]);
+			case '<': return Control(Control::GO_UP);
+			case '>': return Control(Control::GO_DOWN);
+			case 'g': return Control(Control::GRAB);
+			case 'w': return Control(Control::WIELD, console.get_inventory_slot(game, player));
+			case 'W': return Control(Control::WEAR, console.get_inventory_slot(game, player));
+			case 't': return Control(Control::UNWIELD);
+			case 'T': return Control(Control::TAKE_OFF);
+			case 'e': return Control(Control::EAT, console.get_inventory_slot(game, player));
+			case 'd': return Control(Control::DROP, console.get_inventory_slot(game, player));
+			case '.': return Control(Control::WAIT);
+			case 'D': return Control(Control::DRINK, console.draw_and_get_direction(game));
+			case 'f': return Control(Control::FIRE, console.draw_and_get_direction(game));
+			case 's': return Control(Control::SWING, console.draw_and_get_direction(game));
+			case 'o': return Control(Control::OPEN, console.draw_and_get_direction(game));
+			case 'c': return Control(Control::CLOSE, console.draw_and_get_direction(game));
+			default: console.notification(format("Unknown control '{0}'", char(ch)));
 		}
 	}
 	return Control();
