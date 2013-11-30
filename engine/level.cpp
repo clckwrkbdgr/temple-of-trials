@@ -2,6 +2,8 @@
 #include "game.h"
 #include "objects.h"
 #include <cmath>
+#include <algorithm>
+#include <cstdlib>
 
 Level::Level()
 	: map(1, 1)
@@ -320,9 +322,6 @@ Point LevelGenerator::random_pos(const Level & level, const std::pair<Point, Poi
 
 std::pair<Point, Point> LevelGenerator::connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, int type)
 {
-	Point a_center = a.first + (a.second - a.first) / 2;
-	Point b_center = b.first + (b.second - b.first) / 2;
-
 	if(a.first.x < b.first.x) {
 		int start_y = std::max(a.first.y, b.first.y);
 		int stop_y = std::min(a.second.y, b.second.y);
