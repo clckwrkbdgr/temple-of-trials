@@ -29,7 +29,7 @@ const Monster & Level::get_player() const
 Monster & Level::get_player()
 {
 	foreach( Monster & monster, monsters) {
-		if(monster.ai == Monster::PLAYER) {
+		if(monster.faction == Monster::PLAYER) {
 			return monster;
 		}
 	}
@@ -223,7 +223,7 @@ void Level::invalidate_fov(Monster & monster)
 std::list<Control> Level::find_path(const Point & player_pos, const Point & target)
 {
 	std::list<Control> best_path;
-	if(!target || !is_passable(target.x, target.y)) {
+	if(!target || !is_passable(target.x, target.y) || player_pos == target) {
 		return best_path;
 	}
 

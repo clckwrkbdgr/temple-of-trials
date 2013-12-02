@@ -46,6 +46,7 @@ public:
 	const Cell & cell_properties(const Point & pos) const;
 
 	void fill(int celltype);
+	void fill(int * map_of_celltypes);
 	int add_cell_type(const CellType & celltype);
 	void set_cell_type(const Point & pos, int value);
 };

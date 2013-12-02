@@ -50,6 +50,11 @@ void Map::fill(int celltype)
 	cells = std::vector<Cell>(width * height, Cell(celltype));
 }
 
+void Map::fill(int * map_of_celltypes)
+{
+	cells = std::vector<Cell>(map_of_celltypes, map_of_celltypes + width * height);
+}
+
 int Map::add_cell_type(const CellType & celltype)
 {
 	celltypes.push_back(celltype);
