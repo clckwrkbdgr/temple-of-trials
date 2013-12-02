@@ -1,19 +1,34 @@
 #include "../util.h"
+#include <map>
+#include <iostream>
 #include <cassert>
 
-void should_return_sign_of_positive_number()
+typedef void(*TestFunction)();
+static std::map<std::string, TestFunction> tests;
+struct AddTest {
+	AddTest(const std::string & test_name, TestFunction test_function)
+	{
+		tests[test_name] = test_function;
+	}
+};
+#define TEST(test_name) \
+	void test_name(); \
+	AddTest add_test_##test_name(#test_name, test_name); \
+	void test_name()
+
+TEST(should_return_sign_of_positive_number)
 {
 	int result = sign(10);
 	assert(result == 1);
 }
 
-void should_return_sign_of_negative_number()
+TEST(should_return_sign_of_negative_number)
 {
 	int result = sign(-10);
 	assert(result == -1);
 }
 
-void should_return_sign_of_zero()
+TEST(should_return_sign_of_zero)
 {
 	int result = sign(0);
 	assert(result == 0);
@@ -48,8 +63,9 @@ should_return_one_for_close_point
 
 void test_util()
 {
-	should_return_sign_of_positive_number();
-	should_return_sign_of_negative_number();
-	should_return_sign_of_zero();
+	for(std::map<std::string, TestFunction>::const_iterator test = tests.begin(); test != tests.end(); ++test) {
+		std::cout << test->first << std::endl;
+		test->second();
+	}
 }
 
