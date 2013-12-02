@@ -1,39 +1,5 @@
 #include "../util.h"
-#include <list>
-#include <iostream>
-#include <cassert>
-
-typedef void(*TestFunction)();
-struct AddTest {
-	std::string name;
-	TestFunction impl;
-	AddTest(const std::string & test_name, TestFunction test_function);
-};
-std::list<AddTest> & all_tests()
-{
-	static std::list<AddTest> tests;
-	return tests;
-}
-AddTest::AddTest(const std::string & test_name, TestFunction test_function)
-	: name(test_name), impl(test_function)
-{
-	all_tests().push_back(*this);
-}
-struct TestException {
-	std::string filename;
-	int line;
-	std::string what;
-	TestException(const std::string & ex_filename, int ex_linenumber, const std::string & message)
-		: filename(ex_filename), line(ex_linenumber), what(message) {}
-};
-#define TEST(test_name) \
-	void test_name(); \
-	AddTest add_test_##test_name(#test_name, test_name); \
-	void test_name()
-#define EQUAL(a, b) \
-	do { if(a != b) { throw TestException(__FILE__, __LINE__, #a " (" + to_string(a) + ") != " #b " (" + to_string(b) + ")"); } } while(0);
-#define ASSERT(expression) \
-	do { if(!(expression)) { throw TestException(__FILE__, __LINE__, "failed assertion: " #expression ); } } while(0);
+#include "../test.h"
 
 TEST(should_return_sign_of_positive_number)
 {
@@ -303,13 +269,6 @@ TEST(should_return_one_for_close_point)
 
 void test_util()
 {
-	for(std::list<AddTest>::const_iterator test = all_tests().begin(); test != all_tests().end(); ++test) {
-		std::cout << "Check: " << test->name << std::endl;
-		try {
-			test->impl();
-		} catch(const TestException & e) {
-			std::cerr << e.filename << ":" << e.line << ": " << e.what << std::endl;
-		}
-	}
+	run_all_tests();
 }
 
