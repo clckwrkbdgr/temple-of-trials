@@ -6,6 +6,7 @@ else
 endif
 
 BIN = temple
+TEST_BIN = temple_test
 LIBS = -lncurses
 ENGINE_SOURCES = $(wildcard engine/*.cpp)
 TEST_SOURCES = $(wildcard engine/test/*.cpp) $(ENGINE_SOURCES)
@@ -19,12 +20,14 @@ run: $(BIN)
 
 all: $(BIN)
 
-test: $(TEST_OBJ)
-	$(CXX) $(LIBS) -o $@ $(TEST_OBJ)
-	./test
+test: $(TEST_BIN)
+	./$(TEST_BIN)
+
+$(TEST_BIN): $(TEST_OBJ)
+	$(CXX) $(LIBS) -o $@ $^
 
 $(BIN): $(OBJ)
-	$(CXX) $(LIBS) -o $@ $(OBJ)
+	$(CXX) $(LIBS) -o $@ $^
 
 tmp/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -32,7 +35,7 @@ tmp/%.o: %.cpp
 .PHONY: clean Makefile
 
 clean:
-	$(RM) -rf tmp/* $(BIN)
+	$(RM) -rf tmp/* $(BIN) $(TEST_BIN)
 
 $(shell mkdir -p tmp)
 $(shell mkdir -p tmp/engine)
