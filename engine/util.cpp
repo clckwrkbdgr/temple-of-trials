@@ -42,6 +42,27 @@ Point & Point::operator+=(const Point & other)
 	return *this;
 }
 
+Point & Point::operator-=(const Point & other)
+{
+	x -= other.x;
+	y -= other.y;
+	return *this;
+}
+
+Point & Point::operator*=(int factor)
+{
+	x *= factor;
+	y *= factor;
+	return *this;
+}
+
+Point & Point::operator/=(int factor)
+{
+	x /= factor;
+	y /= factor;
+	return *this;
+}
+
 Point::operator bool() const
 {
 	return x != 0 || y != 0;
@@ -49,17 +70,26 @@ Point::operator bool() const
 
 Point operator+(const Point & a, const Point & b)
 {
-	return Point(a.x + b.x, a.y + b.y);
+	Point result = a;
+	return result += b;
 }
 
 Point operator-(const Point & a, const Point & b)
 {
-	return Point(a.x - b.x, a.y - b.y);
+	Point result = a;
+	return result -= b;
+}
+
+Point operator*(const Point & a, int factor)
+{
+	Point result = a;
+	return result *= factor;
 }
 
 Point operator/(const Point & a, int factor)
 {
-	return Point(a.x / factor, a.y / factor);
+	Point result = a;
+	return result /= factor;
 }
 
 int distance(const Point & a, const Point & b)

@@ -78,10 +78,14 @@ struct Point {
 	Point();
 	bool operator==(const Point & other) const;
 	Point & operator+=(const Point & other);
+	Point & operator-=(const Point & other);
+	Point & operator*=(int factor);
+	Point & operator/=(int factor);
 	operator bool() const;
 };
 Point operator+(const Point & a, const Point & b);
 Point operator-(const Point & a, const Point & b);
+Point operator*(const Point & a, int factor);
 Point operator/(const Point & a, int factor);
 
 template<class T>
