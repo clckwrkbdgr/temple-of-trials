@@ -108,6 +108,8 @@ Monster::Builder & Monster::Builder::name(const std::string & value) { result.na
 Monster::Builder & Monster::Builder::item(const Item & value) { result.inventory.push_back(value); return *this; }
 Monster::Builder & Monster::Builder::hit_strength(int value) { result.hit_strength = value; return *this; }
 Monster::Builder & Monster::Builder::poisonous(bool value) { result.poisonous = value; return *this; }
+Monster::Builder & Monster::Builder::wield(int value) { result.wielded = value; return *this; }
+Monster::Builder & Monster::Builder::wear(int value) { result.worn = value; return *this; }
 
 
 Door::Door()
@@ -139,7 +141,7 @@ Item::Item()
 
 Item::operator bool() const
 {
-	return bool(pos);
+	return bool(sprite);
 }
 
 Item::Builder & Item::Builder::pos(const Point & value) { result.pos = value; return *this; }

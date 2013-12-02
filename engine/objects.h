@@ -46,6 +46,8 @@ struct Monster::Builder {
 	Builder & item(const Item & value);
 	Builder & hit_strength(int value);
 	Builder & poisonous(bool value);
+	Builder & wield(int value);
+	Builder & wear(int value);
 };
 
 
