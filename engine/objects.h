@@ -5,7 +5,7 @@ class Control;
 class Item;
 
 struct Monster {
-	enum { NEUTRAL, PLAYER, MONSTER };
+	enum Faction { NEUTRAL, PLAYER, MONSTER };
 
 	int faction;
 	bool godmode;

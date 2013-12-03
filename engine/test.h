@@ -18,12 +18,22 @@ struct TestException {
 	std::string what;
 	TestException(const std::string & ex_filename, int ex_linenumber, const std::string & message);
 };
+
 #define TEST(test_name) \
 	void test_name(); \
 	AddTest add_test_##test_name(#test_name, test_name); \
 	void test_name()
+
+template<class A, class B>
+void test_equal(const A & a, const B & b, const std::string & a_string, const std::string & b_string, const std::string & file, int line)
+{
+	if(a != b) {
+		throw TestException(file, line, a_string + " (" + to_string(a) + ") != "  + b_string + " (" + to_string(b) + ")");
+	}
+}
 #define EQUAL(a, b) \
-	do { if(a != b) { throw TestException(__FILE__, __LINE__, #a " (" + to_string(a) + ") != " #b " (" + to_string(b) + ")"); } } while(0);
+	test_equal(a, b, #a, #b, __FILE__, __LINE__);
+
 #define ASSERT(expression) \
 	do { if(!(expression)) { throw TestException(__FILE__, __LINE__, "failed assertion: " #expression ); } } while(0);
 

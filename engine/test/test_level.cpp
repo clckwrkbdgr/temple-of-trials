@@ -223,7 +223,7 @@ TEST(should_find_path_between_points)
 	level.map.fill(a);
 
 	std::list<Control> path = level.find_path(Point(0, 3), Point(2, 3));
-	EQUAL(path.size(), 5);
+	EQUAL(path.size(), (unsigned)5);
 	std::list<Control>::const_iterator it = path.begin();
 	EQUAL((*it++).direction, Point(0, -1));
 	EQUAL((*it++).direction, Point(1, -1));
@@ -246,7 +246,7 @@ TEST(should_find_path_between_close_points)
 	level.map.fill(a);
 
 	std::list<Control> path = level.find_path(Point(0, 3), Point(0, 2));
-	EQUAL(path.size(), 1);
+	EQUAL(path.size(), (unsigned)1);
 	std::list<Control>::const_iterator it = path.begin();
 	EQUAL((*it++).direction, Point(0, -1));
 }
@@ -348,7 +348,7 @@ TEST(should_erase_dead_monsters)
 	level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).sprite(2));
 	level.monsters[0].hp = 0;
 	level.erase_dead_monsters();
-	EQUAL(level.monsters.size(), 1);
+	EQUAL(level.monsters.size(), (unsigned)1);
 	EQUAL(level.monsters[0].sprite, 2);
 }
 
