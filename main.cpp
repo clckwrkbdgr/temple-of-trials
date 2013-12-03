@@ -21,7 +21,14 @@ int main()
 	LinearGenerator generator;
 	Game game(&generator);
 	try {
-		Reader savefile(SAVEFILE);
+		if(!file_exists(SAVEFILE)) {
+			throw Reader::Exception(format("File '{0}' doesn't exists!", SAVEFILE));
+		}
+		std::ifstream in(SAVEFILE.c_str(), std::ios::in);
+		if(!in) {
+			throw Reader::Exception(format("Cannot open file '{0}' for reading!", SAVEFILE));
+		}
+		Reader savefile(in);
 		load(savefile, game);
 		if(remove(SAVEFILE.c_str()) != 0) {
 			log("Error: cannot delete savefile!");
@@ -37,7 +44,11 @@ int main()
 	Console::instance().see_messages(game);
 	if(!game.player_died && !game.completed) {
 		try {
-			Writer savefile(SAVEFILE);
+			std::ofstream out(SAVEFILE.c_str(), std::ios::out);
+			if(!out) {
+				throw Writer::Exception(format("Cannot open file '{0}' for writing!", SAVEFILE));
+			}
+			Writer savefile(out);
 			save(savefile, game);
 		} catch(const Writer::Exception & e) {
 			log(e.message);

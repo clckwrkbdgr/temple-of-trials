@@ -1,4 +1,5 @@
 #include "test.h"
+#include "util.h"
 
 std::list<AddTest> & all_tests()
 {

@@ -9,7 +9,7 @@ bool file_exists(const std::string & filename)
 	return (stat(filename.c_str(), &buffer) == 0); 
 }
 
-std::string read_string(std::istream & in, char quote = '"')
+std::string read_string(std::istream & in, char quote)
 {
 	std::string result;
 	char c;
@@ -29,26 +29,20 @@ std::string read_string(std::istream & in, char quote = '"')
 	return result;
 }
 
-std::string escaped(const std::string & s, char quote = '"')
+std::string escaped(const std::string & s, char quote)
 {
 	std::string result = s;
 	size_t pos = result.find(quote);
 	while(pos != std::string::npos) {
 		result.replace(pos, 1, std::string("\\") + quote);
-		pos = result.find(quote);
+		pos = result.find(quote, pos + 2);
 	}
 	return quote + result + quote;
 }
 
-Reader::Reader(const std::string & filename)
-	: actual_minor_version(0), in(filename.c_str(), std::ios::in)
+Reader::Reader(std::istream & in_stream)
+	: actual_minor_version(0), in(in_stream)
 {
-	if(!file_exists(filename)) {
-		throw Exception(format("File '{0}' doesn't exists!", filename));
-	}
-	if(!in) {
-		throw Exception(format("Cannot open file '{0}' for reading!", filename));
-	}
 }
 
 Reader & Reader::newline()
@@ -71,7 +65,7 @@ Reader & Reader::version(int major_version, int minor_version)
 	check("minor version");
 	if(actual_minor_version > minor_version) {
 		throw Exception(format(
-					"Savefile is of minor_version {0}, which is incompatible with current program savefile minor version {1}.",
+					"Savefile has minor version {0}, which is incompatible with current program savefile minor version {1}.",
 					actual_minor_version, minor_version
 					));
 	}
@@ -127,12 +121,9 @@ Reader & Reader::size_of(Map & map)
 	return *this;
 }
 
-Writer::Writer(const std::string & filename)
-	: actual_minor_version(0), out(filename.c_str(), std::ios::out)
+Writer::Writer(std::ostream & out_stream)
+	: actual_minor_version(0), out(out_stream)
 {
-	if(!out) {
-		throw Exception(format("Cannot open file '{0}' for writing!", filename));
-	}
 }
 
 Writer & Writer::newline()

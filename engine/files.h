@@ -4,6 +4,10 @@
 #include <vector>
 class Map;
 
+bool file_exists(const std::string & filename);
+std::string read_string(std::istream & in, char quote = '"');
+std::string escaped(const std::string & s, char quote = '"');
+
 #define SAVEFILE_STORE_EXT(Type, variable) \
 	template<class Savefile> void store_ext(Savefile & savefile, Type & variable) { store_##variable(savefile, variable); } \
 	template<class Savefile> void store_ext(Savefile & savefile, const Type & variable) { store_##variable(savefile, variable); } \
@@ -16,7 +20,7 @@ public:
 		std::string message;
 		Exception(const std::string text) : message(text) {}
 	};
-	Reader(const std::string & filename);
+	Reader(std::istream & in_stream);
 
 	Reader & newline();
 	Reader & version(int major_version, int minor_version);
@@ -51,7 +55,7 @@ public:
 	}
 private:
 	int actual_minor_version;
-	std::ifstream in;
+	std::istream & in;
 };
 
 class Writer {
@@ -60,7 +64,7 @@ public:
 		std::string message;
 		Exception(const std::string text) : message(text) {}
 	};
-	Writer(const std::string & filename);
+	Writer(std::ostream & out_stream);
 
 	Writer & newline();
 	Writer & version(int major_version, int minor_version);
@@ -93,6 +97,6 @@ public:
 	}
 private:
 	int actual_minor_version;
-	std::ofstream out;
+	std::ostream & out;
 };
 
