@@ -4,7 +4,7 @@
 TEST(map_should_have_default_cell_type)
 {
 	Map map(1, 1);
-	EQUAL(map.celltypes.size(), 1);
+	EQUAL(map.celltypes.size(), (unsigned)1);
 }
 
 TEST(point_inside_map_should_be_valid)

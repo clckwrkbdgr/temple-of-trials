@@ -7,8 +7,8 @@ std::list<AddTest> & all_tests()
 	return tests;
 }
 
-AddTest::AddTest(const std::string & test_name, TestFunction test_function)
-	: name(test_name), impl(test_function)
+AddTest::AddTest(const std::string & test_suite, const std::string & test_name, TestFunction test_function)
+	: suite(test_suite), name(test_name), impl(test_function)
 {
 	all_tests().push_back(*this);
 }
@@ -16,6 +16,11 @@ AddTest::AddTest(const std::string & test_name, TestFunction test_function)
 TestException::TestException(const std::string & ex_filename, int ex_linenumber, const std::string & message)
 	: filename(ex_filename), line(ex_linenumber), what(message)
 {
+}
+
+std::string current_suite_name()
+{
+	return "";
 }
 
 void run_all_tests(int argc, char ** argv)
@@ -39,11 +44,11 @@ void run_all_tests(int argc, char ** argv)
 			test->impl();
 		} catch(const TestException & e) {
 			ok = false;
-			std::cout << "Check: " << test->name << ": FAIL" << std::endl;
+			std::cout << "[FAIL] " << test->suite << test->name << std::endl;
 			std::cerr << e.filename << ":" << e.line << ": " << e.what << std::endl;
 		}
 		if(ok) {
-			std::cout << "Check: " << test->name << ": OK" << std::endl;
+			std::cout << "[ OK ] " << test->suite << test->name << std::endl;
 		} else {
 			all_tests_are_ok = false;
 		}

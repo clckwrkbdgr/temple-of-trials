@@ -76,7 +76,7 @@ TEST(reader_should_read_unsigned)
 	Reader reader(in);
 	unsigned int i;
 	reader.store(i);
-	EQUAL(i, 1);
+	EQUAL(i, (unsigned)1);
 }
 
 TEST(reader_should_read_char_as_int)
@@ -121,8 +121,8 @@ TEST(reader_should_read_size_of_map_and_resize_it)
 	Reader reader(in);
 	Map map(1, 1);
 	reader.size_of(map);
-	EQUAL(map.width, 3);
-	EQUAL(map.height, 4);
+	EQUAL(map.width, (unsigned)3);
+	EQUAL(map.height, (unsigned)4);
 }
 
 TEST(reader_should_read_size_of_vector_and_resize_it)
@@ -131,7 +131,7 @@ TEST(reader_should_read_size_of_vector_and_resize_it)
 	Reader reader(in);
 	std::vector<int> v;
 	reader.size_of(v);
-	EQUAL(v.size(), 3);
+	EQUAL(v.size(), (unsigned)3);
 }
 
 void store_ext(Reader & savefile, int & i)
@@ -145,7 +145,7 @@ TEST(reader_should_resize_vector_and_read_it)
 	Reader reader(in);
 	std::vector<int> v;
 	reader.store(v, "vector");
-	EQUAL(v.size(), 3);
+	EQUAL(v.size(), (unsigned)3);
 	EQUAL(v[0], 1);
 	EQUAL(v[1], 2);
 	EQUAL(v[2], 3);
@@ -277,4 +277,3 @@ TEST(should_write_complex_type_by_store_ext)
 	store_ext(writer, ComplexStructure(1, 'A'));
 	EQUAL(out.str(), "1 65 ");
 }
-

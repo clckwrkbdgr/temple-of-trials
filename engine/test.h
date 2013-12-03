@@ -5,9 +5,11 @@
 typedef void(*TestFunction)();
 
 struct AddTest {
+	std::string suite;
 	std::string name;
 	TestFunction impl;
-	AddTest(const std::string & test_name, TestFunction test_function);
+	AddTest(const std::string & test_suite, const std::string & test_name, TestFunction test_function);
+	std::string get_full_name() const;
 };
 
 std::list<AddTest> & all_tests();
@@ -19,9 +21,16 @@ struct TestException {
 	TestException(const std::string & ex_filename, int ex_linenumber, const std::string & message);
 };
 
+std::string current_suite_name();
+#define SUITE(suite_name) \
+	namespace Suite_##suite_name { \
+		std::string current_suite_name() { return ::current_suite_name() + #suite_name "::"; } \
+	} \
+	namespace Suite_##suite_name
+
 #define TEST(test_name) \
 	void test_name(); \
-	AddTest add_test_##test_name(#test_name, test_name); \
+	AddTest add_test_##test_name(current_suite_name(), #test_name, test_name); \
 	void test_name()
 
 template<class A, class B>

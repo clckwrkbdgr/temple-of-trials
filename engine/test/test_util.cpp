@@ -220,7 +220,7 @@ TEST(should_push_back_value_to_vector)
 {
 	std::vector<int> v;
 	v << 99;
-	EQUAL(v.size(), 1);
+	EQUAL(v.size(), (unsigned)1);
 	EQUAL(v[0], 99);
 }
 
@@ -228,7 +228,7 @@ TEST(should_push_back_c_string_to_vector)
 {
 	std::vector<std::string> stringlist;
 	stringlist << "hello";
-	EQUAL(stringlist.size(), 1);
+	EQUAL(stringlist.size(), (unsigned)1);
 	EQUAL(stringlist[0], "hello");
 }
 
