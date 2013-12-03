@@ -267,8 +267,3 @@ TEST(should_return_one_for_close_point)
 	EQUAL(d, 1);
 }
 
-void test_util()
-{
-	run_all_tests();
-}
-

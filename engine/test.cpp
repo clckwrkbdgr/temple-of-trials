@@ -18,21 +18,32 @@ TestException::TestException(const std::string & ex_filename, int ex_linenumber,
 {
 }
 
-void run_all_tests()
+void run_all_tests(int argc, char ** argv)
 {
+	bool tests_specified = argc > 1;
 	bool all_tests_are_ok = true;
 	for(std::list<AddTest>::const_iterator test = all_tests().begin(); test != all_tests().end(); ++test) {
-		std::cout << "Check: " << test->name;
+		if(tests_specified) {
+			bool found = false;
+			for(int i = 1; i < argc; ++i) {
+				if(test->name == argv[i]) {
+					found = true;
+				}
+			}
+			if(!found) {
+				continue;
+			}
+		}
 		bool ok = true;
 		try {
 			test->impl();
 		} catch(const TestException & e) {
 			ok = false;
-			std::cout << ": FAIL" << std::endl;
+			std::cout << "Check: " << test->name << ": FAIL" << std::endl;
 			std::cerr << e.filename << ":" << e.line << ": " << e.what << std::endl;
 		}
 		if(ok) {
-			std::cout << ": OK" << std::endl;
+			std::cout << "Check: " << test->name << ": OK" << std::endl;
 		} else {
 			all_tests_are_ok = false;
 		}

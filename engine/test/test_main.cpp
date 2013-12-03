@@ -1,7 +1,7 @@
 #include "../test.h"
-#include <iostream>
-int main()
+
+int main(int argc, char ** argv)
 {
-	run_all_tests();
+	run_all_tests(argc, argv);
 	return 0;
 }

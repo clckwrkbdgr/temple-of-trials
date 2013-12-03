@@ -27,5 +27,5 @@ struct TestException {
 #define ASSERT(expression) \
 	do { if(!(expression)) { throw TestException(__FILE__, __LINE__, "failed assertion: " #expression ); } } while(0);
 
-void run_all_tests();
+void run_all_tests(int argc, char ** argv);
 

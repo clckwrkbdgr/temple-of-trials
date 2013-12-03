@@ -21,7 +21,7 @@ run: $(BIN)
 all: $(BIN)
 
 test: $(TEST_BIN)
-	./$(TEST_BIN)
+	./$(TEST_BIN) $(TESTS)
 
 $(TEST_BIN): $(TEST_OBJ)
 	$(CXX) $(LIBS) -o $@ $^
