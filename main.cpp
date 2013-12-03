@@ -17,7 +17,9 @@ const std::string SAVEFILE = "temple.sav";
 int main()
 {
 	srand(time(0));
-	log("Log started: " + now());
+	std::ofstream log_file("temple.log", std::ios::app);
+	direct_log(&log_file);
+
 	LinearGenerator generator;
 	Game game(&generator);
 	try {

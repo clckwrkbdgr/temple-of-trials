@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <cmath>
 #include <unistd.h>
 
@@ -13,10 +14,25 @@ std::string now()
 	return s.replace(s.find('\n'), 1, " ");
 }
 
+void log_control(std::ostream * out_stream, const std::string & message)
+{
+	static std::ostream * out = &std::cout;
+	if(out_stream) {
+		out = out_stream;
+	}
+	if(out && !message.empty()) {
+		*out << message << std::endl;
+	}
+}
+
+void direct_log(std::ostream * out_stream)
+{
+	log_control(out_stream, "Log started: " + now());
+}
+
 void log(const std::string & message)
 {
-	static std::ofstream lout("temple.log", std::ios::app);
-	lout << message << std::endl;
+	log_control(0, message);
 }
 
 

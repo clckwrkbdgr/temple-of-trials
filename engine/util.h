@@ -50,6 +50,7 @@ template<class T0, class T1, class T2>
 
 std::string now();
 
+void direct_log(std::ostream * out_stream);
 void start_log(const std::string & filename);
 void log(const std::string & message);
 template<class T0>
