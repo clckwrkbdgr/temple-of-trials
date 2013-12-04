@@ -41,6 +41,7 @@ TEST(should_get_monster_wielded_item)
 {
 	Monster monster;
 	Item weapon;
+	weapon.sprite = 1;
 	weapon.damage = 1;
 	monster.inventory.push_back(weapon);
 	monster.wielded = 0;
@@ -63,6 +64,7 @@ TEST(should_get_const_monster_wielded_item)
 {
 	Item weapon;
 	weapon.damage = 1;
+	weapon.sprite = 1;
 	const Monster monster = Monster::Builder().item(weapon).wield(0);
 	EQUAL(monster.wielded_item(), weapon);
 }
@@ -71,6 +73,7 @@ TEST(should_get_monster_worn_item)
 {
 	Monster monster;
 	Item armor;
+	armor.sprite = 1;
 	armor.wearable = true;
 	monster.inventory.push_back(armor);
 	monster.worn = 0;
@@ -92,6 +95,7 @@ TEST(should_modify_monster_worn_item)
 TEST(should_get_const_monster_worn_item)
 {
 	Item armor;
+	armor.sprite = 1;
 	armor.wearable = true;
 	const Monster monster = Monster::Builder().item(armor).wear(0);
 	EQUAL(monster.worn_item(), armor);
