@@ -1,138 +1,360 @@
 #include "../game.h"
 #include "../test.h"
 
+class TestLevelGenerator : public LevelGenerator {
+public:
+	TestLevelGenerator(const Point & player_pos1, const Point & player_pos2);
+	virtual void generate(Level & level, int level_index);
+private:
+	Point pos1, pos2;
+};
+
+TestLevelGenerator::TestLevelGenerator(const Point & player_pos1, const Point & player_pos2)
+	: pos1(player_pos1), pos2(player_pos2)
+{
+}
+
+void TestLevelGenerator::generate(Level & level, int level_index)
+{
+	level = Level(4, 4);
+	if(level_index == 1) {
+		level.monsters.push_back(Monster::Builder().sprite(1).faction(Monster::PLAYER).pos(pos1));
+	} else {
+		level.monsters.push_back(Monster::Builder().sprite(2).faction(Monster::PLAYER).pos(pos2));
+	}
+}
+
 SUITE(game) {
 
 TEST(should_save_current_level_as_visited)
 {
-	FAIL("not implemented");
+	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
+	Game game(&generator);
+	game.generate(1);
+	game.generate(2);
+	EQUAL(game.saved_levels.count(1), (unsigned)1);
 }
 
 TEST(should_restore_player_from_the_old_level_at_new_pos)
 {
-	FAIL("not implemented");
+	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
+	Game game(&generator);
+	game.generate(1);
+	game.generate(2);
+	EQUAL(game.level.get_player().pos, Point(2, 2));
 }
 
 TEST(should_restore_previously_visited_level)
 {
-	FAIL("not implemented");
+	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
+	Game game(&generator);
+	game.generate(1);
+	game.level.get_player().sprite = 3;
+	game.generate(2);
+	game.generate(1);
+	EQUAL(game.level.get_player().sprite, 3);
 }
 
 TEST(should_generated_newly_visited_level)
 {
-	FAIL("not implemented");
+	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
+	Game game(&generator);
+	game.generate(1);
+	EQUAL(game.level.get_player().sprite, 1);
 }
 
 TEST(should_end_turn_after_generation)
 {
-	FAIL("not implemented");
+	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
+	Game game(&generator);
+	game.generate(1);
+	EQUAL(game.level.get_player().sprite, 1);
 }
 
 
+TEST(game_should_start_with_empty_messages)
+{
+	Game game;
+	ASSERT(game.messages.empty());
+}
+
 TEST(should_accept_only_non_empty_messages)
 {
-	FAIL("not implemented");
+	Game game;
+	game.message("");
+	ASSERT(game.messages.empty());
 }
 
 TEST(should_add_messages)
 {
-	FAIL("not implemented");
+	Game game;
+	game.message("hello");
+	EQUAL(game.messages.size(), (unsigned)1);
 }
 
 TEST(should_titlecase_messages)
 {
-	FAIL("not implemented");
+	Game game;
+	game.message("hello");
+	EQUAL(game.messages.front(), "Hello");
 }
 
 
 TEST(should_hurt_monster_if_cell_hurts)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.map.celltypes[0].hurts = true;
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.process_environment(game.level.monsters.front());
+	EQUAL(game.level.monsters.front().hp, 99);
+	std::string expected_messages[] = {
+		"It hurts!",
+		"Dummy loses 1 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_trigger_trap_if_trap_is_set)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap"));
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.process_environment(game.level.monsters.front());
+	ASSERT(game.level.traps.front().triggered);
 }
 
 TEST(should_hurt_monster_if_trap_is_set)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap"));
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.process_environment(game.level.monsters.front());
+	EQUAL(game.level.monsters.front().hp, 99);
+	std::string expected_messages[] = {
+		"Dummy triggers the trap.",
+		"Dummy loses 1 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_leave_bolt_if_trap_is_set)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap").bolt(Item::Builder().sprite(1)));
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.process_environment(game.level.monsters.front());
+	EQUAL(game.level.items.front().sprite, 1);
 }
 
 TEST(should_not_hurt_monster_if_trap_is_triggered_already)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap"));
+	game.level.traps.front().triggered = true;
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.process_environment(game.level.monsters.front());
+	EQUAL(game.level.monsters.front().hp, 100);
+	std::string expected_messages[] = {
+		"Trap is already triggered."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_hurt_monster_is_poisoned)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.level.monsters.front().poisoning = 10;
+	game.process_environment(game.level.monsters.front());
+	EQUAL(game.level.monsters.front().hp, 99);
+	std::string expected_messages[] = {
+		"Dummy is poisoned.",
+		"Dummy loses 1 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_decrease_poisoning_each_turn)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.level.monsters.front().poisoning = 10;
+	game.process_environment(game.level.monsters.front());
+	EQUAL(game.level.monsters.front().poisoning, 9);
 }
 
 
 TEST(should_drop_loot_if_monster_is_dead)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	Item item = Item::Builder().sprite(1).name("item");
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(item));
+	game.die(game.level.monsters.front());
+	EQUAL(game.level.items.front().pos, game.level.monsters.front().pos);
+	std::string expected_messages[] = {
+		"Dummy drops item."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_end_game_if_player_is_dead)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").faction(Monster::PLAYER));
+	game.die(game.level.monsters.front());
+	ASSERT(game.done);
+	ASSERT(game.player_died);
+	std::string expected_messages[] = {
+		"You died."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 
 TEST(should_hurt_monster)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.hurt(game.level.monsters.front(), 5);
+	EQUAL(game.level.monsters.front().hp, 95);
+	std::string expected_messages[] = {
+		"Dummy loses 5 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_hurt_if_damage_exceeds_defence)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	Item armor = Item::Builder().sprite(1).wearable().defence(3);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
+	game.level.monsters.front().wielded = 0;
+	game.hurt(game.level.monsters.front(), 5);
+	EQUAL(game.level.monsters.front().hp, 97);
+	std::string expected_messages[] = {
+		"Dummy loses 2 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_hurt_at_full_damage_if_piercing)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	Item armor = Item::Builder().sprite(1).wearable().defence(3);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
+	game.level.monsters.front().wielded = 0;
+	game.hurt(game.level.monsters.front(), 5, true);
+	EQUAL(game.level.monsters.front().hp, 95);
+	std::string expected_messages[] = {
+		"Dummy loses 5 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_die_if_hurts_too_much)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.hurt(game.level.monsters.front(), 105);
+	ASSERT(game.level.monsters.front().is_dead());
+	std::string expected_messages[] = {
+		"Dummy loses 105 hp and dies."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 
 TEST(should_hit_monster)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer"));
+	game.hit(game.level.monsters.back(), game.level.monsters.front(), 5);
+	EQUAL(game.level.monsters.front().hp, 95);
+	std::string expected_messages[] = {
+		"Killer hit dummy for 5 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_hit_if_damage_exceeds_defence)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	Item armor = Item::Builder().sprite(1).wearable().defence(3);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
+	game.level.monsters.front().wielded = 0;
+	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer"));
+	game.hit(game.level.monsters.back(), game.level.monsters.front(), 5);
+	EQUAL(game.level.monsters.front().hp, 97);
+	std::string expected_messages[] = {
+		"Killer hit dummy for 2 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
 TEST(should_poison_monster)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer").poisonous(true));
+	game.hit(game.level.monsters.back(), game.level.monsters.front(), 5);
+	EQUAL(game.level.monsters.front().poisoning, 5);
+	std::string expected_messages[] = {
+		"Killer poisons dummy.",
+		"Killer hit dummy for 5 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
-TEST(should_dir_if_hit_was_too_much)
+TEST(should_poison_monster_no_more_than_some_max)
 {
-	FAIL("not implemented");
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.level.monsters.front().poisoning =  3;
+	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer").poisonous(true));
+	game.hit(game.level.monsters.back(), game.level.monsters.front(), 5);
+	EQUAL(game.level.monsters.front().poisoning, 5);
+	std::string expected_messages[] = {
+		"Killer poisons dummy.",
+		"Killer hit dummy for 5 hp."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
 }
 
+TEST(should_die_if_hit_was_too_much)
+{
+	Game game;
+	game.level.map = Map(2, 2);
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer"));
+	game.hit(game.level.monsters.back(), game.level.monsters.front(), 105);
+	ASSERT(game.level.monsters.front().is_dead());
+	std::string expected_messages[] = {
+		"Killer hit dummy for 105 hp and kills it."
+	};
+	EQUAL(game.messages, make_vector(expected_messages));
+}
+
+}
+
+SUITE(game_actions) {
 
 TEST(should_move_on_smart_move_if_passable)
 {
@@ -159,9 +381,6 @@ TEST(should_swing_at_monster_on_smart_move_if_exists)
 	FAIL("not implemented");
 }
 
-}
-
-SUITE(game_actions) {
 
 TEST(should_not_drink_monsters)
 {

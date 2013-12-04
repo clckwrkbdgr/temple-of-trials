@@ -34,6 +34,8 @@ struct Game {
 		Message() {}
 	};
 
+	bool log_messages;
+
 	int current_level;
 	LevelGenerator * generator;
 	Level level;
@@ -42,11 +44,8 @@ struct Game {
 	std::vector<std::string> messages;
 	int turns;
 
-	Game(LevelGenerator * level_generator);
+	Game(LevelGenerator * level_generator = 0);
 	void run(ControllerFactory controller_factory);
-
-	int get_message_count() const;
-	const std::string & get_top_message() const;
 
 	void generate(int level);
 

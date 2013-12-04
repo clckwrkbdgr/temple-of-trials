@@ -35,7 +35,7 @@ Control::Control(int control_value, int control_slot)
 
 
 Game::Game(LevelGenerator * level_generator)
-	: current_level(0), generator(level_generator),
+	: log_messages(false), current_level(0), generator(level_generator),
 	done(false), player_died(false), completed(false), turn_ended(false),
 	turns(0)
 {
@@ -129,7 +129,9 @@ void Game::message(std::string text)
 	}
 	text[0] = toupper(text[0]);
 	messages.push_back(text);
-	log("Message: " + text);
+	if(log_messages) {
+		log("Message: " + text);
+	}
 }
 
 void Game::process_environment(Monster & someone)

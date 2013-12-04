@@ -234,6 +234,16 @@ TEST(should_push_back_c_string_to_vector)
 	EQUAL(stringlist[0], "hello");
 }
 
+TEST(should_make_vector_from_array)
+{
+	int a[] = {1, 2, 3};
+	std::vector<int> v = make_vector(a);
+	EQUAL(v.size(), (unsigned)3);
+	EQUAL(v[0], 1);
+	EQUAL(v[1], 2);
+	EQUAL(v[2], 3);
+}
+
 TEST(should_compute_distance_between_points)
 {
 	Point a(1, 2), b(11, 12);

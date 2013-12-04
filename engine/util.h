@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <cstdarg>
 class Point;
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
@@ -32,6 +33,16 @@ std::string to_string(long unsigned value);
 std::string to_string(char value);
 std::string to_string(const std::string & value);
 std::string to_string(const Point & value);
+template<class T>
+std::string to_string(const std::vector<T> & v, unsigned starting_from)
+{
+	return starting_from < v.size() ? to_string(v[starting_from]) + to_string(v, starting_from + 1) : "";
+}
+template<class T>
+std::string to_string(const std::vector<T> & v)
+{
+	return v.empty() ? "" : to_string(v.front()) + to_string(v, 1);
+}
 
 void subs_arg_str(std::string & result, int index, const std::string & value);
 template<class T>
@@ -129,8 +140,12 @@ std::vector<T> & operator<<(std::vector<T> & out, const T & t)
 	out.push_back(t);
 	return out;
 }
-
 std::vector<std::string> & operator<<(std::vector<std::string> & out, const char * t);
+
+template<class T, size_t N>
+size_t size_of_array(T (&)[N]) { return N; }
+template<class T, size_t N>
+std::vector<T> make_vector(T (&a)[N]) { return std::vector<T>(a, a + N); }
 
 int distance(const Point & a, const Point & b);
 

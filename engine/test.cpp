@@ -49,6 +49,14 @@ void run_all_tests(int argc, char ** argv)
 			ok = false;
 			std::cout << "[FAIL] " << suite_name << test->name << std::endl;
 			std::cerr << e.filename << ":" << e.line << ": " << e.what << std::endl;
+		} catch(const std::exception & e) {
+			ok = false;
+			std::cout << "[FAIL] " << suite_name << test->name << std::endl;
+			std::cerr << e.what() << std::endl;
+		} catch(...) {
+			ok = false;
+			std::cout << "[FAIL] " << suite_name << test->name << std::endl;
+			std::cerr << "Unknown exception caught." << std::endl;
 		}
 		if(ok) {
 			std::cout << "[ OK ] " << suite_name << test->name << std::endl;
