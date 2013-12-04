@@ -73,7 +73,11 @@ Control angry_and_wander(Monster & monster, Game & game)
 	if(sees_player && d == 1) {
 		return Control(Control::SWING, shift);
 	}
-	return Control(Control::MOVE, Point(rand() % 3 - 1, rand() % 3 - 1));
+	Point direction = Point(rand() % 3 - 1, rand() % 3 - 1);
+	if(direction) {
+		return Control(Control::MOVE, direction);
+	}
+	return Control(Control::WAIT);
 }
 
 Control angry_and_still(Monster & monster, Game & game)
