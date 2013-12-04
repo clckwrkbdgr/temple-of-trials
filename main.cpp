@@ -22,6 +22,7 @@ int main()
 
 	LinearGenerator generator;
 	Game game(&generator);
+	game.log_messages = true;
 	try {
 		if(!file_exists(SAVEFILE)) {
 			throw Reader::Exception(format("File '{0}' doesn't exists!", SAVEFILE));
