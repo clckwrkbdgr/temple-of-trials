@@ -36,7 +36,7 @@ std::string to_string(const Point & value);
 template<class T>
 std::string to_string(const std::vector<T> & v, unsigned starting_from)
 {
-	return starting_from < v.size() ? to_string(v[starting_from]) + to_string(v, starting_from + 1) : "";
+	return starting_from < v.size() ? "|" + to_string(v[starting_from]) + to_string(v, starting_from + 1) : "";
 }
 template<class T>
 std::string to_string(const std::vector<T> & v)

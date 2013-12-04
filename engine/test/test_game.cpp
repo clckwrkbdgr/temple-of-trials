@@ -134,7 +134,7 @@ TEST(should_hurt_monster_if_trap_is_set)
 	game.process_environment(game.level.monsters.front());
 	EQUAL(game.level.monsters.front().hp, 99);
 	std::string expected_messages[] = {
-		"Dummy triggers the trap.",
+		"Dummy trigger the trap.",
 		"Dummy loses 1 hp."
 	};
 	EQUAL(game.messages, make_vector(expected_messages));
@@ -239,9 +239,9 @@ TEST(should_hurt_if_damage_exceeds_defence)
 	game.level.map = Map(2, 2);
 	Item armor = Item::Builder().sprite(1).wearable().defence(3);
 	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
-	game.level.monsters.front().wielded = 0;
+	game.level.monsters.front().worn = 0;
 	game.hurt(game.level.monsters.front(), 5);
-	EQUAL(game.level.monsters.front().hp, 97);
+	EQUAL(game.level.monsters.front().hp, 98);
 	std::string expected_messages[] = {
 		"Dummy loses 2 hp."
 	};
@@ -254,7 +254,7 @@ TEST(should_hurt_at_full_damage_if_piercing)
 	game.level.map = Map(2, 2);
 	Item armor = Item::Builder().sprite(1).wearable().defence(3);
 	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
-	game.level.monsters.front().wielded = 0;
+	game.level.monsters.front().worn = 0;
 	game.hurt(game.level.monsters.front(), 5, true);
 	EQUAL(game.level.monsters.front().hp, 95);
 	std::string expected_messages[] = {
@@ -297,10 +297,10 @@ TEST(should_hit_if_damage_exceeds_defence)
 	game.level.map = Map(2, 2);
 	Item armor = Item::Builder().sprite(1).wearable().defence(3);
 	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
-	game.level.monsters.front().wielded = 0;
+	game.level.monsters.front().worn = 0;
 	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer"));
 	game.hit(game.level.monsters.back(), game.level.monsters.front(), 5);
-	EQUAL(game.level.monsters.front().hp, 97);
+	EQUAL(game.level.monsters.front().hp, 98);
 	std::string expected_messages[] = {
 		"Killer hit dummy for 2 hp."
 	};
