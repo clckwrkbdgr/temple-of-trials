@@ -48,7 +48,7 @@ TEST(reader_should_throw_exception_when_major_version_is_wrong)
 			 );
 		return;
 	}
-	ASSERT(false);
+	FAIL("no exception");
 }
 
 TEST(reader_should_throw_exception_when_minor_version_is_less)
@@ -64,7 +64,7 @@ TEST(reader_should_throw_exception_when_minor_version_is_less)
 			 );
 		return;
 	}
-	ASSERT(false);
+	FAIL("no exception");
 }
 
 TEST(reader_should_throw_exception_when_stream_is_bad)
@@ -82,7 +82,7 @@ TEST(reader_should_throw_exception_when_stream_is_bad)
 			 );
 		return;
 	}
-	ASSERT(false);
+	FAIL("no exception");
 }
 
 TEST(reader_should_read_int)

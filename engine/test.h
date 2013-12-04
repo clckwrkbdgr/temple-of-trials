@@ -43,6 +43,9 @@ void test_equal(const A & a, const B & b, const std::string & a_string, const st
 #define EQUAL(a, b) \
 	test_equal(a, b, #a, #b, __FILE__, __LINE__);
 
+#define FAIL(message) \
+	do { throw TestException(__FILE__, __LINE__, message); } while(0);
+
 #define ASSERT(expression) \
 	do { if(!(expression)) { throw TestException(__FILE__, __LINE__, "failed assertion: " #expression ); } } while(0);
 
