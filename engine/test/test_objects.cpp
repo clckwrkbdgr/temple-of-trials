@@ -2,6 +2,8 @@
 #include "../game.h"
 #include "../test.h"
 
+SUITE(objects) {
+
 TEST(monster_with_nonzero_hp_should_be_alive)
 {
 	Monster monster;
@@ -107,3 +109,4 @@ TEST(should_get_door_closed_sprite_when_closed)
 	EQUAL(door.sprite(), 2);
 }
 
+}

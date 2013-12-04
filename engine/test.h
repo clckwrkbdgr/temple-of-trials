@@ -24,7 +24,7 @@ struct TestException {
 std::string current_suite_name();
 #define SUITE(suite_name) \
 	namespace Suite_##suite_name { \
-		std::string current_suite_name() { return ::current_suite_name() + #suite_name "::"; } \
+		std::string current_suite_name() { return #suite_name; } \
 	} \
 	namespace Suite_##suite_name
 

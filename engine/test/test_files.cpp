@@ -3,6 +3,30 @@
 #include "../test.h"
 #include <sstream>
 
+struct ComplexStructure {
+	int i;
+	char ch;
+	ComplexStructure(int _i, char _ch) : i(_i), ch(_ch) {}
+};
+
+SAVEFILE_STORE_EXT(ComplexStructure, c)
+{
+	savefile.store(c.i);
+	savefile.store(c.ch);
+}
+
+void store_ext(Writer & savefile, const int & i)
+{
+	savefile.store(i);
+}
+
+void store_ext(Reader & savefile, int & i)
+{
+	savefile.store(i);
+}
+
+SUITE(files) {
+
 TEST(reader_should_skip_newline)
 {
 	std::istringstream in("\n");
@@ -134,11 +158,6 @@ TEST(reader_should_read_size_of_vector_and_resize_it)
 	EQUAL(v.size(), (unsigned)3);
 }
 
-void store_ext(Reader & savefile, int & i)
-{
-	savefile.store(i);
-}
-
 TEST(reader_should_resize_vector_and_read_it)
 {
 	std::istringstream in("3 1 2 3 ");
@@ -233,11 +252,6 @@ TEST(writer_should_write_size_of_vector)
 	EQUAL(out.str(), "3 ");
 }
 
-void store_ext(Writer & savefile, const int & i)
-{
-	savefile.store(i);
-}
-
 TEST(writer_should_write_vector_preceeded_by_size)
 {
 	std::ostringstream out;
@@ -247,18 +261,6 @@ TEST(writer_should_write_vector_preceeded_by_size)
 	EQUAL(out.str(), "3 \n1 \n2 \n3 \n");
 }
 
-
-struct ComplexStructure {
-	int i;
-	char ch;
-	ComplexStructure(int _i, char _ch) : i(_i), ch(_ch) {}
-};
-
-SAVEFILE_STORE_EXT(ComplexStructure, c)
-{
-	savefile.store(c.i);
-	savefile.store(c.ch);
-}
 
 TEST(should_read_complex_type_by_store_ext)
 {
@@ -276,4 +278,6 @@ TEST(should_write_complex_type_by_store_ext)
 	Writer writer(out);
 	store_ext(writer, ComplexStructure(1, 'A'));
 	EQUAL(out.str(), "1 65 ");
+}
+
 }

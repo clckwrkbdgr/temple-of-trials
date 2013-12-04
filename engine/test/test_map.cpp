@@ -1,6 +1,8 @@
 #include "../map.h"
 #include "../test.h"
 
+SUITE(map) {
+
 TEST(map_should_have_default_cell_type)
 {
 	Map map(1, 1);
@@ -28,3 +30,4 @@ TEST(cell_type_should_be_appended_to_the_end)
 	EQUAL(new_type, 1);
 }
 
+}

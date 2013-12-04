@@ -1,6 +1,8 @@
 #include "../util.h"
 #include "../test.h"
 
+SUITE(util) {
+
 TEST(should_return_sign_of_positive_number)
 {
 	int result = sign(10);
@@ -267,3 +269,4 @@ TEST(should_return_one_for_close_point)
 	EQUAL(d, 1);
 }
 
+}

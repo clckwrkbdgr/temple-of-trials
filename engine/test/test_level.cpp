@@ -3,6 +3,8 @@
 #include "../game.h"
 #include "../test.h"
 
+SUITE(level) {
+
 TEST(impassable_cells_should_be_impassable)
 {
 	Level level(1, 1);
@@ -352,3 +354,4 @@ TEST(should_erase_dead_monsters)
 	EQUAL(level.monsters[0].sprite, 2);
 }
 
+}

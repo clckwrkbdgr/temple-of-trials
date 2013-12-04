@@ -1,6 +1,7 @@
 #include "../game.h"
 #include "../test.h"
 
+SUITE(game) {
 
 TEST(should_save_current_level_as_visited)
 {
@@ -414,3 +415,4 @@ TEST(should_generate_corresponding_level_when_going_down)
 {
 }
 
+}
