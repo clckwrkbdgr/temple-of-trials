@@ -7,18 +7,18 @@ std::list<AddTest> & all_tests()
 	return tests;
 }
 
-AddTest::AddTest(const std::string & test_suite, const std::string & test_name, TestFunction test_function)
+AddTest::AddTest(const char * test_suite, const char * test_name, TestFunction test_function)
 	: suite(test_suite), name(test_name), impl(test_function)
 {
 	all_tests().push_back(*this);
 }
 
-TestException::TestException(const std::string & ex_filename, int ex_linenumber, const std::string & message)
+TestException::TestException(const char * ex_filename, const char * ex_linenumber, const std::string & message)
 	: filename(ex_filename), line(ex_linenumber), what(message)
 {
 }
 
-std::string current_suite_name()
+const char * current_suite_name()
 {
 	return "";
 }
@@ -32,8 +32,9 @@ void run_all_tests(int argc, char ** argv)
 		if(tests_specified) {
 			bool found = false;
 			for(int i = 1; i < argc; ++i) {
-				if(test->name == argv[i] || test->suite == argv[i]) {
+				if(strcmp(test->name, argv[i]) == 0 || strcmp(test->suite, argv[i]) == 0) {
 					found = true;
+					break;
 				}
 			}
 			if(!found) {
@@ -42,25 +43,24 @@ void run_all_tests(int argc, char ** argv)
 		}
 		tests_found = true;
 		bool ok = true;
-		std::string suite_name = test->suite.empty() ? "" : test->suite + " :: ";
+		std::string exception_text;
+		std::string test_name = test->suite;
+		test_name += std::string(test_name.empty() ? "" : " :: ") + test->name;
 		try {
 			test->impl();
 		} catch(const TestException & e) {
 			ok = false;
-			std::cout << "[FAIL] " << suite_name << test->name << std::endl;
-			std::cerr << e.filename << ":" << e.line << ": " << e.what << std::endl;
+			exception_text = std::string(e.filename) + ":" + e.line + ": " + e.what;
 		} catch(const std::exception & e) {
 			ok = false;
-			std::cout << "[FAIL] " << suite_name << test->name << std::endl;
-			std::cerr << e.what() << std::endl;
+			exception_text = e.what();
 		} catch(...) {
 			ok = false;
-			std::cout << "[FAIL] " << suite_name << test->name << std::endl;
-			std::cerr << "Unknown exception caught." << std::endl;
+			exception_text = "Unknown exception caught.";
 		}
-		if(ok) {
-			std::cout << "[ OK ] " << suite_name << test->name << std::endl;
-		} else {
+		std::cout << (ok ? "[ OK ] " : "[FAIL] ") << test_name << std::endl;
+		if(!ok) {
+			std::cout << exception_text << std::endl;
 			all_tests_are_ok = false;
 		}
 	}
