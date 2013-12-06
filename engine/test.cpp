@@ -1,16 +1,16 @@
 #include "test.h"
 #include "util.h"
 
-std::list<AddTest> & all_tests()
+std::list<Test*> & all_tests()
 {
-	static std::list<AddTest> tests;
+	static std::list<Test*> tests;
 	return tests;
 }
 
-AddTest::AddTest(const char * test_suite, const char * test_name, TestFunction test_function)
-	: suite(test_suite), name(test_name), impl(test_function)
+Test::Test(const char * test_suite, const char * test_name)
+	: suite(test_suite), name(test_name)
 {
-	all_tests().push_back(*this);
+	all_tests().push_back(this);
 }
 
 TestException::TestException(const char * ex_filename, const char * ex_linenumber, const std::string & message)
@@ -28,7 +28,8 @@ void run_all_tests(int argc, char ** argv)
 	bool tests_specified = argc > 1;
 	bool tests_found = false;
 	bool all_tests_are_ok = true;
-	for(std::list<AddTest>::const_iterator test = all_tests().begin(); test != all_tests().end(); ++test) {
+	for(std::list<Test*>::iterator it = all_tests().begin(); it != all_tests().end(); ++it) {
+		Test * test = *it;
 		if(tests_specified) {
 			bool found = false;
 			for(int i = 1; i < argc; ++i) {
@@ -47,7 +48,7 @@ void run_all_tests(int argc, char ** argv)
 		std::string test_name = test->suite;
 		test_name += std::string(test_name.empty() ? "" : " :: ") + test->name;
 		try {
-			test->impl();
+			test->run();
 		} catch(const TestException & e) {
 			ok = false;
 			exception_text = std::string(e.filename) + ":" + e.line + ": " + e.what;
