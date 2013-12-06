@@ -8,6 +8,7 @@ struct Test {
 	Test(const char * test_suite, const char * test_name);
 	virtual ~Test() {}
 	virtual void run() = 0;
+	bool specified(int argc, char ** argv) const;
 };
 
 std::list<Test*> & all_tests();

@@ -13,6 +13,16 @@ Test::Test(const char * test_suite, const char * test_name)
 	all_tests().push_back(this);
 }
 
+bool Test::specified(int argc, char ** argv) const
+{
+	for(int i = 1; i < argc; ++i) {
+		if(strcmp(name, argv[i]) == 0 || strcmp(suite, argv[i]) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
 TestException::TestException(const char * ex_filename, const char * ex_linenumber, const std::string & message)
 	: filename(ex_filename), line(ex_linenumber), what(message)
 {
@@ -30,17 +40,8 @@ void run_all_tests(int argc, char ** argv)
 	bool all_tests_are_ok = true;
 	for(std::list<Test*>::iterator it = all_tests().begin(); it != all_tests().end(); ++it) {
 		Test * test = *it;
-		if(tests_specified) {
-			bool found = false;
-			for(int i = 1; i < argc; ++i) {
-				if(strcmp(test->name, argv[i]) == 0 || strcmp(test->suite, argv[i]) == 0) {
-					found = true;
-					break;
-				}
-			}
-			if(!found) {
-				continue;
-			}
+		if(tests_specified && !test->specified(argc, argv)) {
+			continue;
 		}
 		tests_found = true;
 		bool ok = true;
@@ -61,7 +62,7 @@ void run_all_tests(int argc, char ** argv)
 		}
 		std::cout << (ok ? "[ OK ] " : "[FAIL] ") << test_name << std::endl;
 		if(!ok) {
-			std::cout << exception_text << std::endl;
+			std::cerr << exception_text << std::endl;
 			all_tests_are_ok = false;
 		}
 	}
