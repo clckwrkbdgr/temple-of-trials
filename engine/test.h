@@ -72,5 +72,5 @@ void test_equal(const A & a, const B & b, const char * a_string, const char * b_
 #define ASSERT(expression) \
 	do { if(!(expression)) { throw TestException(__FILE__, STR(__LINE__), "failed assertion: " #expression ); } } while(0)
 
-void run_all_tests(int argc, char ** argv);
+int run_all_tests(int argc, char ** argv);
 

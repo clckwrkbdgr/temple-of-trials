@@ -33,17 +33,17 @@ const char * current_suite_name()
 	return "";
 }
 
-void run_all_tests(int argc, char ** argv)
+int run_all_tests(int argc, char ** argv)
 {
 	bool tests_specified = argc > 1;
-	bool tests_found = false;
-	bool all_tests_are_ok = true;
+	int total_test_count = 0;
+	int passed_tests = 0;
 	for(std::list<Test*>::iterator it = all_tests().begin(); it != all_tests().end(); ++it) {
 		Test * test = *it;
 		if(tests_specified && !test->specified(argc, argv)) {
 			continue;
 		}
-		tests_found = true;
+		++total_test_count;
 		bool ok = true;
 		std::string exception_text;
 		std::string test_name = test->suite;
@@ -60,18 +60,22 @@ void run_all_tests(int argc, char ** argv)
 			ok = false;
 			exception_text = "Unknown exception caught.";
 		}
-		std::cout << (ok ? "[ OK ] " : "[FAIL] ") << test_name << std::endl;
-		if(!ok) {
+		if(ok) {
+			std::cout << "[ OK ] " << test_name << std::endl;
+			++passed_tests;
+		} else {
+			std::cout << "[FAIL] " << test_name << std::endl;
 			std::cerr << exception_text << std::endl;
-			all_tests_are_ok = false;
 		}
 	}
-	if(!tests_found) {
+	int failed_tests = total_test_count - passed_tests;
+	if(total_test_count == 0) {
 		std::cout << "No tests to run." << std::endl;
-	} else if(all_tests_are_ok) {
+	} else if(failed_tests == 0) {
 		std::cout << "All tests are passed." << std::endl;
 	} else {
-		std::cout << "Some tests are failed!" << std::endl;
+		std::cout << failed_tests << ((failed_tests % 10 == 1) ? " test" : " tests") << " failed!" << std::endl;
 	}
+	return failed_tests;
 }
 
