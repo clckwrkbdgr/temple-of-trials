@@ -30,11 +30,29 @@ const char * current_suite_name();
 #define TEST(test_name) \
 	class Test_##test_name : public Test { \
 	public: \
-		Test_##test_name(const char * test_suite, const char * test_name) : Test(test_suite, test_name) {} \
+		Test_##test_name(const char * suite, const char * name) : Test(suite, name) {} \
 		virtual void run(); \
 	}; \
 	Test_##test_name test_##test_name(current_suite_name(), #test_name); \
 	void Test_##test_name::run()
+
+#define TEST_FIXTURE(fixture_name, test_name) \
+	class Fixture_##fixture_name##test_name : public fixture_name { \
+	public: \
+		void run(); \
+	}; \
+	class Test_##test_name : public Test {  \
+	public:  \
+		Test_##test_name(const char * suite, const char * name) : Test(suite, name) {}  \
+		virtual void run();  \
+	};  \
+	Test_##test_name test_##test_name(current_suite_name(), #test_name);  \
+	void Test_##test_name::run() \
+	{ \
+		Fixture_##fixture_name##test_name fixture; \
+		fixture.run(); \
+	} \
+	void Fixture_##fixture_name##test_name::run()
 
 template<class A, class B>
 void test_equal(const A & a, const B & b, const char * a_string, const char * b_string, const char * file, const char * line)

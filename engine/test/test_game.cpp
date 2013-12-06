@@ -26,28 +26,28 @@ void TestLevelGenerator::generate(Level & level, int level_index)
 
 SUITE(game) {
 
-TEST(should_save_current_level_as_visited)
+struct GameWithLevels {
+	TestLevelGenerator generator;
+	Game game;
+	GameWithLevels(): generator(Point(1, 1), Point(2, 2)), game(&generator) {}
+};
+
+TEST_FIXTURE(GameWithLevels, should_save_current_level_as_visited)
 {
-	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
-	Game game(&generator);
 	game.generate(1);
 	game.generate(2);
 	EQUAL(game.saved_levels.count(1), (unsigned)1);
 }
 
-TEST(should_restore_player_from_the_old_level_at_new_pos)
+TEST_FIXTURE(GameWithLevels, should_restore_player_from_the_old_level_at_new_pos)
 {
-	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
-	Game game(&generator);
 	game.generate(1);
 	game.generate(2);
 	EQUAL(game.level.get_player().pos, Point(2, 2));
 }
 
-TEST(should_restore_previously_visited_level)
+TEST_FIXTURE(GameWithLevels, should_restore_previously_visited_level)
 {
-	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
-	Game game(&generator);
 	game.generate(1);
 	game.level.get_player().sprite = 3;
 	game.generate(2);
@@ -55,18 +55,14 @@ TEST(should_restore_previously_visited_level)
 	EQUAL(game.level.get_player().sprite, 3);
 }
 
-TEST(should_generated_newly_visited_level)
+TEST_FIXTURE(GameWithLevels, should_generated_newly_visited_level)
 {
-	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
-	Game game(&generator);
 	game.generate(1);
 	EQUAL(game.level.get_player().sprite, 1);
 }
 
-TEST(should_end_turn_after_generation)
+TEST_FIXTURE(GameWithLevels, should_end_turn_after_generation)
 {
-	TestLevelGenerator generator(Point(1, 1), Point(2, 2));
-	Game game(&generator);
 	game.generate(1);
 	EQUAL(game.level.get_player().sprite, 1);
 }
