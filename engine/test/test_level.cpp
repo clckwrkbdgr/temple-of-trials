@@ -211,19 +211,25 @@ TEST(should_get_player_from_const_monsters)
 }
 
 
-TEST(should_find_path_between_points)
-{
-	Level level(4, 4);
-	level.map.add_cell_type(CellType::Builder().passable(true));
-	level.map.add_cell_type(CellType::Builder().passable(false));
-	int a[] = {
-		1, 2, 1, 1,
-		2, 1, 1, 2,
-		1, 2, 2, 1,
-		1, 2, 1, 2,
-	};
-	level.map.fill(a);
+struct LevelWithPath {
+	Level level;
+	LevelWithPath()
+		: level(4, 4)
+	{
+		level.map.add_cell_type(CellType::Builder().passable(true));
+		level.map.add_cell_type(CellType::Builder().passable(false));
+		int a[] = {
+			1, 2, 1, 1,
+			2, 1, 1, 2,
+			1, 2, 2, 1,
+			1, 2, 1, 2,
+		};
+		level.map.fill(a);
+	}
+};
 
+TEST_FIXTURE(LevelWithPath, should_find_path_between_points)
+{
 	std::list<Control> path = level.find_path(Point(0, 3), Point(2, 3));
 	EQUAL(path.size(), (unsigned)5);
 	std::list<Control>::const_iterator it = path.begin();
@@ -234,54 +240,38 @@ TEST(should_find_path_between_points)
 	EQUAL((*it++).direction, Point(-1, 1));
 }
 
-TEST(should_find_path_between_close_points)
+TEST_FIXTURE(LevelWithPath, should_find_path_between_close_points)
 {
-	Level level(4, 4);
-	level.map.add_cell_type(CellType::Builder().passable(true));
-	level.map.add_cell_type(CellType::Builder().passable(false));
-	int a[] = {
-		1, 2, 1, 1,
-		2, 1, 1, 2,
-		1, 2, 2, 1,
-		1, 2, 1, 2,
-	};
-	level.map.fill(a);
-
 	std::list<Control> path = level.find_path(Point(0, 3), Point(0, 2));
 	EQUAL(path.size(), (unsigned)1);
 	std::list<Control>::const_iterator it = path.begin();
 	EQUAL((*it++).direction, Point(0, -1));
 }
 
-TEST(should_not_find_path_if_target_is_the_same_as_start)
+TEST_FIXTURE(LevelWithPath, should_not_find_path_if_target_is_the_same_as_start)
 {
-	Level level(4, 4);
-	level.map.add_cell_type(CellType::Builder().passable(true));
-	level.map.add_cell_type(CellType::Builder().passable(false));
-	int a[] = {
-		1, 2, 1, 1,
-		2, 1, 1, 2,
-		1, 2, 2, 1,
-		1, 2, 1, 2,
-	};
-	level.map.fill(a);
-
 	std::list<Control> path = level.find_path(Point(0, 3), Point(0, 3));
 	ASSERT(path.empty());
 }
 
+struct LevelForSeeing {
+	Level level;
+	LevelForSeeing()
+		: level(3, 2)
+	{
+		level.map.add_cell_type(CellType::Builder().sprite(1).passable(true).transparent(true));
+		level.map.add_cell_type(CellType::Builder().sprite(2).passable(false).transparent(false));
+		int a[] = {
+			2, 1, 2,
+			1, 2, 1,
+		};
+		level.map.fill(a);
+		level.monsters.push_back(Monster::Builder().pos(Point(2, 1)).faction(Monster::PLAYER).sight(3).sprite(100));
+	}
+};
 
-TEST(should_store_seen_sprites)
+TEST_FIXTURE(LevelForSeeing, should_store_seen_sprites)
 {
-	Level level(3, 2);
-	level.map.add_cell_type(CellType::Builder().sprite(1).passable(true).transparent(true));
-	level.map.add_cell_type(CellType::Builder().sprite(2).passable(false).transparent(false));
-	int a[] = {
-		2, 1, 2,
-		1, 2, 1,
-	};
-	level.map.fill(a);
-	level.monsters.push_back(Monster::Builder().pos(Point(2, 1)).faction(Monster::PLAYER).sight(3).sprite(100));
 	level.invalidate_fov(level.get_player());
 	EQUAL(level.map.cell_properties(1, 0).seen_sprite, 1);
 	EQUAL(level.map.cell_properties(2, 0).seen_sprite, 2);
@@ -289,17 +279,8 @@ TEST(should_store_seen_sprites)
 	EQUAL(level.map.cell_properties(2, 1).seen_sprite, 100);
 }
 
-TEST(should_remember_sprite_instead_of_content)
+TEST_FIXTURE(LevelForSeeing, should_remember_sprite_instead_of_content)
 {
-	Level level(3, 2);
-	level.map.add_cell_type(CellType::Builder().sprite(1).passable(true).transparent(true));
-	level.map.add_cell_type(CellType::Builder().sprite(2).passable(false).transparent(false));
-	int a[] = {
-		2, 1, 2,
-		1, 2, 1,
-	};
-	level.map.fill(a);
-	level.monsters.push_back(Monster::Builder().pos(Point(2, 1)).faction(Monster::PLAYER).sight(3).sprite(100));
 	level.invalidate_fov(level.get_player());
 
 	level.get_player().pos = Point(0, 1);
@@ -307,17 +288,8 @@ TEST(should_remember_sprite_instead_of_content)
 	EQUAL(level.map.cell_properties(2, 1).seen_sprite, 100);
 }
 
-TEST(should_calculate_visible_area_within_sight_radius)
+TEST_FIXTURE(LevelForSeeing, should_calculate_visible_area_within_sight_radius)
 {
-	Level level(3, 2);
-	level.map.add_cell_type(CellType::Builder().sprite(1).passable(true).transparent(true));
-	level.map.add_cell_type(CellType::Builder().sprite(2).passable(false).transparent(false));
-	int a[] = {
-		2, 1, 2,
-		1, 2, 1,
-	};
-	level.map.fill(a);
-	level.monsters.push_back(Monster::Builder().pos(Point(2, 1)).faction(Monster::PLAYER).sight(3).sprite(100));
 	level.invalidate_fov(level.get_player());
 	EQUAL(level.map.cell_properties(0, 0).visible, false);
 	EQUAL(level.map.cell_properties(0, 1).visible, false);
@@ -327,17 +299,8 @@ TEST(should_calculate_visible_area_within_sight_radius)
 	EQUAL(level.map.cell_properties(2, 1).visible, true);
 }
 
-TEST(should_not_see_through_opaque_cells)
+TEST_FIXTURE(LevelForSeeing, should_not_see_through_opaque_cells)
 {
-	Level level(3, 2);
-	level.map.add_cell_type(CellType::Builder().sprite(1).passable(true).transparent(true));
-	level.map.add_cell_type(CellType::Builder().sprite(2).passable(false).transparent(false));
-	int a[] = {
-		2, 1, 2,
-		1, 2, 1,
-	};
-	level.map.fill(a);
-	level.monsters.push_back(Monster::Builder().pos(Point(2, 1)).faction(Monster::PLAYER).sight(3).sprite(100));
 	level.invalidate_fov(level.get_player());
 	EQUAL(level.map.cell_properties(0, 1).visible, false);
 }

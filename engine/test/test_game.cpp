@@ -64,7 +64,7 @@ TEST_FIXTURE(GameWithLevels, should_generated_newly_visited_level)
 TEST_FIXTURE(GameWithLevels, should_end_turn_after_generation)
 {
 	game.generate(1);
-	EQUAL(game.level.get_player().sprite, 1);
+	ASSERT(game.turn_ended);
 }
 
 
@@ -95,257 +95,170 @@ TEST(should_titlecase_messages)
 	EQUAL(game.messages.front(), "Hello");
 }
 
-
-TEST(should_hurt_monster_if_cell_hurts)
-{
+struct GameWithDummyOnTrap {
 	Game game;
-	game.level.map = Map(2, 2);
-	game.level.map.celltypes[0].hurts = true;
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
-	game.process_environment(game.level.monsters.front());
-	EQUAL(game.level.monsters.front().hp, 99);
-	std::string expected_messages[] = {
-		"It hurts!",
-		"Dummy loses 1 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
-}
+	GameWithDummyOnTrap() {
+		game.level.map = Map(2, 2);
+		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+		game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap").bolt(Item::Builder().sprite(1)));
+	}
+};
 
-TEST(should_trigger_trap_if_trap_is_set)
+TEST_FIXTURE(GameWithDummyOnTrap, should_trigger_trap_if_trap_is_set)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap"));
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	game.process_environment(game.level.monsters.front());
 	ASSERT(game.level.traps.front().triggered);
 }
 
-TEST(should_hurt_monster_if_trap_is_set)
+TEST_FIXTURE(GameWithDummyOnTrap, should_hurt_monster_if_trap_is_set)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap"));
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	game.process_environment(game.level.monsters.front());
 	EQUAL(game.level.monsters.front().hp, 99);
-	std::string expected_messages[] = {
-		"Dummy trigger the trap.",
-		"Dummy loses 1 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy trigger the trap.")("Dummy loses 1 hp.").result);
 }
 
-TEST(should_leave_bolt_if_trap_is_set)
+TEST_FIXTURE(GameWithDummyOnTrap, should_leave_bolt_if_trap_is_set)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap").bolt(Item::Builder().sprite(1)));
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	game.process_environment(game.level.monsters.front());
 	EQUAL(game.level.items.front().sprite, 1);
 }
 
-TEST(should_not_hurt_monster_if_trap_is_triggered_already)
+TEST_FIXTURE(GameWithDummyOnTrap, should_not_hurt_monster_if_trap_is_triggered_already)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap"));
 	game.level.traps.front().triggered = true;
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	game.process_environment(game.level.monsters.front());
 	EQUAL(game.level.monsters.front().hp, 100);
-	std::string expected_messages[] = {
-		"Trap is already triggered."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Trap is already triggered.").result);
 }
 
-TEST(should_hurt_monster_is_poisoned)
-{
+struct GameWithDummy {
 	Game game;
-	game.level.map = Map(2, 2);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
+	GameWithDummy() {
+		game.level.map = Map(2, 2);
+		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("item");
+		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
+	}
+};
+
+TEST_FIXTURE(GameWithDummy, should_hurt_monster_if_cell_hurts)
+{
+	game.level.map.celltypes[0].hurts = true;
+	game.process_environment(game.level.monsters.front());
+	EQUAL(game.level.monsters.front().hp, 99);
+	EQUAL(game.messages, MakeVector<std::string>("It hurts!")("Dummy loses 1 hp.").result);
+}
+
+TEST_FIXTURE(GameWithDummy, should_hurt_monster_is_poisoned)
+{
 	game.level.monsters.front().poisoning = 10;
 	game.process_environment(game.level.monsters.front());
 	EQUAL(game.level.monsters.front().hp, 99);
-	std::string expected_messages[] = {
-		"Dummy is poisoned.",
-		"Dummy loses 1 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy is poisoned.")("Dummy loses 1 hp.").result);
 }
 
-TEST(should_decrease_poisoning_each_turn)
+TEST_FIXTURE(GameWithDummy, should_decrease_poisoning_each_turn)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	game.level.monsters.front().poisoning = 10;
 	game.process_environment(game.level.monsters.front());
 	EQUAL(game.level.monsters.front().poisoning, 9);
 }
 
 
-TEST(should_drop_loot_if_monster_is_dead)
+TEST_FIXTURE(GameWithDummy, should_drop_loot_if_monster_is_dead)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	Item item = Item::Builder().sprite(1).name("item");
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(item));
 	game.die(game.level.monsters.front());
 	EQUAL(game.level.items.front().pos, game.level.monsters.front().pos);
-	std::string expected_messages[] = {
-		"Dummy drops item."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy drops item.").result);
 }
 
-TEST(should_end_game_if_player_is_dead)
+TEST_FIXTURE(GameWithDummy, should_end_game_if_player_is_dead)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").faction(Monster::PLAYER));
+	game.level.monsters.front().faction = Monster::PLAYER;
 	game.die(game.level.monsters.front());
 	ASSERT(game.done);
 	ASSERT(game.player_died);
-	std::string expected_messages[] = {
-		"You died."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy drops item.")("You died.").result);
 }
 
 
-TEST(should_hurt_monster)
+TEST_FIXTURE(GameWithDummy, should_hurt_monster)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	game.hurt(game.level.monsters.front(), 5);
 	EQUAL(game.level.monsters.front().hp, 95);
-	std::string expected_messages[] = {
-		"Dummy loses 5 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy loses 5 hp.").result);
 }
 
-TEST(should_hurt_if_damage_exceeds_defence)
+TEST_FIXTURE(GameWithDummy, should_hurt_if_damage_exceeds_defence)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	Item armor = Item::Builder().sprite(1).wearable().defence(3);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
 	game.level.monsters.front().worn = 0;
 	game.hurt(game.level.monsters.front(), 5);
 	EQUAL(game.level.monsters.front().hp, 98);
-	std::string expected_messages[] = {
-		"Dummy loses 2 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy loses 2 hp.").result);
 }
 
-TEST(should_hurt_at_full_damage_if_piercing)
+TEST_FIXTURE(GameWithDummy, should_hurt_at_full_damage_if_piercing)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	Item armor = Item::Builder().sprite(1).wearable().defence(3);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
 	game.level.monsters.front().worn = 0;
 	game.hurt(game.level.monsters.front(), 5, true);
 	EQUAL(game.level.monsters.front().hp, 95);
-	std::string expected_messages[] = {
-		"Dummy loses 5 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy loses 5 hp.").result);
 }
 
-TEST(should_die_if_hurts_too_much)
+TEST_FIXTURE(GameWithDummy, should_die_if_hurts_too_much)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	game.hurt(game.level.monsters.front(), 105);
 	ASSERT(game.level.monsters.front().is_dead());
-	std::string expected_messages[] = {
-		"Dummy loses 105 hp and dies."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy loses 105 hp and dies.")("Dummy drops item.").result);
 }
 
 
-TEST(should_hit_monster)
-{
+struct GameWithDummyAndKiller {
 	Game game;
-	game.level.map = Map(2, 2);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
-	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer"));
+	GameWithDummyAndKiller() {
+		game.level.map = Map(2, 2);
+		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("item");
+		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
+		game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer"));
+	}
+};
+
+TEST_FIXTURE(GameWithDummyAndKiller, should_hit_monster)
+{
 	game.hit(game.level.monsters.back(), game.level.monsters.front(), 5);
 	EQUAL(game.level.monsters.front().hp, 95);
-	std::string expected_messages[] = {
-		"Killer hit dummy for 5 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Killer hit dummy for 5 hp.").result);
 }
 
-TEST(should_hit_if_damage_exceeds_defence)
+TEST_FIXTURE(GameWithDummyAndKiller, should_hit_if_damage_exceeds_defence)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	Item armor = Item::Builder().sprite(1).wearable().defence(3);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
 	game.level.monsters.front().worn = 0;
-	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer"));
 	game.hit(game.level.monsters.back(), game.level.monsters.front(), 5);
 	EQUAL(game.level.monsters.front().hp, 98);
-	std::string expected_messages[] = {
-		"Killer hit dummy for 2 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Killer hit dummy for 2 hp.").result);
 }
 
-TEST(should_poison_monster)
+TEST_FIXTURE(GameWithDummyAndKiller, should_poison_monster)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
-	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer").poisonous(true));
+	game.level.monsters.back().poisonous = true;
 	game.hit(game.level.monsters.back(), game.level.monsters.front(), 5);
 	EQUAL(game.level.monsters.front().poisoning, 5);
-	std::string expected_messages[] = {
-		"Killer poisons dummy.",
-		"Killer hit dummy for 5 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Killer poisons dummy.")("Killer hit dummy for 5 hp.").result);
 }
 
-TEST(should_poison_monster_no_more_than_some_max)
+TEST_FIXTURE(GameWithDummyAndKiller, should_poison_monster_no_more_than_some_max)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	game.level.monsters.front().poisoning =  3;
-	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer").poisonous(true));
+	game.level.monsters.back().poisonous = true;
 	game.hit(game.level.monsters.back(), game.level.monsters.front(), 5);
 	EQUAL(game.level.monsters.front().poisoning, 5);
-	std::string expected_messages[] = {
-		"Killer poisons dummy.",
-		"Killer hit dummy for 5 hp."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Killer poisons dummy.")("Killer hit dummy for 5 hp.").result);
 }
 
-TEST(should_die_if_hit_was_too_much)
+TEST_FIXTURE(GameWithDummyAndKiller, should_die_if_hit_was_too_much)
 {
-	Game game;
-	game.level.map = Map(2, 2);
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
-	game.level.monsters.push_back(Monster::Builder().pos(Point(0, 1)).hp(100).name("killer"));
 	game.hit(game.level.monsters.back(), game.level.monsters.front(), 105);
 	ASSERT(game.level.monsters.front().is_dead());
-	std::string expected_messages[] = {
-		"Killer hit dummy for 105 hp and kills it."
-	};
-	EQUAL(game.messages, make_vector(expected_messages));
+	EQUAL(game.messages, MakeVector<std::string>("Killer hit dummy for 105 hp and kills it.")("Dummy drops item.").result);
 }
 
 }

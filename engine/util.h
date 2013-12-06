@@ -147,5 +147,16 @@ size_t size_of_array(T (&)[N]) { return N; }
 template<class T, size_t N>
 std::vector<T> make_vector(T (&a)[N]) { return std::vector<T>(a, a + N); }
 
+template<class T>
+class MakeVector {
+public:
+	std::vector<T> result;
+	MakeVector(const T & value) : result(1, value) {}
+	MakeVector & operator()(const T & value) { result.push_back(value); return *this; }
+	operator std::vector<T> & () { return result; }
+	operator const std::vector<T> & () const { return result; }
+};
+
+
 int distance(const Point & a, const Point & b);
 

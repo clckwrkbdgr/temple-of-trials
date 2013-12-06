@@ -164,10 +164,7 @@ TEST(reader_should_resize_vector_and_read_it)
 	Reader reader(in);
 	std::vector<int> v;
 	reader.store(v, "vector");
-	EQUAL(v.size(), (unsigned)3);
-	EQUAL(v[0], 1);
-	EQUAL(v[1], 2);
-	EQUAL(v[2], 3);
+	EQUAL(v, MakeVector<int>(1)(2)(3).result);
 }
 
 
@@ -257,7 +254,7 @@ TEST(writer_should_write_vector_preceeded_by_size)
 	std::ostringstream out;
 	Writer writer(out);
 	int a[] = {1, 2, 3};
-	writer.store(std::vector<int>(a, a + 3), "vector");
+	writer.store(make_vector(a), "vector");
 	EQUAL(out.str(), "3 \n1 \n2 \n3 \n");
 }
 

@@ -23,10 +23,7 @@ TEST(should_return_sign_of_zero)
 
 TEST(should_iterate_for_each_value_in_vector)
 {
-	std::vector<int> v;
-	v.push_back(1);
-	v.push_back(2);
-	v.push_back(3);
+	std::vector<int> v = MakeVector<int>(1)(2)(3);
 	int j = 1;
 	foreach(int i, v) {
 		EQUAL(i, j);
@@ -36,16 +33,12 @@ TEST(should_iterate_for_each_value_in_vector)
 
 TEST(should_iterate_for_each_value_in_vector_by_ref)
 {
-	std::vector<int> v;
-	v.push_back(1);
-	v.push_back(2);
-	v.push_back(3);
+	std::vector<int> v = MakeVector<int>(1)(2)(3);
 	foreach(int & i, v) {
 		i *= i;
 	}
-	EQUAL(v[0], 1);
-	EQUAL(v[1], 4);
-	EQUAL(v[2], 9);
+	int a[] = {1, 4, 9};
+	EQUAL(v, make_vector(a));
 }
 
 TEST(should_iterate_for_each_char_in_string)
@@ -177,16 +170,14 @@ struct PosInt {
 
 TEST(should_find_item_in_vector)
 {
-	PosInt a[] = {PosInt(1, Point(1, 0)), PosInt(2, Point(0, 1)), PosInt(3, Point(0, 0))};
-	std::vector<PosInt> v(a, a + 3);
+	std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
 	PosInt & i = find_at(v, Point(0, 1));
 	EQUAL(i.value, 2);
 }
 
 TEST(should_change_found_item_in_vector)
 {
-	PosInt a[] = {PosInt(1, Point(1, 0)), PosInt(2, Point(0, 1)), PosInt(3, Point(0, 0))};
-	std::vector<PosInt> v(a, a + 3);
+	std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
 	PosInt & i = find_at(v, Point(0, 1));
 	i.value = 4;
 	EQUAL(v[1].value, 4);
@@ -194,8 +185,7 @@ TEST(should_change_found_item_in_vector)
 
 TEST(should_return_empty_item_if_not_found_in_vector)
 {
-	PosInt a[] = {PosInt(1, Point(1, 0)), PosInt(2, Point(0, 1)), PosInt(3, Point(0, 0))};
-	std::vector<PosInt> v(a, a + 3);
+	std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
 	PosInt & i = find_at(v, Point(1, 1));
 	EQUAL(i.value, 0);
 	ASSERT(!i.pos);
@@ -203,16 +193,14 @@ TEST(should_return_empty_item_if_not_found_in_vector)
 
 TEST(should_find_item_in_const_vector)
 {
-	PosInt a[] = {PosInt(1, Point(1, 0)), PosInt(2, Point(0, 1)), PosInt(3, Point(0, 0))};
-	const std::vector<PosInt> v(a, a + 3);
+	const std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
 	PosInt i = find_at(v, Point(0, 1));
 	EQUAL(i.value, 2);
 }
 
 TEST(should_return_empty_item_if_not_found_in_const_vector)
 {
-	PosInt a[] = {PosInt(1, Point(1, 0)), PosInt(2, Point(0, 1)), PosInt(3, Point(0, 0))};
-	const std::vector<PosInt> v(a, a + 3);
+	const std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
 	PosInt i = find_at(v, Point(1, 1));
 	EQUAL(i.value, 0);
 	ASSERT(!i.pos);
@@ -238,6 +226,15 @@ TEST(should_make_vector_from_array)
 {
 	int a[] = {1, 2, 3};
 	std::vector<int> v = make_vector(a);
+	EQUAL(v.size(), (unsigned)3);
+	EQUAL(v[0], 1);
+	EQUAL(v[1], 2);
+	EQUAL(v[2], 3);
+}
+
+TEST(should_make_vector_using_init_chain)
+{
+	std::vector<int> v = MakeVector<int>(1)(2)(3);
 	EQUAL(v.size(), (unsigned)3);
 	EQUAL(v[0], 1);
 	EQUAL(v[1], 2);
