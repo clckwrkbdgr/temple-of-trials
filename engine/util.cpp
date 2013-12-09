@@ -16,7 +16,7 @@ std::string now()
 
 void log_control(std::ostream * out_stream, const std::string & message)
 {
-	static std::ostream * out = &std::cout;
+	static std::ostream * out = &std::clog;
 	if(out_stream) {
 		out = out_stream;
 	}

@@ -305,19 +305,33 @@ TEST_FIXTURE(GameWithDummy, should_plan_to_move_in_just_opened_door_on_smart)
 	EQUAL_CONTAINERS(dummy->plan, MakeVector<Control>(Control(Control::MOVE, Point(0, -1))).result);
 }
 
-TEST(should_open_container_on_smart_move_if_exists)
+TEST_FIXTURE(GameWithDummy, should_open_container_on_smart_move_if_exists)
 {
-	FAIL("not implemented");
+	Item apple = Item::Builder().sprite(1).name("apple");
+	game.level.containers.push_back(Container::Builder().pos(Point(1, 0)).name("pot").item(apple));
+	game.smart_move(*dummy, Point(0, -1));
+	ASSERT(game.level.containers.front().items.empty());
+	EQUAL(dummy->pos, Point(1, 1));
+	EQUAL(game.level.items, MakeVector<Item>(Item::Builder().sprite(1).name("apple").pos(Point(1, 1))).result);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy took up a apple from pot.").result);
 }
 
-TEST(should_drink_from_fountain_on_smart_move_if_exists)
+TEST_FIXTURE(GameWithDummy, should_drink_from_fountain_on_smart_move_if_exists)
 {
-	FAIL("not implemented");
+	game.level.fountains.push_back(Fountain::Builder().pos(Point(1, 0)).name("well"));
+	game.smart_move(*dummy, Point(0, -1));
+	EQUAL(dummy->pos, Point(1, 1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy drink from well.").result);
 }
 
-TEST(should_swing_at_monster_on_smart_move_if_exists)
+TEST_FIXTURE(GameWithDummy, should_swing_at_monster_on_smart_move_if_exists)
 {
-	FAIL("not implemented");
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 0)).name("stub"));
+	Monster & dummy = game.level.monsters[0];
+	game.smart_move(dummy, Point(0, -1));
+	EQUAL(dummy.pos, Point(1, 1));
+	ASSERT(!game.messages.empty());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy hit stub for 0 hp.").result);
 }
 
 
