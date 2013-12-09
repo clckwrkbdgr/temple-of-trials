@@ -41,4 +41,5 @@ $(shell mkdir -p tmp)
 $(shell mkdir -p tmp/engine)
 $(shell mkdir -p tmp/engine/test)
 -include $(OBJ:%.o=%.d)
+-include $(TEST_OBJ:%.o=%.d)
 
