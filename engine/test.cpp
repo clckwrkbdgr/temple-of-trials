@@ -23,7 +23,7 @@ bool Test::specified(int argc, char ** argv) const
 	return false;
 }
 
-TestException::TestException(const char * ex_filename, const char * ex_linenumber, const std::string & message)
+TestException::TestException(const char * ex_filename, int ex_linenumber, const std::string & message)
 	: filename(ex_filename), line(ex_linenumber), what(message)
 {
 }
@@ -52,7 +52,7 @@ int run_all_tests(int argc, char ** argv)
 			test->run();
 		} catch(const TestException & e) {
 			ok = false;
-			exception_text = std::string(e.filename) + ":" + e.line + ": " + e.what;
+			exception_text = format("{0}:{1}: {2}", e.filename, e.line, e.what);
 		} catch(const std::exception & e) {
 			ok = false;
 			exception_text = e.what();

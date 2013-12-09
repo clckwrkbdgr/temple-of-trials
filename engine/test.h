@@ -15,9 +15,9 @@ std::list<Test*> & all_tests();
 
 struct TestException {
 	const char * filename;
-	const char * line;
+	int line;
 	std::string what;
-	TestException(const char * ex_filename, const char * ex_linenumber, const std::string & message);
+	TestException(const char * ex_filename, int ex_linenumber, const std::string & message);
 };
 
 const char * current_suite_name();
@@ -55,32 +55,30 @@ const char * current_suite_name();
 	void Fixture_##fixture_name##test_name::run()
 
 template<class A, class B>
-void test_equal(const A & a, const B & b, const char * a_string, const char * b_string, const char * file, const char * line)
+void test_equal(const A & a, const B & b, const char * a_string, const char * b_string, const char * file, int line)
 {
 	if(a != b) {
 		throw TestException(file, line, std::string(a_string) + " (" + to_string(a) + ") != "  + b_string + " (" + to_string(b) + ")");
 	}
 }
-#define STR_VALUE(x) #x
-#define STR(x) STR_VALUE(x)
 #define EQUAL(a, b) \
-	test_equal(a, b, #a, #b, __FILE__, STR(__LINE__))
+	test_equal(a, b, #a, #b, __FILE__, __LINE__)
 
 template<class ContainerA, class ContainerB>
-void test_equal_containers(const ContainerA & a, const ContainerB & b, const char * a_string, const char * b_string, const char * file, const char * line)
+void test_equal_containers(const ContainerA & a, const ContainerB & b, const char * a_string, const char * b_string, const char * file, int line)
 {
 	if(!equal_containers(a.begin(), a.end(), b.begin(), b.end())) {
 		throw TestException(file, line, std::string(a_string) + " (" + to_string(a) + ") != "  + b_string + " (" + to_string(b) + ")");
 	}
 }
 #define EQUAL_CONTAINERS(a, b) \
-	test_equal_containers(a, b, #a, #b, __FILE__, STR(__LINE__))
+	test_equal_containers(a, b, #a, #b, __FILE__, __LINE__)
 
 #define FAIL(message) \
-	throw TestException(__FILE__, STR(__LINE__), message)
+	throw TestException(__FILE__, __LINE__, message)
 
 #define ASSERT(expression) \
-	do { if(!(expression)) { throw TestException(__FILE__, STR(__LINE__), "failed assertion: " #expression ); } } while(0)
+	do { if(!(expression)) { throw TestException(__FILE__, __LINE__, "failed assertion: " #expression ); } } while(0)
 
 int run_all_tests(int argc, char ** argv);
 
