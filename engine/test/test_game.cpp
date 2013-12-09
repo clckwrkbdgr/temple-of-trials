@@ -1,6 +1,11 @@
 #include "../game.h"
 #include "../test.h"
 
+std::string to_string(const Control & control)
+{
+	return format("Control({0}, dir={1}, slot={2})", control.control, control.direction, control.slot);
+}
+
 class TestLevelGenerator : public LevelGenerator {
 public:
 	TestLevelGenerator(const Point & player_pos1, const Point & player_pos2);
@@ -265,14 +270,39 @@ TEST_FIXTURE(GameWithDummyAndKiller, should_die_if_hit_was_too_much)
 
 SUITE(game_actions) {
 
-TEST(should_move_on_smart_move_if_passable)
+struct GameWithDummy {
+	Game game;
+	Monster * dummy;
+	GameWithDummy() {
+		game.level.map = Map(2, 2);
+		game.level.map.celltypes.front().passable = true;
+		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("item");
+		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
+		dummy = &game.level.monsters[0];
+	}
+};
+
+TEST_FIXTURE(GameWithDummy, should_move_on_smart_move_if_passable)
 {
-	FAIL("not implemented");
+	game.smart_move(*dummy, Point(0, -1));
+	EQUAL(dummy->pos, Point(1, 0));
+	ASSERT(game.messages.empty());
 }
 
-TEST(should_open_door_on_smart_move_if_exists)
+TEST_FIXTURE(GameWithDummy, should_open_door_on_smart_move_if_exists)
 {
-	FAIL("not implemented");
+	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).opened(false).name("door"));
+	game.smart_move(*dummy, Point(0, -1));
+	ASSERT(game.level.doors.front().opened);
+	EQUAL(dummy->pos, Point(1, 1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy opened the door.").result);
+}
+
+TEST_FIXTURE(GameWithDummy, should_plan_to_move_in_just_opened_door_on_smart)
+{
+	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).opened(false).name("door"));
+	game.smart_move(*dummy, Point(0, -1));
+	EQUAL_CONTAINERS(dummy->plan, MakeVector<Control>(Control(Control::MOVE, Point(0, -1))).result);
 }
 
 TEST(should_open_container_on_smart_move_if_exists)

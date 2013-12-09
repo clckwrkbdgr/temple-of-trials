@@ -22,6 +22,8 @@ struct Control {
 	Control(int control, const Point & direction);
 	Control(int control, int slot);
 	bool done() const { return control != NONE; }
+	bool operator==(const Control & other) const { return control == other.control && direction == other.direction && slot == other.slot; }
+	bool operator!=(const Control & other) const { return !operator==(other); }
 };
 
 typedef Control (*Controller)(Monster&, Game&);

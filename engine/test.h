@@ -66,6 +66,16 @@ void test_equal(const A & a, const B & b, const char * a_string, const char * b_
 #define EQUAL(a, b) \
 	test_equal(a, b, #a, #b, __FILE__, STR(__LINE__))
 
+template<class ContainerA, class ContainerB>
+void test_equal_containers(const ContainerA & a, const ContainerB & b, const char * a_string, const char * b_string, const char * file, const char * line)
+{
+	if(!equal_containers(a.begin(), a.end(), b.begin(), b.end())) {
+		throw TestException(file, line, std::string(a_string) + " (" + to_string(a) + ") != "  + b_string + " (" + to_string(b) + ")");
+	}
+}
+#define EQUAL_CONTAINERS(a, b) \
+	test_equal_containers(a, b, #a, #b, __FILE__, STR(__LINE__))
+
 #define FAIL(message) \
 	throw TestException(__FILE__, STR(__LINE__), message)
 

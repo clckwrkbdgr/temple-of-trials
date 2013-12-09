@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <list>
 #include <cstdarg>
 class Point;
 
@@ -33,15 +34,27 @@ std::string to_string(long unsigned value);
 std::string to_string(char value);
 std::string to_string(const std::string & value);
 std::string to_string(const Point & value);
-template<class T>
-std::string to_string(const std::vector<T> & v, unsigned starting_from)
+
+template<class Iterator>
+std::string to_string(Iterator begin, Iterator current, Iterator end)
 {
-	return starting_from < v.size() ? "|" + to_string(v[starting_from]) + to_string(v, starting_from + 1) : "";
+	Iterator next = current;
+	++next;
+	if(begin == current) {
+		return (current != end) ? to_string(*current) + to_string(begin, next, end) : "";
+	} else {
+		return (current != end) ? "|" + to_string(*current) + to_string(begin, next, end) : "";
+	}
 }
 template<class T>
 std::string to_string(const std::vector<T> & v)
 {
-	return v.empty() ? "" : to_string(v.front()) + to_string(v, 1);
+	return to_string(v.begin(), v.begin(), v.end());
+}
+template<class T>
+std::string to_string(const std::list<T> & v)
+{
+	return to_string(v.begin(), v.begin(), v.end());
 }
 
 void subs_arg_str(std::string & result, int index, const std::string & value);
@@ -146,6 +159,8 @@ template<class T, size_t N>
 size_t size_of_array(T (&)[N]) { return N; }
 template<class T, size_t N>
 std::vector<T> make_vector(T (&a)[N]) { return std::vector<T>(a, a + N); }
+template<class T>
+std::vector<T> make_vector(const std::list<T> & a) { return std::vector<T>(a.begin(), a.end()); }
 
 template<class T>
 class MakeVector {
@@ -157,6 +172,16 @@ public:
 	operator const std::vector<T> & () const { return result; }
 };
 
+template<class IteratorA, class IteratorB>
+bool equal_containers(IteratorA a_begin, IteratorA a_end, IteratorB b_begin, IteratorB b_end)
+{
+	for(; a_begin != a_end && b_begin != b_end; ++a_begin, ++b_begin) {
+		if(*a_begin != *b_begin) {
+			return false;
+		}
+	}
+	return a_begin == a_end && b_begin == b_end;
+}
 
 int distance(const Point & a, const Point & b);
 

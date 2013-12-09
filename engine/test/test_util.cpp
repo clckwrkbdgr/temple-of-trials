@@ -102,6 +102,21 @@ TEST(should_convert_point_to_string)
 	EQUAL(result, "(10, 0)");
 }
 
+TEST(should_convert_vector_to_string)
+{
+	std::vector<int> v = MakeVector<int>(1)(2)(3)(4);
+	std::string result = to_string(v);
+	EQUAL(result, "1|2|3|4");
+}
+
+TEST(should_convert_list_to_string)
+{
+	std::vector<int> v = MakeVector<int>(1)(2)(3)(4);
+	std::list<int> l(v.begin(), v.end());
+	std::string result = to_string(l);
+	EQUAL(result, "1|2|3|4");
+}
+
 TEST(should_make_point_from_two_coords)
 {
 	Point p(1, 2);
@@ -239,6 +254,21 @@ TEST(should_make_vector_using_init_chain)
 	EQUAL(v[0], 1);
 	EQUAL(v[1], 2);
 	EQUAL(v[2], 3);
+}
+
+TEST(should_compare_containers)
+{
+	std::vector<int> v = MakeVector<int>(1)(2)(3);
+	std::list<int> l(v.begin(), v.end());
+	ASSERT(equal_containers(v.begin(), v.end(), l.begin(), l.end()));
+}
+
+TEST(should_compare_unequal_containers_unequal)
+{
+	std::vector<int> v = MakeVector<int>(1)(2)(3);
+	std::list<int> l(v.begin(), v.end());
+	v.push_back(4);
+	ASSERT(!equal_containers(v.begin(), v.end(), l.begin(), l.end()));
 }
 
 TEST(should_compute_distance_between_points)
