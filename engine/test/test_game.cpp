@@ -272,46 +272,45 @@ SUITE(game_actions) {
 
 struct GameWithDummy {
 	Game game;
-	Monster * dummy;
 	GameWithDummy() {
 		game.level.map = Map(2, 2);
 		game.level.map.celltypes.front().passable = true;
 		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("item");
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
-		dummy = &game.level.monsters[0];
 	}
+	Monster & dummy() { return game.level.monsters[0]; }
 };
 
 TEST_FIXTURE(GameWithDummy, should_move_on_smart_move_if_passable)
 {
-	game.smart_move(*dummy, Point(0, -1));
-	EQUAL(dummy->pos, Point(1, 0));
+	game.smart_move(dummy(), Point(0, -1));
+	EQUAL(dummy().pos, Point(1, 0));
 	ASSERT(game.messages.empty());
 }
 
 TEST_FIXTURE(GameWithDummy, should_open_door_on_smart_move_if_exists)
 {
 	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).opened(false).name("door"));
-	game.smart_move(*dummy, Point(0, -1));
+	game.smart_move(dummy(), Point(0, -1));
 	ASSERT(game.level.doors.front().opened);
-	EQUAL(dummy->pos, Point(1, 1));
+	EQUAL(dummy().pos, Point(1, 1));
 	EQUAL(game.messages, MakeVector<std::string>("Dummy opened the door.").result);
 }
 
 TEST_FIXTURE(GameWithDummy, should_plan_to_move_in_just_opened_door_on_smart)
 {
 	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).opened(false).name("door"));
-	game.smart_move(*dummy, Point(0, -1));
-	EQUAL_CONTAINERS(dummy->plan, MakeVector<Control>(Control(Control::MOVE, Point(0, -1))).result);
+	game.smart_move(dummy(), Point(0, -1));
+	EQUAL_CONTAINERS(dummy().plan, MakeVector<Control>(Control(Control::MOVE, Point(0, -1))).result);
 }
 
 TEST_FIXTURE(GameWithDummy, should_open_container_on_smart_move_if_exists)
 {
 	Item apple = Item::Builder().sprite(1).name("apple");
 	game.level.containers.push_back(Container::Builder().pos(Point(1, 0)).name("pot").item(apple));
-	game.smart_move(*dummy, Point(0, -1));
+	game.smart_move(dummy(), Point(0, -1));
 	ASSERT(game.level.containers.front().items.empty());
-	EQUAL(dummy->pos, Point(1, 1));
+	EQUAL(dummy().pos, Point(1, 1));
 	EQUAL(game.level.items, MakeVector<Item>(Item::Builder().sprite(1).name("apple").pos(Point(1, 1))).result);
 	EQUAL(game.messages, MakeVector<std::string>("Dummy took up a apple from pot.").result);
 }
@@ -319,45 +318,54 @@ TEST_FIXTURE(GameWithDummy, should_open_container_on_smart_move_if_exists)
 TEST_FIXTURE(GameWithDummy, should_drink_from_fountain_on_smart_move_if_exists)
 {
 	game.level.fountains.push_back(Fountain::Builder().pos(Point(1, 0)).name("well"));
-	game.smart_move(*dummy, Point(0, -1));
-	EQUAL(dummy->pos, Point(1, 1));
+	game.smart_move(dummy(), Point(0, -1));
+	EQUAL(dummy().pos, Point(1, 1));
 	EQUAL(game.messages, MakeVector<std::string>("Dummy drink from well.").result);
 }
 
 TEST_FIXTURE(GameWithDummy, should_swing_at_monster_on_smart_move_if_exists)
 {
 	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 0)).name("stub"));
-	Monster & dummy = game.level.monsters[0];
-	game.smart_move(dummy, Point(0, -1));
-	EQUAL(dummy.pos, Point(1, 1));
-	ASSERT(!game.messages.empty());
+	game.smart_move(dummy(), Point(0, -1));
+	EQUAL(dummy().pos, Point(1, 1));
 	EQUAL(game.messages, MakeVector<std::string>("Dummy hit stub for 0 hp.").result);
 }
 
 
-TEST(should_not_drink_monsters)
+TEST_FIXTURE(GameWithDummy, should_not_drink_monsters)
 {
-	FAIL("not implemented");
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 0)).name("stub"));
+	game.drink(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("It is stub. dummy is not a vampire to drink that.").result);
 }
 
-TEST(should_not_drink_containers)
+TEST_FIXTURE(GameWithDummy, should_not_drink_containers)
 {
-	FAIL("not implemented");
+	game.level.containers.push_back(Container::Builder().pos(Point(1, 0)).name("pot"));
+	game.drink(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Unfortunately, pot is totally empty.").result);
 }
 
-TEST(should_not_drink_at_empty_cell)
+TEST_FIXTURE(GameWithDummy, should_not_drink_at_empty_cell)
 {
-	FAIL("not implemented");
+	game.drink(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("There is nothing to drink.").result);
 }
 
-TEST(should_drink_fountains)
+TEST_FIXTURE(GameWithDummy, should_drink_fountains)
 {
-	FAIL("not implemented");
+	game.level.fountains.push_back(Fountain::Builder().pos(Point(1, 0)).name("well"));
+	game.drink(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy drink from well.").result);
 }
 
-TEST(should_heal_from_fountains)
+TEST_FIXTURE(GameWithDummy, should_heal_from_fountains)
 {
-	FAIL("not implemented");
+	game.level.fountains.push_back(Fountain::Builder().pos(Point(1, 0)).name("well"));
+	dummy().hp -= 5;
+	game.drink(dummy(), Point(0, -1));
+	EQUAL(dummy().hp, 96);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy drink from well. It helps a bit.").result);
 }
 
 

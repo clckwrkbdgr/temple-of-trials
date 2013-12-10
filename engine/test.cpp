@@ -1,5 +1,6 @@
 #include "test.h"
 #include "util.h"
+#include <cstring>
 
 std::list<Test*> & all_tests()
 {
