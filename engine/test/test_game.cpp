@@ -369,164 +369,257 @@ TEST_FIXTURE(GameWithDummy, should_heal_from_fountains)
 }
 
 
-TEST(should_not_open_already_opened_doors)
+TEST_FIXTURE(GameWithDummy, should_not_open_already_opened_doors)
 {
-	FAIL("not implemented");
+	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).name("door").opened(true));
+	game.open(dummy(), Point(0, -1));
+	ASSERT(game.level.doors[0].opened);
+	EQUAL(game.messages, MakeVector<std::string>("Door is already opened.").result);
 }
 
-TEST(should_open_closed_doors)
+TEST_FIXTURE(GameWithDummy, should_open_closed_doors)
 {
-	FAIL("not implemented");
+	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).name("door").opened(false));
+	game.open(dummy(), Point(0, -1));
+	ASSERT(game.level.doors[0].opened);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy opened the door.").result);
 }
 
-TEST(should_not_open_empty_cell)
+TEST_FIXTURE(GameWithDummy, should_not_open_empty_cell)
 {
-	FAIL("not implemented");
+	game.open(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("There is nothing to open there.").result);
 }
 
-TEST(should_open_containers_and_drop_items)
+TEST_FIXTURE(GameWithDummy, should_open_containers_and_drop_items)
 {
-	FAIL("not implemented");
+	Item item = Item::Builder().sprite(1).name("item");
+	game.level.containers.push_back(Container::Builder().pos(Point(1, 0)).name("pot").item(item));
+	game.open(dummy(), Point(0, -1));
+	EQUAL(game.level.items[0].sprite, item.sprite);
+	ASSERT(game.level.containers[0].items.empty());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy took up a item from pot.").result);
 }
 
-TEST(should_not_open_empty_containers)
+TEST_FIXTURE(GameWithDummy, should_not_open_empty_containers)
 {
-	FAIL("not implemented");
-}
-
-
-TEST(should_close_opened_doors)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_not_close_already_closed_doors)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_not_close_empty_cell)
-{
-	FAIL("not implemented");
-}
-
-
-TEST(should_hit_impassable_cells_on_swing)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_open_closed_doors_on_swing)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_hit_monsters_on_swing)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_swing_at_nothing_at_empty_cell)
-{
-	FAIL("not implemented");
+	game.level.containers.push_back(Container::Builder().pos(Point(1, 0)).name("pot"));
+	game.open(dummy(), Point(0, -1));
+	ASSERT(game.level.items.empty());
+	ASSERT(game.level.containers[0].items.empty());
+	EQUAL(game.messages, MakeVector<std::string>("Pot is empty.").result);
 }
 
 
-TEST(should_not_throw_in_wields_nothing)
+TEST_FIXTURE(GameWithDummy, should_close_opened_doors)
 {
-	FAIL("not implemented");
+	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).name("door").opened(true));
+	game.close(dummy(), Point(0, -1));
+	ASSERT(!game.level.doors[0].opened);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy closed the door.").result);
 }
 
-TEST(should_remove_item_from_monster_when_thrown)
+TEST_FIXTURE(GameWithDummy, should_not_close_already_closed_doors)
 {
-	FAIL("not implemented");
+	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).name("door").opened(false));
+	game.close(dummy(), Point(0, -1));
+	ASSERT(!game.level.doors[0].opened);
+	EQUAL(game.messages, MakeVector<std::string>("Door is already closed.").result);
 }
 
-TEST(should_unwield_item_from_monster_when_thrown)
+TEST_FIXTURE(GameWithDummy, should_not_close_empty_cell)
 {
-	FAIL("not implemented");
-}
-
-TEST(should_hit_opaque_cell_and_drop_item_before_it)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_hit_closed_door_and_drop_item_before_it)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_hit_container_and_drop_item_in_it)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_hit_fountain_and_erase_item_forever)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_hit_monster_and_drop_item_under_it)
-{
-	FAIL("not implemented");
+	game.close(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("There is nothing to close there.").result);
 }
 
 
-TEST(should_not_drop_if_nothing_to_drop)
+TEST_FIXTURE(GameWithDummy, should_hit_impassable_cells_on_swing)
 {
-	FAIL("not implemented");
+	int wall = game.level.map.add_cell_type(CellType::Builder().name("wall").passable(false));
+	game.level.map.set_cell_type(Point(1, 0), wall);
+	game.swing(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy hit wall.").result);
 }
 
-TEST(should_drop_items_only_in_range)
+TEST_FIXTURE(GameWithDummy, should_open_closed_doors_on_swing)
 {
-	FAIL("not implemented");
+	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).name("door").opened(false));
+	game.swing(dummy(), Point(0, -1));
+	ASSERT(game.level.doors[0].opened);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy swing at door.")("Dummy opened the door.").result);
 }
 
-TEST(should_unwield_item_before_dropping)
+TEST_FIXTURE(GameWithDummy, should_hit_monsters_on_swing)
 {
-	FAIL("not implemented");
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 0)).name("stub"));
+	game.swing(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy hit stub for 0 hp.").result);
 }
 
-TEST(should_take_off_item_before_dropping)
+TEST_FIXTURE(GameWithDummy, should_swing_at_nothing_at_empty_cell)
 {
-	FAIL("not implemented");
-}
-
-TEST(should_remove_item_from_inventory_when_dropped)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_place_item_on_the_floor_when_dropped)
-{
-	FAIL("not implemented");
+	game.swing(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy swing at nothing.").result);
 }
 
 
-TEST(should_not_grab_if_floor_is_empty)
+struct GameWithDummyWieldingAndWearing {
+	Game game;
+	GameWithDummyWieldingAndWearing() {
+		game.level.map = Map(2, 3);
+		int floor = game.level.map.add_cell_type(CellType::Builder().passable(true).transparent(true).name("floor"));
+		game.level.map.fill(floor);
+		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("armor");
+		Item spear = Item::Builder().sprite(2).damage(3).name("spear");
+		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 2)).hp(100).name("dummy").item(spear).item(armor).wield(0).wear(1));
+	}
+	Monster & dummy() { return game.level.monsters[0]; }
+};
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_throw_if_wields_nothing)
 {
-	FAIL("not implemented");
+	dummy().wielded = -1;
+	game.fire(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy have nothing to throw.").result);
 }
 
-TEST(should_put_grabbed_item_to_the_first_empty_slot)
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_item_from_monster_when_thrown)
 {
-	FAIL("not implemented");
+	game.fire(dummy(), Point(0, -1));
+	ASSERT(!dummy().inventory[0]);
 }
 
-TEST(should_remove_grabbed_item_from_map)
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_from_monster_when_thrown)
 {
-	FAIL("not implemented");
+	game.fire(dummy(), Point(0, -1));
+	EQUAL(dummy().wielded, -1);
 }
 
-TEST(should_notify_if_quest_item)
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_item_before_it)
 {
-	FAIL("not implemented");
+	int wall = game.level.map.add_cell_type(CellType::Builder().name("wall").transparent(false));
+	game.level.map.set_cell_type(Point(1, 0), wall);
+	game.fire(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hit wall.").result);
+	ASSERT(!game.level.items.empty());
+	EQUAL(game.level.items[0].pos, Point(1, 1));
 }
 
-TEST(should_not_grab_item_if_inventory_is_full)
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_closed_door_and_drop_item_before_it)
 {
-	FAIL("not implemented");
+	game.level.doors.push_back(Door::Builder().pos(Point(1, 0)).name("door").opened(false));
+	game.fire(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hit door.").result);
+	ASSERT(!game.level.items.empty());
+	EQUAL(game.level.items[0].pos, Point(1, 1));
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_container_and_drop_item_in_it)
+{
+	game.level.containers.push_back(Container::Builder().pos(Point(1, 0)).name("pot"));
+	game.fire(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy throw spear.")("Spear falls into pot.").result);
+	ASSERT(game.level.items.empty());
+	ASSERT(!game.level.containers[0].items.empty());
+	EQUAL(game.level.containers[0].items[0].name, "spear");
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_fountain_and_erase_item_forever)
+{
+	game.level.fountains.push_back(Fountain::Builder().pos(Point(1, 0)).name("well"));
+	game.fire(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy throw spear.")("Spear falls into well. Forever lost.").result);
+	ASSERT(game.level.items.empty());
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_monster_and_drop_item_under_it)
+{
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 0)).name("stub").hp(100));
+	game.fire(dummy(), Point(0, -1));
+	EQUAL(game.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hits stub.")("Dummy hit stub for 3 hp.").result);
+	ASSERT(!game.level.items.empty());
+	EQUAL(game.level.items[0].pos, Point(1, 0));
+}
+
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_drop_if_nothing_to_drop)
+{
+	dummy().inventory.clear();
+	game.drop(dummy(), 0);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy have nothing to drop.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_drop_items_only_in_range)
+{
+	game.drop(dummy(), 4);
+	EQUAL(game.messages, MakeVector<std::string>("No such object.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_dropping)
+{
+	game.drop(dummy(), 0);
+	EQUAL(dummy().wielded, -1);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy dropped spear on the floor.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_before_dropping)
+{
+	game.drop(dummy(), 1);
+	EQUAL(dummy().worn, -1);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy dropped armor on the floor.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_item_from_inventory_when_dropped)
+{
+	game.drop(dummy(), 0);
+	ASSERT(!dummy().inventory[0]);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_place_item_on_the_floor_when_dropped)
+{
+	game.drop(dummy(), 0);
+	EQUAL(game.level.items.size(), 1);
+	EQUAL(game.level.items[0].name, "spear");
+}
+
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_if_floor_is_empty)
+{
+	game.grab(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Nothing here to pick up.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_grabbed_item_to_the_first_empty_slot)
+{
+	game.level.items.push_back(Item::Builder().pos(Point(1, 2)).name("item").sprite(1));
+	game.grab(dummy());
+	EQUAL(dummy().inventory[2].name, "item");
+	EQUAL(game.messages, MakeVector<std::string>("Dummy picked up item from the floor.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_grabbed_item_from_map)
+{
+	game.level.items.push_back(Item::Builder().pos(Point(1, 2)).name("item").sprite(1));
+	game.grab(dummy());
+	ASSERT(game.level.items.empty());
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_notify_if_quest_item)
+{
+	game.level.items.push_back(Item::Builder().pos(Point(1, 2)).name("item").sprite(1).quest());
+	game.grab(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy picked up item from the floor.")("Now bring it back to the surface!").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_item_if_inventory_is_full)
+{
+	for(int i = 2; i < 26; ++i) {
+		dummy().inventory.push_back(Item::Builder().name("stub").sprite(2));
+	}
+	game.level.items.push_back(Item::Builder().pos(Point(1, 2)).name("item").sprite(1));
+	game.grab(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy carry too much items.").result);
 }
 
 
