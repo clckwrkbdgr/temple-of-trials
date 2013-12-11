@@ -10,17 +10,20 @@ class TestLevelGenerator : public LevelGenerator {
 public:
 	TestLevelGenerator(const Point & player_pos1, const Point & player_pos2);
 	virtual void generate(Level & level, int level_index);
+	bool was_generated() const { return generated; }
 private:
+	bool generated;
 	Point pos1, pos2;
 };
 
 TestLevelGenerator::TestLevelGenerator(const Point & player_pos1, const Point & player_pos2)
-	: pos1(player_pos1), pos2(player_pos2)
+	: generated(false), pos1(player_pos1), pos2(player_pos2)
 {
 }
 
 void TestLevelGenerator::generate(Level & level, int level_index)
 {
+	generated = true;
 	level = Level(4, 4);
 	if(level_index == 1) {
 		level.monsters.push_back(Monster::Builder().sprite(1).faction(Monster::PLAYER).pos(pos1));
@@ -623,170 +626,280 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_item_if_inventory_
 }
 
 
-TEST(should_wield_any_item)
+struct GameWithDummyWithItems {
+	Game game;
+	GameWithDummyWithItems() {
+		game.level.map = Map(2, 3);
+		int floor = game.level.map.add_cell_type(CellType::Builder().passable(true).transparent(true).name("floor"));
+		game.level.map.fill(floor);
+		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("armor");
+		Item spear = Item::Builder().sprite(2).damage(3).name("spear");
+		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 2)).hp(100).name("dummy").item(spear).item(armor).item(Item()));
+	}
+	Monster & dummy() { return game.level.monsters[0]; }
+};
+
+TEST_FIXTURE(GameWithDummyWithItems, should_wield_any_item)
 {
-	FAIL("not implemented");
+	game.wield(dummy(), 0);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy wields spear.").result);
 }
 
-TEST(should_not_wield_invalid_slot)
+TEST_FIXTURE(GameWithDummyWithItems, should_not_wield_invalid_slot)
 {
-	FAIL("not implemented");
+	game.wield(dummy(), 3);
+	EQUAL(game.messages, MakeVector<std::string>("No such object.").result);
 }
 
-TEST(should_not_wield_empty_slot)
+TEST_FIXTURE(GameWithDummyWithItems, should_not_wield_empty_slot)
 {
-	FAIL("not implemented");
+	game.wield(dummy(), 2);
+	EQUAL(game.messages, MakeVector<std::string>("No such object.").result);
 }
 
-TEST(should_unwield_previous_item_before_wielding_new)
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_previous_item_before_wielding_new)
 {
-	FAIL("not implemented");
+	dummy().inventory.push_back(Item::Builder().sprite(1).name("sword"));
+	game.wield(dummy(), 2);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy wields sword.").result);
 }
 
-TEST(should_take_off_item_before_wielding_it)
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_before_wielding_it)
 {
-	FAIL("not implemented");
-}
-
-
-TEST(should_unwield_item_if_wielded)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_not_unwield_item_if_not_wielded)
-{
-	FAIL("not implemented");
-}
-
-
-TEST(should_wear_any_item)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_not_wear_invalid_slot)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_not_wear_empty_slot)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_not_wear_unwearable_item)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_take_off_previous_item_before_wearing_new)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_unwield_item_before_wearing_it)
-{
-	FAIL("not implemented");
+	game.wield(dummy(), 1);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy takes off armor.")("Dummy wields armor.").result);
 }
 
 
-TEST(should_take_off_item_if_worn)
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_if_wielded)
 {
-	FAIL("not implemented");
+	game.unwield(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy unwields spear.").result);
 }
 
-TEST(should_not_take_off_item_if_not_worn)
+TEST_FIXTURE(GameWithDummyWithItems, should_not_unwield_item_if_not_wielded)
 {
-	FAIL("not implemented");
-}
-
-
-TEST(should_not_eat_invalid_slot)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_not_eat_empty_slot)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_not_eat_not_edible_item)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_take_off_item_before_eating)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_unwield_item_before_eating)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_eat_items)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_heal_when_eating_healing_item)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_heal_up_to_max_hp_when_eating_healing_item)
-{
-	FAIL("not implemented");
-}
-
-TEST(should_cure_poisoning_when_eating_antidote)
-{
-	FAIL("not implemented");
+	game.unwield(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy is wielding nothing.").result);
 }
 
 
-TEST(should_go_up_on_upstairs)
+TEST_FIXTURE(GameWithDummyWithItems, should_wear_any_item)
 {
-	FAIL("not implemented");
+	game.wear(dummy(), 1);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy wear armor.").result);
 }
 
-TEST(should_send_to_quest_on_upstairs_to_the_surface)
+TEST_FIXTURE(GameWithDummyWithItems, should_not_wear_invalid_slot)
 {
-	FAIL("not implemented");
+	game.wear(dummy(), 3);
+	EQUAL(game.messages, MakeVector<std::string>("No such object.").result);
 }
 
-TEST(should_win_game_on_upstairs_when_have_quest_item)
+TEST_FIXTURE(GameWithDummyWithItems, should_not_wear_empty_slot)
 {
-	FAIL("not implemented");
+	game.wear(dummy(), 2);
+	EQUAL(game.messages, MakeVector<std::string>("No such object.").result);
 }
 
-TEST(should_generate_corresponding_level_when_going_up)
+TEST_FIXTURE(GameWithDummyWithItems, should_not_wear_unwearable_item)
 {
-	FAIL("not implemented");
+	dummy().inventory[2].sprite = 1;
+	dummy().inventory[2].name = "pot";
+	game.wear(dummy(), 2);
+	EQUAL(game.messages, MakeVector<std::string>("Pot cannot be worn.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_previous_item_before_wearing_new)
+{
+	dummy().inventory.push_back(Item::Builder().sprite(1).name("jacket").wearable());
+	game.wear(dummy(), 2);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy wear jacket.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_wearing_it)
+{
+	dummy().inventory[0].wearable = true;
+	game.wear(dummy(), 0);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy unwields spear.")("Dummy wear spear.").result);
 }
 
 
-TEST(should_go_down_on_downstairs)
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_if_worn)
 {
-	FAIL("not implemented");
+	game.take_off(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy takes off armor.").result);
 }
 
-TEST(should_send_to_quest_on_downstairs_to_the_surface)
+TEST_FIXTURE(GameWithDummyWithItems, should_not_take_off_item_if_not_worn)
 {
-	FAIL("not implemented");
+	game.take_off(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy is wearing nothing.").result);
 }
 
-TEST(should_win_game_on_downstairs_when_have_quest_item)
+
+struct GameWithDummyAndFood {
+	Game game;
+	enum { ARMOR, SPEAR, JUNK, FOOD, MEDKIT, MEGASPHERE, ANTIDOTE, EMPTY, NONE };
+	GameWithDummyAndFood() {
+		game.level.map = Map(2, 2);
+		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("armor").edible();
+		Item spear = Item::Builder().sprite(2).damage(3).name("spear").edible();
+		Item junk = Item::Builder().sprite(3).name("junk");
+		Item food = Item::Builder().sprite(4).name("food").edible();
+		Item medkit = Item::Builder().sprite(4).name("medkit").edible().healing(5);
+		Item megasphere = Item::Builder().sprite(4).name("megasphere").edible().healing(100);
+		Item antidote = Item::Builder().sprite(4).name("antidote").edible().antidote(5);
+		Item empty;
+		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").wield(1).wear(0));
+		dummy().inventory << armor << spear << junk << food << medkit << megasphere << antidote << empty;
+		dummy().hp = 90;
+	}
+	Monster & dummy() { return game.level.monsters[0]; }
+};
+
+TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_invalid_slot)
 {
-	FAIL("not implemented");
+	game.eat(dummy(), NONE);
+	EQUAL(game.messages, MakeVector<std::string>("No such object.").result);
 }
 
-TEST(should_generate_corresponding_level_when_going_down)
+TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_empty_slot)
 {
-	FAIL("not implemented");
+	game.eat(dummy(), EMPTY);
+	EQUAL(game.messages, MakeVector<std::string>("No such object.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_not_edible_item)
+{
+	game.eat(dummy(), JUNK);
+	EQUAL(game.messages, MakeVector<std::string>("Junk isn't edible.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_take_off_item_before_eating)
+{
+	game.eat(dummy(), ARMOR);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy eats armor.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_unwield_item_before_eating)
+{
+	game.eat(dummy(), SPEAR);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy eats spear.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_eat_items)
+{
+	game.eat(dummy(), FOOD);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy eats food.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_heal_when_eating_healing_item)
+{
+	game.eat(dummy(), MEDKIT);
+	EQUAL(dummy().hp, 95);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy eats medkit.")("Medkit heals dummy.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_heal_up_to_max_hp_when_eating_healing_item)
+{
+	game.eat(dummy(), MEGASPHERE);
+	EQUAL(dummy().hp, 100);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy eats megasphere.")("Megasphere heals dummy.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_cure_poisoning_when_eating_antidote)
+{
+	dummy().poisoning = 10;
+	game.eat(dummy(), ANTIDOTE);
+	EQUAL(dummy().poisoning, 5);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy eats antidote.")("Antidote cures poisoning a little.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_cure_poisoning_to_the_end_when_eating_antidote)
+{
+	dummy().poisoning = 5;
+	game.eat(dummy(), ANTIDOTE);
+	EQUAL(dummy().poisoning, 0);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy eats antidote.")("Antidote cures poisoning.").result);
+}
+
+
+struct GameWithDummyAndStairs {
+	TestLevelGenerator generator;
+	Game game;
+	GameWithDummyAndStairs()
+		: generator(Point(1, 1), Point(2, 2)), game(&generator)
+	{
+		game.level.map = Map(2, 2);
+		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).name("dummy"));
+		game.level.stairs.push_back(Stairs::Builder().pos(Point(1, 1)).name("stairs"));
+	}
+	Monster & dummy() { return game.level.monsters[0]; }
+	Stairs & stairs() { return game.level.stairs[0]; }
+};
+
+TEST_FIXTURE(GameWithDummyAndStairs, should_go_up_on_upstairs)
+{
+	stairs().up_destination = 1;
+	game.go_up(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy goes up.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndStairs, should_send_to_quest_on_upstairs_to_the_surface)
+{
+	stairs().up_destination = -1;
+	game.go_up(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy must complete mission in order to go back to the surface.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_upstairs_when_have_quest_item)
+{
+	dummy().inventory.push_back(Item::Builder().sprite(1).quest().name("Yendor"));
+	stairs().up_destination = -1;
+	game.go_up(dummy());
+	ASSERT(game.done);
+	ASSERT(game.completed);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy have brought Yendor to the surface. Yay! Game if finished.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_going_up)
+{
+	stairs().up_destination = 1;
+	game.go_up(dummy());
+	ASSERT(generator.was_generated());
+}
+
+
+TEST_FIXTURE(GameWithDummyAndStairs, should_go_down_on_downstairs)
+{
+	stairs().down_destination = 1;
+	game.go_down(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy goes down.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndStairs, should_send_to_quest_on_downstairs_to_the_surface)
+{
+	stairs().down_destination = -1;
+	game.go_down(dummy());
+	EQUAL(game.messages, MakeVector<std::string>("Dummy must complete mission in order to go back to the surface.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_downstairs_when_have_quest_item)
+{
+	dummy().inventory.push_back(Item::Builder().sprite(1).quest().name("Yendor"));
+	stairs().down_destination = -1;
+	game.go_down(dummy());
+	ASSERT(game.done);
+	ASSERT(game.completed);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy have brought Yendor to the surface. Yay! Game if finished.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_going_down)
+{
+	stairs().down_destination = 1;
+	game.go_down(dummy());
+	ASSERT(generator.was_generated());
 }
 
 }
