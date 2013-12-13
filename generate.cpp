@@ -81,39 +81,39 @@ Monster scorpion(int ai, const Point & monster_pos)
 		item(scorpion_tail()).hit_strength(2).poisonous(true);
 }
 
-Door door(const Point & pos)
+Object door(const Point & pos)
 {
-	return Door::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).name("door").opened(false);
+	return Object::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).name("door").openable().opened(false).passable().transparent();
 }
 
 Object pot(const Point & pos)
 {
-	return Object::Builder().pos(pos).sprite(Sprites::POT).name("pot").containable().item(money()).item(antidote());
+	return Object::Builder().pos(pos).sprite(Sprites::POT).name("pot").containable().item(money()).item(antidote()).transparent();
 }
 
 Object well(const Point & pos)
 {
-	return Object::Builder().pos(pos).sprite(Sprites::WELL).name("well").drinkable();
+	return Object::Builder().pos(pos).sprite(Sprites::WELL).name("well").drinkable().transparent();
 }
 
 Object gate(const Point & pos)
 {
-	return Object::Builder().pos(pos).sprite(Sprites::GATE).name("gate").transporting().up_destination(-1);
+	return Object::Builder().pos(pos).sprite(Sprites::GATE).name("gate").transporting().up_destination(-1).passable().transparent();
 }
 
 Object stairs_up(const Point & pos, int destination)
 {
-	return Object::Builder().pos(pos).sprite(Sprites::STAIRS_UP).name("stairs").transporting().up_destination(destination);
+	return Object::Builder().pos(pos).sprite(Sprites::STAIRS_UP).name("stairs").transporting().up_destination(destination).passable().transparent();
 }
 
 Object stairs_down(const Point & pos, int destination)
 {
-	return Object::Builder().pos(pos).sprite(Sprites::STAIRS_DOWN).name("stairs").transporting().down_destination(destination);
+	return Object::Builder().pos(pos).sprite(Sprites::STAIRS_DOWN).name("stairs").transporting().down_destination(destination).passable().transparent();
 }
 
-Trap trap(const Point & pos)
+Object trap(const Point & pos)
 {
-	return Trap::Builder().pos(pos).sprite(Sprites::TRAP).name("trap").bolt(sharpened_pole());
+	return Object::Builder().pos(pos).sprite(Sprites::TRAP).name("trap").triggerable().item(sharpened_pole()).passable().transparent();
 }
 
 }
@@ -196,21 +196,21 @@ void LinearGenerator::generate(Level & level, int level_index)
 				case '[' : level.items.push_back(World::jacket(pos)); break;
 
 				case '{' : level.objects.push_back(World::well(pos)); break;
-				case '+' : level.doors.push_back(World::door(pos)); break;
+				case '+' : level.objects.push_back(World::door(pos)); break;
 				case 'V' : level.objects.push_back(World::pot(pos)); break;
-				case '^' : level.traps.push_back(World::trap(pos)); break;
+				case '^' : level.objects.push_back(World::trap(pos)); break;
 				case '>' :
 					if(level_index == 3) {
 						level.items.push_back(World::explosive(pos));
 					} else {
-						level.stairs.push_back(World::stairs_down(pos, level_index + 1));
+						level.objects.push_back(World::stairs_down(pos, level_index + 1));
 					}
 					break;
 				case '<' :
 					if(level_index == 1) {
-						level.stairs.push_back(World::gate(pos)); break;
+						level.objects.push_back(World::gate(pos)); break;
 					} else {
-						level.stairs.push_back(World::stairs_up(pos, level_index - 1)); break;
+						level.objects.push_back(World::stairs_up(pos, level_index - 1)); break;
 					}
 					break;
 				case '@' :
@@ -230,8 +230,8 @@ void LinearGenerator::generate(Level & level, int level_index)
 		if(i > 0) {
 			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], floor_type);
 			if(doors.first && doors.second) {
-				level.doors.push_back(World::door(doors.first));
-				level.doors.push_back(World::door(doors.second));
+				level.objects.push_back(World::door(doors.first));
+				level.objects.push_back(World::door(doors.second));
 			}
 		}
 	}

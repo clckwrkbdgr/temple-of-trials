@@ -214,8 +214,12 @@ void Game::move(Monster & someone, const Point & shift)
 	Point new_pos = someone.pos + shift;
 	GAME_ASSERT(level.map.cell(new_pos).passable, format("{0} bump into the {1}.", someone.name, level.map.cell(new_pos).name));
     Object & object = find_at(level.objects, new_pos);
-	GAME_ASSERT(!object || !object.openable || object.opened, format("{0} is closed.", object.name));
-	GAME_ASSERT(!object, format("{0} bump into {1}.", someone.name, object.name));
+	if(object) {
+		if(object.openable) {
+			GAME_ASSERT(object.opened, format("{0} is closed.", object.name));
+		}
+		GAME_ASSERT(object.passable, format("{0} bump into {1}.", someone.name, object.name));
+	}
     Monster & monster = find_at(level.monsters, new_pos);
 	GAME_ASSERT(!monster, format("{0} bump into {1}.", someone.name, monster.name));
     someone.pos = new_pos;

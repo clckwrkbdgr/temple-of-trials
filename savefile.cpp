@@ -27,33 +27,14 @@ SAVEFILE_STORE_EXT(Item, item)
 SAVEFILE_STORE_EXT(Object, object)
 {
 	savefile.store(object.pos.x).store(object.pos.y);
-	savefile.store(object.sprite).store(object.name);
-	savefile.store(containable).store(drinkable);
-	// TODO new fields
+	savefile.store(object.sprite).store(object.opened_sprite).store(object.name);
+	savefile.store(object.passable).store(object.transparent);
+	savefile.store(object.containable).store(object.drinkable);
+	savefile.store(object.transporting).store(object.triggerable);
+	savefile.store(object.openable).store(object.opened);
+	savefile.store(object.up_destination).store(object.down_destination);
 	savefile.newline();
 	savefile.store(object.items, "object item");
-}
-
-SAVEFILE_STORE_EXT(Trap, trap)
-{
-	savefile.store(trap.pos.x).store(trap.pos.y);
-	savefile.store(trap.sprite).store(trap.name);
-	savefile.store(trap.triggered);
-	store_ext(savefile, trap.bolt);
-}
-
-SAVEFILE_STORE_EXT(Stairs, stairs)
-{
-	savefile.store(stairs.pos.x).store(stairs.pos.y);
-	savefile.store(stairs.sprite).store(stairs.name);
-	savefile.store(stairs.up_destination).store(stairs.down_destination);
-}
-
-SAVEFILE_STORE_EXT(Door, door)
-{
-	savefile.store(door.pos.x).store(door.pos.y);
-	savefile.store(door.opened_sprite).store(door.closed_sprite);
-	savefile.store(door.name).store(door.opened);
 }
 
 SAVEFILE_STORE_EXT(Monster, monster)
@@ -95,15 +76,6 @@ SAVEFILE_STORE_EXT(Level, level)
 	savefile.newline();
 
 	savefile.store(level.objects, "object");
-	savefile.newline();
-
-	savefile.store(level.stairs, "stairs");
-	savefile.newline();
-
-	savefile.store(level.traps, "trap");
-	savefile.newline();
-
-	savefile.store(level.doors, "door");
 }
 
 void store_ext(Writer & savefile, const std::map<int, Level> & saved_levels)
