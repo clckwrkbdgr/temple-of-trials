@@ -5,7 +5,9 @@
 struct Test {
 	const char * suite;
 	const char * name;
-	Test(const char * test_suite, const char * test_name);
+	const char * filename;
+	int line;
+	Test(const char * test_suite, const char * test_name, const char * filename, int line);
 	virtual ~Test() {}
 	virtual void run() = 0;
 	bool specified(int argc, char ** argv) const;
@@ -30,7 +32,7 @@ const char * current_suite_name();
 #define TEST(test_name) \
 	class Test_##test_name : public Test { \
 	public: \
-		Test_##test_name(const char * suite, const char * name) : Test(suite, name) {} \
+		Test_##test_name(const char * suite, const char * name) : Test(suite, name, __FILE__, __LINE__) {} \
 		virtual void run(); \
 	}; \
 	Test_##test_name test_##test_name(current_suite_name(), #test_name); \
@@ -41,13 +43,7 @@ const char * current_suite_name();
 	public: \
 		void run(); \
 	}; \
-	class Test_##test_name : public Test {  \
-	public:  \
-		Test_##test_name(const char * suite, const char * name) : Test(suite, name) {}  \
-		virtual void run();  \
-	};  \
-	Test_##test_name test_##test_name(current_suite_name(), #test_name);  \
-	void Test_##test_name::run() \
+	TEST(test_name) \
 	{ \
 		Fixture_##fixture_name##test_name fixture; \
 		fixture.run(); \

@@ -1,6 +1,9 @@
 #include "test.h"
 #include "util.h"
 #include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <signal.h>
 
 std::list<Test*> & all_tests()
 {
@@ -8,8 +11,8 @@ std::list<Test*> & all_tests()
 	return tests;
 }
 
-Test::Test(const char * test_suite, const char * test_name)
-	: suite(test_suite), name(test_name)
+Test::Test(const char * test_suite, const char * test_name, const char * test_filename, int test_line)
+	: suite(test_suite), name(test_name), filename(test_filename), line(test_line)
 {
 	all_tests().push_back(this);
 }
@@ -34,8 +37,20 @@ const char * current_suite_name()
 	return "";
 }
 
+
+static const char * current_filename = __FILE__;
+static int current_line = __LINE__;
+
+void catch_segfault(int sig)
+{
+	printf("%s:%d: segmentation fault\n", current_filename, current_line);
+	exit(1);
+}
+
 int run_all_tests(int argc, char ** argv)
 {
+	signal(SIGSEGV, catch_segfault);
+
 	bool tests_specified = argc > 1;
 	int total_test_count = 0;
 	int passed_tests = 0;
@@ -44,6 +59,8 @@ int run_all_tests(int argc, char ** argv)
 		if(tests_specified && !test->specified(argc, argv)) {
 			continue;
 		}
+		current_filename = test->filename;
+		current_line = test->line;
 		++total_test_count;
 		bool ok = true;
 		std::string exception_text;
@@ -56,10 +73,10 @@ int run_all_tests(int argc, char ** argv)
 			exception_text = format("{0}:{1}: {2}", e.filename, e.line, e.what);
 		} catch(const std::exception & e) {
 			ok = false;
-			exception_text = e.what();
+			exception_text = format("{0}:{1}: {2}", test->filename, test->line, e.what());
 		} catch(...) {
 			ok = false;
-			exception_text = "Unknown exception caught.";
+			exception_text = format("{0}:{1}: unknown exception", test->filename, test->line);
 		}
 		if(ok) {
 			std::cout << "[ OK ] " << test_name << std::endl;
