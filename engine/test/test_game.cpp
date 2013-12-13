@@ -833,10 +833,10 @@ struct GameWithDummyAndStairs {
 	{
 		game.level.map = Map(2, 2);
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).name("dummy"));
-		game.level.stairs.push_back(Stairs::Builder().pos(Point(1, 1)).name("stairs"));
+		game.level.stairs.push_back(Object::Builder().pos(Point(1, 1)).name("stairs"));
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
-	Stairs & stairs() { return game.level.stairs[0]; }
+	Object & stairs() { return game.level.stairs[0]; }
 };
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_go_up_on_upstairs)

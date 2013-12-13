@@ -96,19 +96,19 @@ Object well(const Point & pos)
 	return Object::Builder().pos(pos).sprite(Sprites::WELL).name("well").drinkable();
 }
 
-Stairs gate(const Point & pos)
+Object gate(const Point & pos)
 {
-	return Stairs::Builder().pos(pos).sprite(Sprites::GATE).name("gate").up_destination(-1);
+	return Object::Builder().pos(pos).sprite(Sprites::GATE).name("gate").transporting().up_destination(-1);
 }
 
-Stairs stairs_up(const Point & pos, int destination)
+Object stairs_up(const Point & pos, int destination)
 {
-	return Stairs::Builder().pos(pos).sprite(Sprites::STAIRS_UP).name("stairs").up_destination(destination);
+	return Object::Builder().pos(pos).sprite(Sprites::STAIRS_UP).name("stairs").transporting().up_destination(destination);
 }
 
-Stairs stairs_down(const Point & pos, int destination)
+Object stairs_down(const Point & pos, int destination)
 {
-	return Stairs::Builder().pos(pos).sprite(Sprites::STAIRS_DOWN).name("stairs").down_destination(destination);
+	return Object::Builder().pos(pos).sprite(Sprites::STAIRS_DOWN).name("stairs").transporting().down_destination(destination);
 }
 
 Trap trap(const Point & pos)

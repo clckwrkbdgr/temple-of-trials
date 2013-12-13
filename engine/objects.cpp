@@ -157,7 +157,7 @@ Item::Builder & Item::Builder::quest() { result.quest = true; return *this; }
 
 
 Object::Object()
-	: sprite(0), containable(false), drinkable(false)
+	: sprite(0), passable(false), containable(false), drinkable(false)
 {
 }
 
@@ -170,25 +170,12 @@ Object::Builder & Object::Builder::pos(const Point & value) { result.pos = value
 Object::Builder & Object::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Object::Builder & Object::Builder::name(const std::string & value) { result.name = value; return *this; }
 Object::Builder & Object::Builder::item(const Item & value) { result.items.push_back(value); return *this; }
+Object::Builder & Object::Builder::passable() { result.passable = true; return *this; }
 Object::Builder & Object::Builder::containable() { result.containable = true; return *this; }
 Object::Builder & Object::Builder::drinkable() { result.drinkable = true; return *this; }
-
-
-Stairs::Stairs()
-	: sprite(0), up_destination(0), down_destination(0)
-{
-}
-
-Stairs::operator bool() const
-{
-	return bool(pos);
-}
-
-Stairs::Builder & Stairs::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Stairs::Builder & Stairs::Builder::sprite(const int & value) { result.sprite = value; return *this; }
-Stairs::Builder & Stairs::Builder::name(const std::string & value) { result.name = value; return *this; }
-Stairs::Builder & Stairs::Builder::up_destination(int value) { result.up_destination = value; return *this; }
-Stairs::Builder & Stairs::Builder::down_destination(int value) { result.down_destination = value; return *this; }
+Object::Builder & Object::Builder::transporting() { result.transporting = true; return *this; }
+Object::Builder & Object::Builder::up_destination(int value) { result.up_destination = value; return *this; }
+Object::Builder & Object::Builder::down_destination(int value) { result.down_destination = value; return *this; }
 
 
 Trap::Trap()

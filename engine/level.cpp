@@ -52,7 +52,7 @@ bool Level::is_passable(int x, int y) const
 	if(object && !object.is_passable()) {
 		return false;
 	}
-    const Stairs & stair = find_at(stairs, new_pos);
+    const Object & stair = find_at(stairs, new_pos);
 	if(stair && !stair.is_passable()) {
 		return false;
 	}
@@ -78,7 +78,7 @@ bool Level::is_transparent(int x, int y) const
 	if(object && !object.is_transparent()) {
 		return false;
 	}
-    const Stairs & stair = find_at(stairs, new_pos);
+    const Object & stair = find_at(stairs, new_pos);
 	if(stair && !stair.is_transparent()) {
 		return false;
 	}
@@ -111,7 +111,7 @@ int Level::get_sprite_at(const Point & pos) const
 			return object.get_sprite();
 		}
 	}
-	foreach(const Stairs & stair, stairs) {
+	foreach(const Object & stair, stairs) {
 		if(stair.pos == pos) {
 			return stair.get_sprite();
 		}
@@ -146,7 +146,7 @@ std::string Level::name_at(const Point & pos) const
 			return object.name;
 		}
 	}
-	foreach(const Stairs & stair, stairs) {
+	foreach(const Object & stair, stairs) {
 		if(stair.pos == pos) {
 			return stair.name;
 		}

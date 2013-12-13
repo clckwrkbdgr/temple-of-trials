@@ -112,11 +112,14 @@ struct Object {
 	int sprite;
 	std::string name;
 	std::vector<Item> items;
+	bool passable;
 	bool containable;
 	bool drinkable;
+	bool transporting;
+	int up_destination, down_destination;
 	Object();
 	operator bool() const;
-	bool is_passable() const { return false; }
+	bool is_passable() const { return passable; }
 	bool is_transparent() const { return true; }
 	int get_sprite() const { return sprite; }
 
@@ -129,29 +132,10 @@ struct Object::Builder {
 	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
 	Builder & item(const Item & value);
+	Builder & passable();
 	Builder & containable();
 	Builder & drinkable();
-};
-
-struct Stairs {
-	Point pos;
-	int sprite;
-	std::string name;
-	int up_destination, down_destination;
-	Stairs();
-	operator bool() const;
-	bool is_passable() const { return true; }
-	bool is_transparent() const { return true; }
-	int get_sprite() const { return sprite; }
-
-	struct Builder;
-};
-struct Stairs::Builder {
-	Stairs result;
-	operator Stairs() { return result; }
-	Builder & pos(const Point & value);
-	Builder & sprite(const int & value);
-	Builder & name(const std::string & value);
+	Builder & transporting();
 	Builder & up_destination(int value);
 	Builder & down_destination(int value);
 };

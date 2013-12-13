@@ -28,6 +28,8 @@ SAVEFILE_STORE_EXT(Object, object)
 {
 	savefile.store(object.pos.x).store(object.pos.y);
 	savefile.store(object.sprite).store(object.name);
+	savefile.store(containable).store(drinkable);
+	// TODO new fields
 	savefile.newline();
 	savefile.store(object.items, "object item");
 }

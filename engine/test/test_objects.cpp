@@ -139,7 +139,7 @@ TEST(fountain_should_be_impassable)
 
 TEST(stairs_should_be_passable)
 {
-	Stairs stairs;
+	Object stairs = Object::Builder().passable();
 	ASSERT(stairs.is_passable());
 }
 
@@ -175,7 +175,7 @@ TEST(fountain_should_be_transparent)
 
 TEST(stairs_should_be_transparent)
 {
-	Stairs stairs;
+	Object stairs;
 	ASSERT(stairs.is_transparent());
 }
 

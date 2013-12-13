@@ -474,7 +474,7 @@ void Game::eat(Monster & someone, int slot)
 
 void Game::go_up(Monster & someone)
 {
-    Stairs & stair = find_at(level.stairs, someone.pos);
+    Object & stair = find_at(level.stairs, someone.pos);
 	GAME_ASSERT(stair && stair.up_destination, format("{0} cannot go up from there.", someone.name));
 	if(stair.up_destination < 0) {
 		foreach(const Item & item, someone.inventory) {
@@ -494,7 +494,7 @@ void Game::go_up(Monster & someone)
 
 void Game::go_down(Monster & someone)
 {
-    Stairs & stair = find_at(level.stairs, someone.pos);
+    Object & stair = find_at(level.stairs, someone.pos);
 	GAME_ASSERT(stair && stair.down_destination, format("{0} cannot go down from there.", someone.name));
 	if(stair.down_destination < 0) {
 		foreach(const Item & item, someone.inventory) {
