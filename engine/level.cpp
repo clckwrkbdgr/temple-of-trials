@@ -44,7 +44,7 @@ bool Level::is_passable(int x, int y) const
 	if(!map.cell(new_pos).passable) {
 		return false;
 	}
-    const Door & door = find_at(doors, new_pos);
+    const Object & door = find_at(doors, new_pos);
 	if(door && !door.is_passable()) {
 		return false;
 	}
@@ -62,7 +62,7 @@ bool Level::is_passable(int x, int y) const
 bool Level::is_transparent(int x, int y) const
 {
 	Point new_pos(x, y);
-    const Door & door = find_at(doors, new_pos);
+    const Object & door = find_at(doors, new_pos);
 	if(door && !door.is_transparent()) {
 		return false;
 	}
@@ -95,7 +95,7 @@ int Level::get_sprite_at(const Point & pos) const
 			return object.get_sprite();
 		}
 	}
-	foreach(const Door & door, doors) {
+	foreach(const Object & door, doors) {
 		if(door.pos == pos) {
 			return door.get_sprite();
 		}
@@ -120,7 +120,7 @@ std::string Level::name_at(const Point & pos) const
 			return object.name;
 		}
 	}
-	foreach(const Door & door, doors) {
+	foreach(const Object & door, doors) {
 		if(door.pos == pos) {
 			return door.name;
 		}

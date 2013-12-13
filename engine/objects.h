@@ -50,31 +50,6 @@ struct Monster::Builder {
 	Builder & wear(int value);
 };
 
-
-struct Door {
-	Point pos;
-	int opened_sprite, closed_sprite;
-	std::string name;
-	bool opened;
-	Door();
-	int get_sprite() const;
-	operator bool() const;
-	bool is_passable() const { return opened; }
-	bool is_transparent() const { return opened; }
-
-	struct Builder;
-};
-struct Door::Builder {
-	Door result;
-	operator Door() { return result; }
-	Builder & pos(const Point & value);
-	Builder & opened_sprite(const int & value);
-	Builder & closed_sprite(const int & value);
-	Builder & name(const std::string & value);
-	Builder & opened(bool value);
-};
-
-
 struct Item {
 	Point pos;
 	int sprite;
@@ -106,23 +81,23 @@ struct Item::Builder {
 	Builder & quest();
 };
 
-
 struct Object {
 	Point pos;
-	int sprite;
+	int sprite, opened_sprite;
 	std::string name;
 	std::vector<Item> items;
-	bool passable;
+	bool passable, transparent;
 	bool containable;
 	bool drinkable;
 	bool transporting;
 	bool triggerable;
+	bool openable, opened;
 	int up_destination, down_destination;
 	Object();
 	operator bool() const;
-	bool is_passable() const { return passable; }
-	bool is_transparent() const { return true; }
-	int get_sprite() const { return sprite; }
+	bool is_passable() const;
+	bool is_transparent() const;
+	int get_sprite() const;
 
 	struct Builder;
 };
@@ -134,11 +109,17 @@ struct Object::Builder {
 	Builder & name(const std::string & value);
 	Builder & item(const Item & value);
 	Builder & passable();
+	Builder & transparent();
 	Builder & containable();
 	Builder & drinkable();
 	Builder & transporting();
 	Builder & triggerable();
 	Builder & up_destination(int value);
 	Builder & down_destination(int value);
+	Builder & openable();
+	Builder & opened_sprite(const int & value);
+	Builder & closed_sprite(const int & value);
+	Builder & opened(bool value);
 };
+
 

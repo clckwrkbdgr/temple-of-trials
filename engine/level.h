@@ -3,7 +3,6 @@
 #include <vector>
 #include <list>
 class Monster;
-class Door;
 class Item;
 class Object;
 class Control;
@@ -11,8 +10,8 @@ class Control;
 struct Level {
 	Map map;
 	std::vector<Monster> monsters;
-	std::vector<Door> doors;
 	std::vector<Item> items;
+	std::vector<Object> doors;
 	std::vector<Object> objects;
 
 	Level();

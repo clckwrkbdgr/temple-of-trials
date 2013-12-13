@@ -16,7 +16,7 @@ TEST(closed_doors_should_be_impassable)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].passable = true;
-	level.doors.push_back(Door::Builder().pos(Point(1, 1)).opened(false));
+	level.doors.push_back(Object::Builder().pos(Point(1, 1)).openable().opened(false));
 	ASSERT(!level.is_passable(1, 1));
 }
 
@@ -24,7 +24,7 @@ TEST(opened_doors_should_be_passable)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].passable = true;
-	level.doors.push_back(Door::Builder().pos(Point(1, 1)).opened(true));
+	level.doors.push_back(Object::Builder().pos(Point(1, 1)).openable().opened(true).passable());
 	ASSERT(level.is_passable(1, 1));
 }
 
@@ -95,7 +95,7 @@ TEST(closed_doors_should_be_opaque)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].transparent = true;
-	level.doors.push_back(Door::Builder().pos(Point(1, 1)).opened(false));
+	level.doors.push_back(Object::Builder().pos(Point(1, 1)).openable().opened(false));
 	ASSERT(!level.is_transparent(1, 1));
 }
 
@@ -103,7 +103,7 @@ TEST(opened_doors_should_be_transparent)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].transparent = true;
-	level.doors.push_back(Door::Builder().pos(Point(1, 1)).opened(true));
+	level.doors.push_back(Object::Builder().pos(Point(1, 1)).openable().opened(true).transparent());
 	ASSERT(level.is_transparent(1, 1));
 }
 
@@ -111,7 +111,7 @@ TEST(containers_should_be_transparent)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].transparent = true;
-	level.objects.push_back(Object::Builder().pos(Point(1, 1)));
+	level.objects.push_back(Object::Builder().pos(Point(1, 1)).transparent());
 	ASSERT(level.is_transparent(1, 1));
 }
 
@@ -119,7 +119,7 @@ TEST(fountains_should_be_transparent)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].transparent = true;
-	level.objects.push_back(Object::Builder().pos(Point(1, 1)));
+	level.objects.push_back(Object::Builder().pos(Point(1, 1)).transparent());
 	ASSERT(level.is_transparent(1, 1));
 }
 
@@ -143,7 +143,7 @@ TEST(traps_should_be_transparent)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].transparent = true;
-	level.objects.push_back(Object::Builder().pos(Point(1, 1)));
+	level.objects.push_back(Object::Builder().pos(Point(1, 1)).transparent());
 	ASSERT(level.is_transparent(1, 1));
 }
 
@@ -151,7 +151,7 @@ TEST(stairs_should_be_transparent)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].transparent = true;
-	level.objects.push_back(Object::Builder().pos(Point(1, 1)));
+	level.objects.push_back(Object::Builder().pos(Point(1, 1)).transparent());
 	ASSERT(level.is_transparent(1, 1));
 }
 
