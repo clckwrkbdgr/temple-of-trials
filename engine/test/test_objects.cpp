@@ -145,7 +145,8 @@ TEST(stairs_should_be_passable)
 
 TEST(trap_should_be_passable)
 {
-	Trap trap;
+	Object trap;
+	trap.passable = true;
 	ASSERT(trap.is_passable());
 }
 
@@ -181,7 +182,7 @@ TEST(stairs_should_be_transparent)
 
 TEST(trap_should_be_transparent)
 {
-	Trap trap;
+	Object trap;
 	ASSERT(trap.is_transparent());
 }
 

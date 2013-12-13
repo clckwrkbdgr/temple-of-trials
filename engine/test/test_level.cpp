@@ -64,7 +64,7 @@ TEST(traps_should_be_passable)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].passable = true;
-	level.traps.push_back(Trap::Builder().pos(Point(1, 1)));
+	level.traps.push_back(Object::Builder().pos(Point(1, 1)).passable());
 	ASSERT(level.is_passable(1, 1));
 }
 
@@ -143,7 +143,7 @@ TEST(traps_should_be_transparent)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].transparent = true;
-	level.traps.push_back(Trap::Builder().pos(Point(1, 1)));
+	level.traps.push_back(Object::Builder().pos(Point(1, 1)));
 	ASSERT(level.is_transparent(1, 1));
 }
 
@@ -151,7 +151,7 @@ TEST(stairs_should_be_transparent)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].transparent = true;
-	level.traps.push_back(Trap::Builder().pos(Point(1, 1)));
+	level.traps.push_back(Object::Builder().pos(Point(1, 1)));
 	ASSERT(level.is_transparent(1, 1));
 }
 
@@ -167,7 +167,7 @@ TEST(monster_should_be_on_top_of_all)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].sprite = 1;
-	level.traps.push_back(Trap::Builder().pos(Point(1, 1)).sprite(2));
+	level.traps.push_back(Object::Builder().pos(Point(1, 1)).sprite(2));
 	level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).sprite(3));
 	level.items.push_back(Item::Builder().pos(Point(1, 1)).sprite(4));
 	int sprite = level.get_sprite_at(Point(1, 1));
@@ -178,7 +178,7 @@ TEST(items_should_be_on_top_of_objects)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].sprite = 1;
-	level.traps.push_back(Trap::Builder().pos(Point(1, 1)).sprite(2));
+	level.traps.push_back(Object::Builder().pos(Point(1, 1)).sprite(2));
 	level.items.push_back(Item::Builder().pos(Point(1, 1)).sprite(4));
 	int sprite = level.get_sprite_at(Point(1, 1));
 	EQUAL(sprite, 4);
@@ -188,7 +188,7 @@ TEST(objects_should_be_below_everything)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].sprite = 1;
-	level.traps.push_back(Trap::Builder().pos(Point(1, 1)).sprite(2));
+	level.traps.push_back(Object::Builder().pos(Point(1, 1)).sprite(2));
 	int sprite = level.get_sprite_at(Point(1, 1));
 	EQUAL(sprite, 2);
 }

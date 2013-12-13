@@ -6,8 +6,6 @@ class Monster;
 class Door;
 class Item;
 class Object;
-class Stairs;
-class Trap;
 class Control;
 
 struct Level {
@@ -16,7 +14,7 @@ struct Level {
 	std::vector<Door> doors;
 	std::vector<Item> items;
 	std::vector<Object> objects;
-	std::vector<Trap> traps;
+	std::vector<Object> traps;
 
 	Level();
 	Level(int map_width, int map_height);

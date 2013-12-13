@@ -116,6 +116,7 @@ struct Object {
 	bool containable;
 	bool drinkable;
 	bool transporting;
+	bool triggerable;
 	int up_destination, down_destination;
 	Object();
 	operator bool() const;
@@ -136,30 +137,8 @@ struct Object::Builder {
 	Builder & containable();
 	Builder & drinkable();
 	Builder & transporting();
+	Builder & triggerable();
 	Builder & up_destination(int value);
 	Builder & down_destination(int value);
-};
-
-struct Trap {
-	Point pos;
-	int sprite;
-	std::string name;
-	bool triggered;
-	Item bolt;
-	Trap();
-	operator bool() const;
-	bool is_passable() const { return true; }
-	bool is_transparent() const { return true; }
-	int get_sprite() const { return sprite; }
-
-	struct Builder;
-};
-struct Trap::Builder {
-	Trap result;
-	operator Trap() { return result; }
-	Builder & pos(const Point & value);
-	Builder & sprite(const int & value);
-	Builder & name(const std::string & value);
-	Builder & bolt(const Item & value);
 };
 

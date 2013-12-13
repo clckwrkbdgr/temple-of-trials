@@ -157,7 +157,7 @@ Item::Builder & Item::Builder::quest() { result.quest = true; return *this; }
 
 
 Object::Object()
-	: sprite(0), passable(false), containable(false), drinkable(false)
+	: sprite(0), passable(false), containable(false), drinkable(false), transporting(false), triggerable(false)
 {
 }
 
@@ -174,22 +174,8 @@ Object::Builder & Object::Builder::passable() { result.passable = true; return *
 Object::Builder & Object::Builder::containable() { result.containable = true; return *this; }
 Object::Builder & Object::Builder::drinkable() { result.drinkable = true; return *this; }
 Object::Builder & Object::Builder::transporting() { result.transporting = true; return *this; }
+Object::Builder & Object::Builder::triggerable() { result.triggerable = true; return *this; }
 Object::Builder & Object::Builder::up_destination(int value) { result.up_destination = value; return *this; }
 Object::Builder & Object::Builder::down_destination(int value) { result.down_destination = value; return *this; }
 
-
-Trap::Trap()
-	: sprite(0), triggered(false)
-{
-}
-
-Trap::operator bool() const
-{
-	return bool(pos);
-}
-
-Trap::Builder & Trap::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Trap::Builder & Trap::Builder::sprite(const int & value) { result.sprite = value; return *this; }
-Trap::Builder & Trap::Builder::name(const std::string & value) { result.name = value; return *this; }
-Trap::Builder & Trap::Builder::bolt(const Item & value) { result.bolt = value; return *this; }
 

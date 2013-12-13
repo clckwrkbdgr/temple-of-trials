@@ -108,14 +108,14 @@ struct GameWithDummyOnTrap {
 	GameWithDummyOnTrap() {
 		game.level.map = Map(2, 2);
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
-		game.level.traps.push_back(Trap::Builder().pos(Point(1, 1)).name("trap").bolt(Item::Builder().sprite(1)));
+		game.level.traps.push_back(Object::Builder().pos(Point(1, 1)).name("trap").triggerable().item(Item::Builder().sprite(1)));
 	}
 };
 
 TEST_FIXTURE(GameWithDummyOnTrap, should_trigger_trap_if_trap_is_set)
 {
 	game.process_environment(game.level.monsters.front());
-	ASSERT(game.level.traps.front().triggered);
+	ASSERT(game.level.traps.front().items.empty());
 }
 
 TEST_FIXTURE(GameWithDummyOnTrap, should_hurt_monster_if_trap_is_set)
@@ -133,7 +133,7 @@ TEST_FIXTURE(GameWithDummyOnTrap, should_leave_bolt_if_trap_is_set)
 
 TEST_FIXTURE(GameWithDummyOnTrap, should_not_hurt_monster_if_trap_is_triggered_already)
 {
-	game.level.traps.front().triggered = true;
+	game.level.traps.front().items.clear();
 	game.process_environment(game.level.monsters.front());
 	EQUAL(game.level.monsters.front().hp, 100);
 	EQUAL(game.messages, MakeVector<std::string>("Trap is already triggered.").result);
