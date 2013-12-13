@@ -57,8 +57,10 @@ struct Door {
 	std::string name;
 	bool opened;
 	Door();
-	int sprite() const;
+	int get_sprite() const;
 	operator bool() const;
+	bool is_passable() const { return opened; }
+	bool is_transparent() const { return opened; }
 
 	struct Builder;
 };
@@ -112,6 +114,9 @@ struct Container {
 	std::vector<Item> items;
 	Container();
 	operator bool() const;
+	bool is_passable() const { return false; }
+	bool is_transparent() const { return true; }
+	int get_sprite() const { return sprite; }
 
 	struct Builder;
 };
@@ -130,6 +135,9 @@ struct Fountain {
 	std::string name;
 	Fountain();
 	operator bool() const;
+	bool is_passable() const { return false; }
+	bool is_transparent() const { return true; }
+	int get_sprite() const { return sprite; }
 
 	struct Builder;
 };
@@ -148,6 +156,9 @@ struct Stairs {
 	int up_destination, down_destination;
 	Stairs();
 	operator bool() const;
+	bool is_passable() const { return true; }
+	bool is_transparent() const { return true; }
+	int get_sprite() const { return sprite; }
 
 	struct Builder;
 };
@@ -169,6 +180,9 @@ struct Trap {
 	Item bolt;
 	Trap();
 	operator bool() const;
+	bool is_passable() const { return true; }
+	bool is_transparent() const { return true; }
+	int get_sprite() const { return sprite; }
 
 	struct Builder;
 };

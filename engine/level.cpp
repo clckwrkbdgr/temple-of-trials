@@ -45,15 +45,23 @@ bool Level::is_passable(int x, int y) const
 		return false;
 	}
     const Door & door = find_at(doors, new_pos);
-	if(door && !door.opened) {
+	if(door && !door.is_passable()) {
 		return false;
 	}
     const Container & container = find_at(containers, new_pos);
-	if(container) {
+	if(container && !container.is_passable()) {
 		return false;
 	}
     const Fountain & fountain = find_at(fountains, new_pos);
-	if(fountain) {
+	if(fountain && !fountain.is_passable()) {
+		return false;
+	}
+    const Stairs & stair = find_at(stairs, new_pos);
+	if(stair && !stair.is_passable()) {
+		return false;
+	}
+    const Trap & trap = find_at(traps, new_pos);
+	if(trap && !trap.is_passable()) {
 		return false;
 	}
     const Monster & monster = find_at(monsters, new_pos);
@@ -65,10 +73,26 @@ bool Level::is_passable(int x, int y) const
 
 bool Level::is_transparent(int x, int y) const
 {
-	foreach(const Door & door, doors) {
-		if(door.pos == Point(x, y) && !door.opened) {
-			return false;
-		}
+	Point new_pos(x, y);
+    const Door & door = find_at(doors, new_pos);
+	if(door && !door.is_transparent()) {
+		return false;
+	}
+    const Container & container = find_at(containers, new_pos);
+	if(container && !container.is_transparent()) {
+		return false;
+	}
+    const Fountain & fountain = find_at(fountains, new_pos);
+	if(fountain && !fountain.is_transparent()) {
+		return false;
+	}
+    const Stairs & stair = find_at(stairs, new_pos);
+	if(stair && !stair.is_transparent()) {
+		return false;
+	}
+    const Trap & trap = find_at(traps, new_pos);
+	if(trap && !trap.is_transparent()) {
+		return false;
 	}
 	return map.cell(x, y).transparent;
 }
@@ -92,27 +116,27 @@ int Level::get_sprite_at(const Point & pos) const
 	}
 	foreach(const Container & container, containers) {
 		if(container.pos == pos) {
-			return container.sprite;
+			return container.get_sprite();
 		}
 	}
 	foreach(const Fountain & fountain, fountains) {
 		if(fountain.pos == pos) {
-			return fountain.sprite;
+			return fountain.get_sprite();
 		}
 	}
 	foreach(const Stairs & stair, stairs) {
 		if(stair.pos == pos) {
-			return stair.sprite;
+			return stair.get_sprite();
 		}
 	}
 	foreach(const Door & door, doors) {
 		if(door.pos == pos) {
-			return door.sprite();
+			return door.get_sprite();
 		}
 	}
 	foreach(const Trap & trap, traps) {
 		if(trap.pos == pos) {
-			return trap.sprite;
+			return trap.get_sprite();
 		}
 	}
 	return map.cell(pos).sprite;

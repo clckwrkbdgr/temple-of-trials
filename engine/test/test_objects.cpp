@@ -104,13 +104,85 @@ TEST(should_get_const_monster_worn_item)
 TEST(should_get_door_opened_sprite_when_opened)
 {
 	Door door = Door::Builder().opened_sprite(1).closed_sprite(2).opened(true);
-	EQUAL(door.sprite(), 1);
+	EQUAL(door.get_sprite(), 1);
 }
 
 TEST(should_get_door_closed_sprite_when_closed)
 {
 	Door door = Door::Builder().opened_sprite(1).closed_sprite(2).opened(false);
-	EQUAL(door.sprite(), 2);
+	EQUAL(door.get_sprite(), 2);
+}
+
+TEST(opened_door_should_be_passable)
+{
+	Door door = Door::Builder().opened(true);
+	ASSERT(door.is_passable());
+}
+
+TEST(closed_door_should_be_impassable)
+{
+	Door door = Door::Builder().opened(false);
+	ASSERT(!door.is_passable());
+}
+
+TEST(container_should_be_impassable)
+{
+	Container container;
+	ASSERT(!container.is_passable());
+}
+
+TEST(fountain_should_be_impassable)
+{
+	Fountain fountain;
+	ASSERT(!fountain.is_passable());
+}
+
+TEST(stairs_should_be_passable)
+{
+	Stairs stairs;
+	ASSERT(stairs.is_passable());
+}
+
+TEST(trap_should_be_passable)
+{
+	Trap trap;
+	ASSERT(trap.is_passable());
+}
+
+TEST(opened_door_should_be_transparent)
+{
+	Door door = Door::Builder().opened(true);
+	ASSERT(door.is_transparent());
+}
+
+TEST(closed_door_should_be_opaque)
+{
+	Door door = Door::Builder().opened(false);
+	ASSERT(!door.is_transparent());
+}
+
+TEST(container_should_be_transparent)
+{
+	Container container;
+	ASSERT(container.is_transparent());
+}
+
+TEST(fountain_should_be_transparent)
+{
+	Fountain fountain;
+	ASSERT(fountain.is_transparent());
+}
+
+TEST(stairs_should_be_transparent)
+{
+	Stairs stairs;
+	ASSERT(stairs.is_transparent());
+}
+
+TEST(trap_should_be_transparent)
+{
+	Trap trap;
+	ASSERT(trap.is_transparent());
 }
 
 }

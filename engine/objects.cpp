@@ -117,7 +117,7 @@ Door::Door()
 {
 }
 
-int Door::sprite() const
+int Door::get_sprite() const
 {
 	return opened ? opened_sprite : closed_sprite;
 }
