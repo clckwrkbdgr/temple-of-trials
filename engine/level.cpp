@@ -52,10 +52,6 @@ bool Level::is_passable(int x, int y) const
 	if(object && !object.is_passable()) {
 		return false;
 	}
-    const Object & stair = find_at(stairs, new_pos);
-	if(stair && !stair.is_passable()) {
-		return false;
-	}
     const Trap & trap = find_at(traps, new_pos);
 	if(trap && !trap.is_passable()) {
 		return false;
@@ -76,10 +72,6 @@ bool Level::is_transparent(int x, int y) const
 	}
     const Object & object = find_at(objects, new_pos);
 	if(object && !object.is_transparent()) {
-		return false;
-	}
-    const Object & stair = find_at(stairs, new_pos);
-	if(stair && !stair.is_transparent()) {
 		return false;
 	}
     const Trap & trap = find_at(traps, new_pos);
@@ -111,11 +103,6 @@ int Level::get_sprite_at(const Point & pos) const
 			return object.get_sprite();
 		}
 	}
-	foreach(const Object & stair, stairs) {
-		if(stair.pos == pos) {
-			return stair.get_sprite();
-		}
-	}
 	foreach(const Door & door, doors) {
 		if(door.pos == pos) {
 			return door.get_sprite();
@@ -144,11 +131,6 @@ std::string Level::name_at(const Point & pos) const
 	foreach(const Object & object, objects) {
 		if(object.pos == pos) {
 			return object.name;
-		}
-	}
-	foreach(const Object & stair, stairs) {
-		if(stair.pos == pos) {
-			return stair.name;
 		}
 	}
 	foreach(const Door & door, doors) {

@@ -72,7 +72,7 @@ TEST(stairs_should_be_passable)
 {
 	Level level(2, 2);
 	level.map.celltypes[0].passable = true;
-	level.stairs.push_back(Object::Builder().pos(Point(1, 1)).passable());
+	level.objects.push_back(Object::Builder().pos(Point(1, 1)).passable());
 	ASSERT(level.is_passable(1, 1));
 }
 

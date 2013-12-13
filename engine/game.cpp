@@ -474,9 +474,9 @@ void Game::eat(Monster & someone, int slot)
 
 void Game::go_up(Monster & someone)
 {
-    Object & stair = find_at(level.stairs, someone.pos);
-	GAME_ASSERT(stair && stair.up_destination, format("{0} cannot go up from there.", someone.name));
-	if(stair.up_destination < 0) {
+    Object & object = find_at(level.objects, someone.pos);
+	GAME_ASSERT(object && object.transporting && object.up_destination, format("{0} cannot go up from there.", someone.name));
+	if(object.up_destination < 0) {
 		foreach(const Item & item, someone.inventory) {
 			if(item.quest) {
 				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
@@ -489,14 +489,14 @@ void Game::go_up(Monster & someone)
 		return;
 	}
 	message(format("{0} goes up.", someone.name));
-	generate(stair.up_destination);
+	generate(object.up_destination);
 }
 
 void Game::go_down(Monster & someone)
 {
-    Object & stair = find_at(level.stairs, someone.pos);
-	GAME_ASSERT(stair && stair.down_destination, format("{0} cannot go down from there.", someone.name));
-	if(stair.down_destination < 0) {
+    Object & object = find_at(level.objects, someone.pos);
+	GAME_ASSERT(object && object.transporting && object.down_destination, format("{0} cannot go down from there.", someone.name));
+	if(object.down_destination < 0) {
 		foreach(const Item & item, someone.inventory) {
 			if(item.quest) {
 				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
@@ -509,6 +509,6 @@ void Game::go_down(Monster & someone)
 		return;
 	}
 	message(format("{0} goes down.", someone.name));
-	generate(stair.down_destination);
+	generate(object.down_destination);
 }
 
