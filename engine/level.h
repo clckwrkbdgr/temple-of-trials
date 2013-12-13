@@ -11,7 +11,6 @@ struct Level {
 	Map map;
 	std::vector<Monster> monsters;
 	std::vector<Item> items;
-	std::vector<Object> doors;
 	std::vector<Object> objects;
 
 	Level();

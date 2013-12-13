@@ -187,13 +187,12 @@ void Game::smart_move(Monster & someone, const Point & shift)
 {
 	assert(shift);
 	Point new_pos = someone.pos + shift;
-	Object & door = find_at(level.doors, new_pos);
-	if(door && door.openable && !door.opened) {
+	Object & object = find_at(level.objects, new_pos);
+	if(object && object.openable && !object.opened) {
 		someone.plan.push_front(Control(Control::MOVE, shift));
 		open(someone, shift);
 		return;
 	}
-	Object & object = find_at(level.objects, new_pos);
 	if(object && object.containable) {
 		open(someone, shift);
 		return;
@@ -214,9 +213,8 @@ void Game::move(Monster & someone, const Point & shift)
 	assert(shift);
 	Point new_pos = someone.pos + shift;
 	GAME_ASSERT(level.map.cell(new_pos).passable, format("{0} bump into the {1}.", someone.name, level.map.cell(new_pos).name));
-    Object & door = find_at(level.doors, new_pos);
-	GAME_ASSERT(!door || !door.openable || door.opened, format("{0} is closed.", door.name));
     Object & object = find_at(level.objects, new_pos);
+	GAME_ASSERT(!object || !object.openable || object.opened, format("{0} is closed.", object.name));
 	GAME_ASSERT(!object, format("{0} bump into {1}.", someone.name, object.name));
     Monster & monster = find_at(level.monsters, new_pos);
 	GAME_ASSERT(!monster, format("{0} bump into {1}.", someone.name, monster.name));
@@ -250,14 +248,13 @@ void Game::open(Monster & someone, const Point & shift)
 {
 	assert(shift);
     Point new_pos = someone.pos + shift;
-    Object & door = find_at(level.doors, new_pos);
-    if(door && door.openable) {
-		GAME_ASSERT(!door.opened, format("{0} is already opened.", door.name));
-		door.opened = true;
-		message(format("{0} opened the {1}.", someone.name, door.name));
+    Object & object = find_at(level.objects, new_pos);
+    if(object && object.openable) {
+		GAME_ASSERT(!object.opened, format("{0} is already opened.", object.name));
+		object.opened = true;
+		message(format("{0} opened the {1}.", someone.name, object.name));
 		return;
     }
-	Object & object = find_at(level.objects, new_pos);
 	GAME_ASSERT(object && object.containable, "There is nothing to open there.");
 	GAME_ASSERT(!object.items.empty(), format("{0} is empty.", object.name));
 	foreach(Item & item, object.items) {
@@ -272,11 +269,11 @@ void Game::close(Monster & someone, const Point & shift)
 {
 	assert(shift);
     Point new_pos = someone.pos + shift;
-    Object & door = find_at(level.doors, new_pos);
-    GAME_ASSERT(door && door.openable, "There is nothing to close there.");
-    GAME_ASSERT(door.opened, format("{0} is already closed.", door.name));
-    door.opened = false;
-    message(format("{0} closed the {1}.", someone.name, door.name));
+    Object & object = find_at(level.objects, new_pos);
+    GAME_ASSERT(object && object.openable, "There is nothing to close there.");
+    GAME_ASSERT(object.opened, format("{0} is already closed.", object.name));
+    object.opened = false;
+    message(format("{0} closed the {1}.", someone.name, object.name));
 }
 
 void Game::swing(Monster & someone, const Point & shift)
@@ -284,9 +281,9 @@ void Game::swing(Monster & someone, const Point & shift)
 	assert(shift);
     Point new_pos = someone.pos + shift;
 	GAME_ASSERT(level.map.cell(new_pos).passable, format("{0} hit {1}.", someone.name, level.map.cell(new_pos).name));
-    Object & door = find_at(level.doors, new_pos);
-    if(door && door.openable && !door.opened) {
-		message(format("{0} swing at {1}.", someone.name, door.name));
+    Object & object = find_at(level.objects, new_pos);
+    if(object && object.openable && !object.opened) {
+		message(format("{0} swing at {1}.", someone.name, object.name));
 		open(someone, shift);
 		return;
     }
@@ -295,7 +292,6 @@ void Game::swing(Monster & someone, const Point & shift)
 		hit(someone, monster, someone.damage());
 		return;
 	}
-    Object & object = find_at(level.objects, new_pos);
 	GAME_ASSERT(!object, format("{0} swing at {1}.", someone.name, object.name));
     message(format("{0} swing at nothing.", someone.name));
 }
@@ -315,13 +311,12 @@ void Game::fire(Monster & someone, const Point & shift)
 			level.items.push_back(item);
 			break;
 		}
-		Object & door = find_at(level.doors, item.pos + shift);
-		if(door && door.openable && !door.opened) {
-			message(format("{0} hit {1}.", item.name, door.name));
+		Object & object = find_at(level.objects, item.pos + shift);
+		if(object && object.openable && !object.opened) {
+			message(format("{0} hit {1}.", item.name, object.name));
 			level.items.push_back(item);
 			break;
 		}
-		Object & object = find_at(level.objects, item.pos + shift);
 		if(object) {
 			if(object.containable) {
 				message(format("{0} falls into {1}.", item.name, object.name));
