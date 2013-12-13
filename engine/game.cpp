@@ -209,9 +209,9 @@ void Game::move(Monster & someone, const Point & shift)
 	GAME_ASSERT(level.map.cell(new_pos).passable, format("{0} bump into the {1}.", someone.name, level.map.cell(new_pos).name));
     Door & door = find_at(level.doors, new_pos);
 	GAME_ASSERT(!door || door.opened, format("{0} is closed.", door.name));
-    Container & container = find_at(level.containers, new_pos);
+    Object & container = find_at(level.containers, new_pos);
 	GAME_ASSERT(!container, format("{0} bump into {1}.", someone.name, container.name));
-    Fountain & fountain = find_at(level.fountains, new_pos);
+    Object & fountain = find_at(level.fountains, new_pos);
 	GAME_ASSERT(!fountain, format("{0} bump into {1}.", someone.name, fountain.name));
     Monster & monster = find_at(level.monsters, new_pos);
 	GAME_ASSERT(!monster, format("{0} bump into {1}.", someone.name, monster.name));
@@ -224,13 +224,13 @@ void Game::drink(Monster & someone, const Point & shift)
 	Point new_pos = someone.pos + shift;
     Monster & monster = find_at(level.monsters, new_pos);
 	GAME_ASSERT(!monster, format("It is {1}. {0} is not a vampire to drink that.", someone.name, monster.name));
-    Container & container = find_at(level.containers, new_pos);
+    Object & container = find_at(level.containers, new_pos);
 	GAME_ASSERT(
 			!(container && !container.items.empty()),
 			format("Unfortunately, {0} has no water left. But there is something else inside.", container.name)
 			);
 	GAME_ASSERT(!container, format("Unfortunately, {0} is totally empty.", container.name));
-	Fountain & fountain = find_at(level.fountains, new_pos);
+	Object & fountain = find_at(level.fountains, new_pos);
 	GAME_ASSERT(fountain, "There is nothing to drink.");
 	GAME_ASSERT(someone.hp < someone.max_hp, format("{0} drink from {1}.", someone.name, fountain.name));
 	someone.hp += 1;
@@ -249,7 +249,7 @@ void Game::open(Monster & someone, const Point & shift)
 		message(format("{0} opened the {1}.", someone.name, door.name));
 		return;
     }
-	Container & container = find_at(level.containers, new_pos);
+	Object & container = find_at(level.containers, new_pos);
 	GAME_ASSERT(container, "There is nothing to open there.");
 	GAME_ASSERT(!container.items.empty(), format("{0} is empty.", container.name));
 	foreach(Item & item, container.items) {
@@ -287,7 +287,7 @@ void Game::swing(Monster & someone, const Point & shift)
 		hit(someone, monster, someone.damage());
 		return;
 	}
-    Container & container = find_at(level.containers, new_pos);
+    Object & container = find_at(level.containers, new_pos);
 	GAME_ASSERT(!container, format("{0} swing at {1}.", someone.name, container.name));
     message(format("{0} swing at nothing.", someone.name));
 }
@@ -313,13 +313,13 @@ void Game::fire(Monster & someone, const Point & shift)
 			level.items.push_back(item);
 			break;
 		}
-		Container & container = find_at(level.containers, item.pos + shift);
+		Object & container = find_at(level.containers, item.pos + shift);
 		if(container) {
 			message(format("{0} falls into {1}.", item.name, container.name));
 			container.items.push_back(item);
 			break;
 		}
-		Fountain & fountain = find_at(level.fountains, item.pos + shift);
+		Object & fountain = find_at(level.fountains, item.pos + shift);
 		if(fountain) {
 			message(format("{0} falls into {1}. Forever lost.", item.name, fountain.name));
 			break;

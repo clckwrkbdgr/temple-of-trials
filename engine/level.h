@@ -5,8 +5,7 @@
 class Monster;
 class Door;
 class Item;
-class Container;
-class Fountain;
+class Object;
 class Stairs;
 class Trap;
 class Control;
@@ -16,8 +15,8 @@ struct Level {
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;
 	std::vector<Item> items;
-	std::vector<Container> containers;
-	std::vector<Fountain> fountains;
+	std::vector<Object> containers;
+	std::vector<Object> fountains;
 	std::vector<Stairs> stairs;
 	std::vector<Trap> traps;
 

@@ -48,11 +48,11 @@ bool Level::is_passable(int x, int y) const
 	if(door && !door.is_passable()) {
 		return false;
 	}
-    const Container & container = find_at(containers, new_pos);
+    const Object & container = find_at(containers, new_pos);
 	if(container && !container.is_passable()) {
 		return false;
 	}
-    const Fountain & fountain = find_at(fountains, new_pos);
+    const Object & fountain = find_at(fountains, new_pos);
 	if(fountain && !fountain.is_passable()) {
 		return false;
 	}
@@ -78,11 +78,11 @@ bool Level::is_transparent(int x, int y) const
 	if(door && !door.is_transparent()) {
 		return false;
 	}
-    const Container & container = find_at(containers, new_pos);
+    const Object & container = find_at(containers, new_pos);
 	if(container && !container.is_transparent()) {
 		return false;
 	}
-    const Fountain & fountain = find_at(fountains, new_pos);
+    const Object & fountain = find_at(fountains, new_pos);
 	if(fountain && !fountain.is_transparent()) {
 		return false;
 	}
@@ -114,12 +114,12 @@ int Level::get_sprite_at(const Point & pos) const
 			return item.sprite;
 		}
 	}
-	foreach(const Container & container, containers) {
+	foreach(const Object & container, containers) {
 		if(container.pos == pos) {
 			return container.get_sprite();
 		}
 	}
-	foreach(const Fountain & fountain, fountains) {
+	foreach(const Object & fountain, fountains) {
 		if(fountain.pos == pos) {
 			return fountain.get_sprite();
 		}
@@ -154,12 +154,12 @@ std::string Level::name_at(const Point & pos) const
 			return item.name;
 		}
 	}
-	foreach(const Container & container, containers) {
+	foreach(const Object & container, containers) {
 		if(container.pos == pos) {
 			return container.name;
 		}
 	}
-	foreach(const Fountain & fountain, fountains) {
+	foreach(const Object & fountain, fountains) {
 		if(fountain.pos == pos) {
 			return fountain.name;
 		}

@@ -127,13 +127,13 @@ TEST(closed_door_should_be_impassable)
 
 TEST(container_should_be_impassable)
 {
-	Container container;
+	Object container;
 	ASSERT(!container.is_passable());
 }
 
 TEST(fountain_should_be_impassable)
 {
-	Fountain fountain;
+	Object fountain;
 	ASSERT(!fountain.is_passable());
 }
 
@@ -163,13 +163,13 @@ TEST(closed_door_should_be_opaque)
 
 TEST(container_should_be_transparent)
 {
-	Container container;
+	Object container;
 	ASSERT(container.is_transparent());
 }
 
 TEST(fountain_should_be_transparent)
 {
-	Fountain fountain;
+	Object fountain;
 	ASSERT(fountain.is_transparent());
 }
 

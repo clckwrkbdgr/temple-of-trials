@@ -44,18 +44,12 @@ SAVEFILE_STORE_EXT(Item, item)
 	}
 }
 
-SAVEFILE_STORE_EXT(Container, container)
+SAVEFILE_STORE_EXT(Object, object)
 {
-	savefile.store(container.pos.x).store(container.pos.y);
-	savefile.store(container.sprite).store(container.name);
+	savefile.store(object.pos.x).store(object.pos.y);
+	savefile.store(object.sprite).store(object.name);
 	savefile.newline();
-	savefile.store(container.items, "container item");
-}
-
-SAVEFILE_STORE_EXT(Fountain, fountain)
-{
-	savefile.store(fountain.pos.x).store(fountain.pos.y);
-	savefile.store(fountain.sprite).store(fountain.name);
+	savefile.store(object.items, "object item");
 }
 
 SAVEFILE_STORE_EXT(Trap, trap)

@@ -107,12 +107,12 @@ struct Item::Builder {
 };
 
 
-struct Container {
+struct Object {
 	Point pos;
 	int sprite;
 	std::string name;
 	std::vector<Item> items;
-	Container();
+	Object();
 	operator bool() const;
 	bool is_passable() const { return false; }
 	bool is_transparent() const { return true; }
@@ -120,33 +120,13 @@ struct Container {
 
 	struct Builder;
 };
-struct Container::Builder {
-	Container result;
-	operator Container() { return result; }
+struct Object::Builder {
+	Object result;
+	operator Object() { return result; }
 	Builder & pos(const Point & value);
 	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
 	Builder & item(const Item & value);
-};
-
-struct Fountain {
-	Point pos;
-	int sprite;
-	std::string name;
-	Fountain();
-	operator bool() const;
-	bool is_passable() const { return false; }
-	bool is_transparent() const { return true; }
-	int get_sprite() const { return sprite; }
-
-	struct Builder;
-};
-struct Fountain::Builder {
-	Fountain result;
-	operator Fountain() { return result; }
-	Builder & pos(const Point & value);
-	Builder & sprite(const int & value);
-	Builder & name(const std::string & value);
 };
 
 struct Stairs {

@@ -86,14 +86,14 @@ Door door(const Point & pos)
 	return Door::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).name("door").opened(false);
 }
 
-Container pot(const Point & pos)
+Object pot(const Point & pos)
 {
-	return Container::Builder().pos(pos).sprite(Sprites::POT).name("pot").item(money()).item(antidote());
+	return Object::Builder().pos(pos).sprite(Sprites::POT).name("pot").item(money()).item(antidote());
 }
 
-Fountain well(const Point & pos)
+Object well(const Point & pos)
 {
-	return Fountain::Builder().pos(pos).sprite(Sprites::WELL).name("well");
+	return Object::Builder().pos(pos).sprite(Sprites::WELL).name("well");
 }
 
 Stairs gate(const Point & pos)

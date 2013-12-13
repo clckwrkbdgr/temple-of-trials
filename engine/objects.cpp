@@ -156,35 +156,20 @@ Item::Builder & Item::Builder::healing(int value) { result.healing = value; retu
 Item::Builder & Item::Builder::quest() { result.quest = true; return *this; }
 
 
-Container::Container()
+Object::Object()
 	: sprite(0)
 {
 }
 
-Container::operator bool() const
+Object::operator bool() const
 {
 	return bool(pos);
 }
 
-Container::Builder & Container::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Container::Builder & Container::Builder::sprite(const int & value) { result.sprite = value; return *this; }
-Container::Builder & Container::Builder::name(const std::string & value) { result.name = value; return *this; }
-Container::Builder & Container::Builder::item(const Item & value) { result.items.push_back(value); return *this; }
-
-
-Fountain::Fountain()
-	: sprite(0)
-{
-}
-
-Fountain::operator bool() const
-{
-	return bool(pos);
-}
-
-Fountain::Builder & Fountain::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Fountain::Builder & Fountain::Builder::sprite(const int & value) { result.sprite = value; return *this; }
-Fountain::Builder & Fountain::Builder::name(const std::string & value) { result.name = value; return *this; }
+Object::Builder & Object::Builder::pos(const Point & value) { result.pos = value; return *this; }
+Object::Builder & Object::Builder::sprite(const int & value) { result.sprite = value; return *this; }
+Object::Builder & Object::Builder::name(const std::string & value) { result.name = value; return *this; }
+Object::Builder & Object::Builder::item(const Item & value) { result.items.push_back(value); return *this; }
 
 
 Stairs::Stairs()
