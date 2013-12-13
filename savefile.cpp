@@ -2,46 +2,26 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 23, SAVEFILE_MINOR_VERSION = 19 };
+enum { SAVEFILE_MAJOR_VERSION = 24, SAVEFILE_MINOR_VERSION = 0 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
 	savefile.store(celltype.sprite).store(celltype.passable);
-	if(savefile.version() > 0) {
-		savefile.store(celltype.hurts);
-	}
-	if(savefile.version() >= 7) {
-		savefile.store(celltype.transparent);
-	}
-	if(savefile.version() >= 12) {
-		savefile.store(celltype.name);
-	}
+	savefile.store(celltype.hurts).store(celltype.transparent).store(celltype.name);
 }
 
 SAVEFILE_STORE_EXT(Cell, cell)
 {
-	savefile.store(cell.type);
-	if(savefile.version() >= 11) {
-		savefile.store(cell.seen_sprite);
-	}
+	savefile.store(cell.type).store(cell.seen_sprite);
 }
 
 SAVEFILE_STORE_EXT(Item, item)
 {
 	savefile.store(item.pos.x).store(item.pos.y);
 	savefile.store(item.sprite).store(item.name);
-	savefile.store(item.damage);
-	savefile.store(item.wearable);
-	savefile.store(item.defence);
-	if(savefile.version() >= 6) {
-		savefile.store(item.edible).store(item.antidote);
-	}
-	if(savefile.version() >= 8) {
-		savefile.store(item.healing);
-	}
-	if(savefile.version() >= 9) {
-		savefile.store(item.quest);
-	}
+	savefile.store(item.damage).store(item.wearable).store(item.defence);
+	savefile.store(item.edible).store(item.antidote).store(item.healing);
+	savefile.store(item.quest);
 }
 
 SAVEFILE_STORE_EXT(Object, object)
@@ -56,80 +36,36 @@ SAVEFILE_STORE_EXT(Trap, trap)
 {
 	savefile.store(trap.pos.x).store(trap.pos.y);
 	savefile.store(trap.sprite).store(trap.name);
-	if(savefile.version() >= 17) {
-		savefile.store(trap.triggered);
-	}
-	if(savefile.version() >= 18) {
-		store_ext(savefile, trap.bolt);
-	}
+	savefile.store(trap.triggered);
+	store_ext(savefile, trap.bolt);
 }
 
 SAVEFILE_STORE_EXT(Stairs, stairs)
 {
 	savefile.store(stairs.pos.x).store(stairs.pos.y);
 	savefile.store(stairs.sprite).store(stairs.name);
-	if(savefile.version() >= 13) {
-		savefile.store(stairs.up_destination);
-		savefile.store(stairs.down_destination);
-	}
+	savefile.store(stairs.up_destination).store(stairs.down_destination);
 }
 
 SAVEFILE_STORE_EXT(Door, door)
 {
 	savefile.store(door.pos.x).store(door.pos.y);
 	savefile.store(door.opened_sprite).store(door.closed_sprite);
-	if(savefile.version() >= 12) {
-		savefile.store(door.name);
-	}
-	savefile.store(door.opened);
-}
-
-void store_faction(Writer & savefile, const Monster & monster)
-{
-	if(savefile.version() >= 19) {
-		savefile.store(monster.faction);
-	} else {
-		if(monster.ai == AI::PLAYER) {
-			savefile.store(Monster::PLAYER);
-		} else {
-			savefile.store(Monster::MONSTER);
-		}
-	}
-}
-
-void store_faction(Reader & savefile, Monster & monster)
-{
-	if(savefile.version() >= 19) {
-		savefile.store(monster.faction);
-	} else {
-		if(monster.ai == AI::PLAYER) {
-			monster.faction = Monster::PLAYER;
-		} else {
-			monster.faction = Monster::MONSTER;
-		}
-	}
+	savefile.store(door.name).store(door.opened);
 }
 
 SAVEFILE_STORE_EXT(Monster, monster)
 {
 	savefile.store(monster.pos.x).store(monster.pos.y).store(monster.sprite);
 	savefile.store(monster.sight);
-	savefile.store(monster.hp);
-	if(savefile.version() >= 3) {
-		savefile.store(monster.max_hp);
-	}
+	savefile.store(monster.hp).store(monster.max_hp);
 	savefile.store(monster.wielded);
 	savefile.store(monster.worn);
 	savefile.store(monster.hit_strength);
-	if(savefile.version() >= 4) {
-		savefile.store(monster.poisonous);
-	}
-	if(savefile.version() >= 5) {
-		savefile.store(monster.poisoning);
-	}
+	savefile.store(monster.poisonous).store(monster.poisoning);
 	savefile.store(monster.ai);
 	savefile.store(monster.name);
-	store_faction(savefile, monster);
+	savefile.store(monster.faction);
 	savefile.newline();
 	savefile.store(monster.inventory, "inventory item");
 }
@@ -156,23 +92,14 @@ SAVEFILE_STORE_EXT(Level, level)
 	savefile.store(level.items, "item");
 	savefile.newline();
 
-	savefile.store(level.containers, "container");
+	savefile.store(level.objects, "object");
 	savefile.newline();
 
-	if(savefile.version() >= 2) {
-		savefile.store(level.fountains, "fountain");
-		savefile.newline();
-	}
+	savefile.store(level.stairs, "stairs");
+	savefile.newline();
 
-	if(savefile.version() >= 10) {
-		savefile.store(level.stairs, "stairs");
-		savefile.newline();
-	}
-
-	if(savefile.version() >= 16) {
-		savefile.store(level.traps, "trap");
-		savefile.newline();
-	}
+	savefile.store(level.traps, "trap");
+	savefile.newline();
 
 	savefile.store(level.doors, "door");
 }
@@ -211,18 +138,14 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
 	savefile.newline();
 
-	if(savefile.version() >= 14) {
-		savefile.store(game.current_level);
-	}
+	savefile.store(game.current_level);
 	savefile.store(game.turns);
 	savefile.newline();
 
 	store_ext(savefile, game.level);
 	savefile.newline();
 
-	if(savefile.version() >= 15) {
-		store_ext(savefile, game.saved_levels);
-	}
+	store_ext(savefile, game.saved_levels);
 	savefile.newline();
 }
 

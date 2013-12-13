@@ -112,6 +112,8 @@ struct Object {
 	int sprite;
 	std::string name;
 	std::vector<Item> items;
+	bool containable;
+	bool drinkable;
 	Object();
 	operator bool() const;
 	bool is_passable() const { return false; }
@@ -127,6 +129,8 @@ struct Object::Builder {
 	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
 	Builder & item(const Item & value);
+	Builder & containable();
+	Builder & drinkable();
 };
 
 struct Stairs {

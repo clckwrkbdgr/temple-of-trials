@@ -310,9 +310,9 @@ TEST_FIXTURE(GameWithDummy, should_plan_to_move_in_just_opened_door_on_smart)
 TEST_FIXTURE(GameWithDummy, should_open_container_on_smart_move_if_exists)
 {
 	Item apple = Item::Builder().sprite(1).name("apple");
-	game.level.containers.push_back(Object::Builder().pos(Point(1, 0)).name("pot").item(apple));
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("pot").containable().item(apple));
 	game.smart_move(dummy(), Point(0, -1));
-	ASSERT(game.level.containers.front().items.empty());
+	ASSERT(game.level.objects.front().items.empty());
 	EQUAL(dummy().pos, Point(1, 1));
 	EQUAL(game.level.items, MakeVector<Item>(Item::Builder().sprite(1).name("apple").pos(Point(1, 1))).result);
 	EQUAL(game.messages, MakeVector<std::string>("Dummy took up a apple from pot.").result);
@@ -320,7 +320,7 @@ TEST_FIXTURE(GameWithDummy, should_open_container_on_smart_move_if_exists)
 
 TEST_FIXTURE(GameWithDummy, should_drink_from_fountain_on_smart_move_if_exists)
 {
-	game.level.fountains.push_back(Object::Builder().pos(Point(1, 0)).name("well"));
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("well").drinkable());
 	game.smart_move(dummy(), Point(0, -1));
 	EQUAL(dummy().pos, Point(1, 1));
 	EQUAL(game.messages, MakeVector<std::string>("Dummy drink from well.").result);
@@ -344,7 +344,7 @@ TEST_FIXTURE(GameWithDummy, should_not_drink_monsters)
 
 TEST_FIXTURE(GameWithDummy, should_not_drink_containers)
 {
-	game.level.containers.push_back(Object::Builder().pos(Point(1, 0)).name("pot"));
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("pot").containable());
 	game.drink(dummy(), Point(0, -1));
 	EQUAL(game.messages, MakeVector<std::string>("Unfortunately, pot is totally empty.").result);
 }
@@ -357,14 +357,14 @@ TEST_FIXTURE(GameWithDummy, should_not_drink_at_empty_cell)
 
 TEST_FIXTURE(GameWithDummy, should_drink_fountains)
 {
-	game.level.fountains.push_back(Object::Builder().pos(Point(1, 0)).name("well"));
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("well").drinkable());
 	game.drink(dummy(), Point(0, -1));
 	EQUAL(game.messages, MakeVector<std::string>("Dummy drink from well.").result);
 }
 
 TEST_FIXTURE(GameWithDummy, should_heal_from_fountains)
 {
-	game.level.fountains.push_back(Object::Builder().pos(Point(1, 0)).name("well"));
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("well").drinkable());
 	dummy().hp -= 5;
 	game.drink(dummy(), Point(0, -1));
 	EQUAL(dummy().hp, 96);
@@ -397,19 +397,19 @@ TEST_FIXTURE(GameWithDummy, should_not_open_empty_cell)
 TEST_FIXTURE(GameWithDummy, should_open_containers_and_drop_items)
 {
 	Item item = Item::Builder().sprite(1).name("item");
-	game.level.containers.push_back(Object::Builder().pos(Point(1, 0)).name("pot").item(item));
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("pot").containable().item(item));
 	game.open(dummy(), Point(0, -1));
 	EQUAL(game.level.items[0].sprite, item.sprite);
-	ASSERT(game.level.containers[0].items.empty());
+	ASSERT(game.level.objects[0].items.empty());
 	EQUAL(game.messages, MakeVector<std::string>("Dummy took up a item from pot.").result);
 }
 
 TEST_FIXTURE(GameWithDummy, should_not_open_empty_containers)
 {
-	game.level.containers.push_back(Object::Builder().pos(Point(1, 0)).name("pot"));
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("pot").containable());
 	game.open(dummy(), Point(0, -1));
 	ASSERT(game.level.items.empty());
-	ASSERT(game.level.containers[0].items.empty());
+	ASSERT(game.level.objects[0].items.empty());
 	EQUAL(game.messages, MakeVector<std::string>("Pot is empty.").result);
 }
 
@@ -520,17 +520,17 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_closed_door_and_drop_it
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_container_and_drop_item_in_it)
 {
-	game.level.containers.push_back(Object::Builder().pos(Point(1, 0)).name("pot"));
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("pot").containable());
 	game.fire(dummy(), Point(0, -1));
 	EQUAL(game.messages, MakeVector<std::string>("Dummy throw spear.")("Spear falls into pot.").result);
 	ASSERT(game.level.items.empty());
-	ASSERT(!game.level.containers[0].items.empty());
-	EQUAL(game.level.containers[0].items[0].name, "spear");
+	ASSERT(!game.level.objects[0].items.empty());
+	EQUAL(game.level.objects[0].items[0].name, "spear");
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_fountain_and_erase_item_forever)
 {
-	game.level.fountains.push_back(Object::Builder().pos(Point(1, 0)).name("well"));
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("well").drinkable());
 	game.fire(dummy(), Point(0, -1));
 	EQUAL(game.messages, MakeVector<std::string>("Dummy throw spear.")("Spear falls into well. Forever lost.").result);
 	ASSERT(game.level.items.empty());

@@ -88,12 +88,12 @@ Door door(const Point & pos)
 
 Object pot(const Point & pos)
 {
-	return Object::Builder().pos(pos).sprite(Sprites::POT).name("pot").item(money()).item(antidote());
+	return Object::Builder().pos(pos).sprite(Sprites::POT).name("pot").containable().item(money()).item(antidote());
 }
 
 Object well(const Point & pos)
 {
-	return Object::Builder().pos(pos).sprite(Sprites::WELL).name("well");
+	return Object::Builder().pos(pos).sprite(Sprites::WELL).name("well").drinkable();
 }
 
 Stairs gate(const Point & pos)
@@ -195,9 +195,9 @@ void LinearGenerator::generate(Level & level, int level_index)
 				case '*' : level.items.push_back(World::explosive(pos)); break;
 				case '[' : level.items.push_back(World::jacket(pos)); break;
 
-				case '{' : level.fountains.push_back(World::well(pos)); break;
+				case '{' : level.objects.push_back(World::well(pos)); break;
 				case '+' : level.doors.push_back(World::door(pos)); break;
-				case 'V' : level.containers.push_back(World::pot(pos)); break;
+				case 'V' : level.objects.push_back(World::pot(pos)); break;
 				case '^' : level.traps.push_back(World::trap(pos)); break;
 				case '>' :
 					if(level_index == 3) {

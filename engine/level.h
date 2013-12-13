@@ -15,8 +15,7 @@ struct Level {
 	std::vector<Monster> monsters;
 	std::vector<Door> doors;
 	std::vector<Item> items;
-	std::vector<Object> containers;
-	std::vector<Object> fountains;
+	std::vector<Object> objects;
 	std::vector<Stairs> stairs;
 	std::vector<Trap> traps;
 

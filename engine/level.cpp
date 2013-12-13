@@ -48,12 +48,8 @@ bool Level::is_passable(int x, int y) const
 	if(door && !door.is_passable()) {
 		return false;
 	}
-    const Object & container = find_at(containers, new_pos);
-	if(container && !container.is_passable()) {
-		return false;
-	}
-    const Object & fountain = find_at(fountains, new_pos);
-	if(fountain && !fountain.is_passable()) {
+    const Object & object = find_at(objects, new_pos);
+	if(object && !object.is_passable()) {
 		return false;
 	}
     const Stairs & stair = find_at(stairs, new_pos);
@@ -78,12 +74,8 @@ bool Level::is_transparent(int x, int y) const
 	if(door && !door.is_transparent()) {
 		return false;
 	}
-    const Object & container = find_at(containers, new_pos);
-	if(container && !container.is_transparent()) {
-		return false;
-	}
-    const Object & fountain = find_at(fountains, new_pos);
-	if(fountain && !fountain.is_transparent()) {
+    const Object & object = find_at(objects, new_pos);
+	if(object && !object.is_transparent()) {
 		return false;
 	}
     const Stairs & stair = find_at(stairs, new_pos);
@@ -114,14 +106,9 @@ int Level::get_sprite_at(const Point & pos) const
 			return item.sprite;
 		}
 	}
-	foreach(const Object & container, containers) {
-		if(container.pos == pos) {
-			return container.get_sprite();
-		}
-	}
-	foreach(const Object & fountain, fountains) {
-		if(fountain.pos == pos) {
-			return fountain.get_sprite();
+	foreach(const Object & object, objects) {
+		if(object.pos == pos) {
+			return object.get_sprite();
 		}
 	}
 	foreach(const Stairs & stair, stairs) {
@@ -154,14 +141,9 @@ std::string Level::name_at(const Point & pos) const
 			return item.name;
 		}
 	}
-	foreach(const Object & container, containers) {
-		if(container.pos == pos) {
-			return container.name;
-		}
-	}
-	foreach(const Object & fountain, fountains) {
-		if(fountain.pos == pos) {
-			return fountain.name;
+	foreach(const Object & object, objects) {
+		if(object.pos == pos) {
+			return object.name;
 		}
 	}
 	foreach(const Stairs & stair, stairs) {

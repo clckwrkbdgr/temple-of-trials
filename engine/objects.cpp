@@ -157,7 +157,7 @@ Item::Builder & Item::Builder::quest() { result.quest = true; return *this; }
 
 
 Object::Object()
-	: sprite(0)
+	: sprite(0), containable(false), drinkable(false)
 {
 }
 
@@ -170,6 +170,8 @@ Object::Builder & Object::Builder::pos(const Point & value) { result.pos = value
 Object::Builder & Object::Builder::sprite(const int & value) { result.sprite = value; return *this; }
 Object::Builder & Object::Builder::name(const std::string & value) { result.name = value; return *this; }
 Object::Builder & Object::Builder::item(const Item & value) { result.items.push_back(value); return *this; }
+Object::Builder & Object::Builder::containable() { result.containable = true; return *this; }
+Object::Builder & Object::Builder::drinkable() { result.drinkable = true; return *this; }
 
 
 Stairs::Stairs()
