@@ -121,15 +121,15 @@ void Game::process_environment(Monster & someone)
 		message("It hurts!");
 		hurt(someone, 1);
 	}
-	Object & trap = find_at(level.traps, someone.pos);
-	if(trap) {
-		if(trap.items.empty()) {
-			message(format("{0} is already triggered.", trap.name));
+	Object & object = find_at(level.objects, someone.pos);
+	if(object && object.triggerable) {
+		if(object.items.empty()) {
+			message(format("{0} is already triggered.", object.name));
 		} else {
-			message(format("{0} trigger the {1}.", someone.name, trap.name));
-			trap.items.back().pos = trap.pos;
-			level.items.push_back(trap.items.back());
-			trap.items.pop_back();
+			message(format("{0} trigger the {1}.", someone.name, object.name));
+			object.items.back().pos = object.pos;
+			level.items.push_back(object.items.back());
+			object.items.pop_back();
 			hurt(someone, 1);
 		}
 	}
