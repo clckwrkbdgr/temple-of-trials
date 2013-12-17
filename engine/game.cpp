@@ -476,39 +476,37 @@ void Game::go_up(Monster & someone)
 {
     Object & object = find_at(level.objects, someone.pos);
 	GAME_ASSERT(object && object.transporting && object.up_destination, format("{0} cannot go up from there.", someone.name));
-	if(object.up_destination < 0) {
-		foreach(const Item & item, someone.inventory) {
-			if(item.quest) {
-				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
-				done = true;
-				completed = true;
-				return;
-			}
+	if(object.is_exit_up()) {
+		const Item & quest_item = someone.quest_item();
+		if(quest_item) {
+			message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, quest_item.name));
+			done = true;
+			completed = true;
+		} else {
+			message(format("{0} must complete mission in order to go back to the surface.", someone.name));
 		}
-		message(format("{0} must complete mission in order to go back to the surface.", someone.name));
-		return;
+	} else {
+		message(format("{0} goes up.", someone.name));
+		generate(object.up_destination);
 	}
-	message(format("{0} goes up.", someone.name));
-	generate(object.up_destination);
 }
 
 void Game::go_down(Monster & someone)
 {
     Object & object = find_at(level.objects, someone.pos);
 	GAME_ASSERT(object && object.transporting && object.down_destination, format("{0} cannot go down from there.", someone.name));
-	if(object.down_destination < 0) {
-		foreach(const Item & item, someone.inventory) {
-			if(item.quest) {
-				message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, item.name));
-				done = true;
-				completed = true;
-				return;
-			}
+	if(object.is_exit_down()) {
+		const Item & quest_item = someone.quest_item();
+		if(quest_item) {
+			message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, quest_item.name));
+			done = true;
+			completed = true;
+		} else {
+			message(format("{0} must complete mission in order to go back to the surface.", someone.name));
 		}
-		message(format("{0} must complete mission in order to go back to the surface.", someone.name));
-		return;
+	} else {
+		message(format("{0} goes down.", someone.name));
+		generate(object.down_destination);
 	}
-	message(format("{0} goes down.", someone.name));
-	generate(object.down_destination);
 }
 

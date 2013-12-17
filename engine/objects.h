@@ -30,6 +30,7 @@ struct Monster {
 	const Item & wielded_item() const;
 	Item & worn_item();
 	const Item & worn_item() const;
+	const Item & quest_item() const;
 
 	struct Builder;
 };
@@ -98,6 +99,8 @@ struct Object {
 	bool is_passable() const;
 	bool is_transparent() const;
 	int get_sprite() const;
+	bool is_exit_up() const;
+	bool is_exit_down() const;
 
 	struct Builder;
 };

@@ -98,6 +98,17 @@ const Item & Monster::worn_item() const
 	return item;
 }
 
+const Item & Monster::quest_item() const
+{
+	foreach(const Item & item, inventory) {
+		if(item.quest) {
+			return item;
+		}
+	}
+	static Item empty;
+	return empty;
+}
+
 Monster::Builder & Monster::Builder::faction(int value) { result.faction = value; return *this; }
 Monster::Builder & Monster::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Monster::Builder & Monster::Builder::sprite(const int & value) { result.sprite = value; return *this; }
@@ -144,23 +155,6 @@ Object::operator bool() const
 	return bool(pos);
 }
 
-Object::Builder & Object::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Object::Builder & Object::Builder::sprite(const int & value) { result.sprite = value; result.opened_sprite = value; return *this; }
-Object::Builder & Object::Builder::name(const std::string & value) { result.name = value; return *this; }
-Object::Builder & Object::Builder::item(const Item & value) { result.items.push_back(value); return *this; }
-Object::Builder & Object::Builder::passable() { result.passable = true; return *this; }
-Object::Builder & Object::Builder::transparent() { result.transparent = true; return *this; }
-Object::Builder & Object::Builder::containable() { result.containable = true; return *this; }
-Object::Builder & Object::Builder::drinkable() { result.drinkable = true; return *this; }
-Object::Builder & Object::Builder::transporting() { result.transporting = true; return *this; }
-Object::Builder & Object::Builder::triggerable() { result.triggerable = true; return *this; }
-Object::Builder & Object::Builder::up_destination(int value) { result.up_destination = value; return *this; }
-Object::Builder & Object::Builder::down_destination(int value) { result.down_destination = value; return *this; }
-Object::Builder & Object::Builder::opened_sprite(const int & value) { result.opened_sprite = value; return *this; }
-Object::Builder & Object::Builder::closed_sprite(const int & value) { result.sprite = value; return *this; }
-Object::Builder & Object::Builder::openable() { result.openable = true; return *this; }
-Object::Builder & Object::Builder::opened(bool value) { result.opened = value; return *this; }
-
 int Object::get_sprite() const
 {
 	if(openable) {
@@ -184,4 +178,31 @@ bool Object::is_transparent() const
 	}
 	return transparent;
 }
+
+bool Object::is_exit_up() const
+{
+	return up_destination < 0;
+}
+
+bool Object::is_exit_down() const
+{
+	return down_destination < 0;
+}
+
+Object::Builder & Object::Builder::pos(const Point & value) { result.pos = value; return *this; }
+Object::Builder & Object::Builder::sprite(const int & value) { result.sprite = value; result.opened_sprite = value; return *this; }
+Object::Builder & Object::Builder::name(const std::string & value) { result.name = value; return *this; }
+Object::Builder & Object::Builder::item(const Item & value) { result.items.push_back(value); return *this; }
+Object::Builder & Object::Builder::passable() { result.passable = true; return *this; }
+Object::Builder & Object::Builder::transparent() { result.transparent = true; return *this; }
+Object::Builder & Object::Builder::containable() { result.containable = true; return *this; }
+Object::Builder & Object::Builder::drinkable() { result.drinkable = true; return *this; }
+Object::Builder & Object::Builder::transporting() { result.transporting = true; return *this; }
+Object::Builder & Object::Builder::triggerable() { result.triggerable = true; return *this; }
+Object::Builder & Object::Builder::up_destination(int value) { result.up_destination = value; return *this; }
+Object::Builder & Object::Builder::down_destination(int value) { result.down_destination = value; return *this; }
+Object::Builder & Object::Builder::opened_sprite(const int & value) { result.opened_sprite = value; return *this; }
+Object::Builder & Object::Builder::closed_sprite(const int & value) { result.sprite = value; return *this; }
+Object::Builder & Object::Builder::openable() { result.openable = true; return *this; }
+Object::Builder & Object::Builder::opened(bool value) { result.opened = value; return *this; }
 

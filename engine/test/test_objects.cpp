@@ -101,6 +101,14 @@ TEST(should_get_const_monster_worn_item)
 	EQUAL(monster.worn_item(), armor);
 }
 
+TEST(should_get_quest_items_when_carrying_one)
+{
+	Monster monster = Monster::Builder().item(Item::Builder().quest().sprite(1));
+	const Item & item = monster.quest_item();
+	ASSERT(item);
+	ASSERT(item.quest);
+}
+
 }
 
 SUITE(objects) {
@@ -163,6 +171,18 @@ TEST(object_should_be_opaque_by_default)
 {
 	Object object;
 	ASSERT(!object.is_transparent());
+}
+
+TEST(negative_up_destination_should_be_exit_from_dungeon)
+{
+	Object object = Object::Builder().up_destination(-1);
+	ASSERT(object.is_exit_up());
+}
+
+TEST(negative_down_destination_should_be_exit_from_dungeon)
+{
+	Object object = Object::Builder().down_destination(-1);
+	ASSERT(object.is_exit_down());
 }
 
 }
