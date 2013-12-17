@@ -187,23 +187,25 @@ void Game::smart_move(Monster & someone, const Point & shift)
 {
 	assert(shift);
 	Point new_pos = someone.pos + shift;
-	Object & object = find_at(level.objects, new_pos);
-	if(object && object.openable && !object.opened) {
-		someone.plan.push_front(Control(Control::MOVE, shift));
-		open(someone, shift);
-		return;
-	}
-	if(object && object.containable) {
-		open(someone, shift);
-		return;
-	}
-	if(object && object.drinkable) {
-		drink(someone, shift);
-		return;
-	}
 	if(find_at(level.monsters, new_pos)) {
 		swing(someone, shift);
 		return;
+	}
+	Object & object = find_at(level.objects, new_pos);
+	if(object) {
+		if(object.openable && !object.opened) {
+			someone.plan.push_front(Control(Control::MOVE, shift));
+			open(someone, shift);
+			return;
+		}
+		if(object.containable) {
+			open(someone, shift);
+			return;
+		}
+		if(object.drinkable) {
+			drink(someone, shift);
+			return;
+		}
 	}
 	move(someone, shift);
 }
@@ -232,12 +234,12 @@ void Game::drink(Monster & someone, const Point & shift)
     Monster & monster = find_at(level.monsters, new_pos);
 	GAME_ASSERT(!monster, format("It is {1}. {0} is not a vampire to drink that.", someone.name, monster.name));
     Object & object = find_at(level.objects, new_pos);
-	if(object.drinkable) {
+	if(object && object.drinkable) {
 		GAME_ASSERT(someone.hp < someone.max_hp, format("{0} drink from {1}.", someone.name, object.name));
 		someone.hp += 1;
 		someone.hp = std::min(someone.hp, someone.max_hp);
 		message(format("{0} drink from {1}. It helps a bit.", someone.name, object.name));
-	} else if(object.containable) {
+	} else if(object && object.containable) {
 		if(object.items.empty()) {
 			message(format("Unfortunately, {0} is totally empty.", object.name));
 		} else {
@@ -316,18 +318,17 @@ void Game::fire(Monster & someone, const Point & shift)
 			break;
 		}
 		Object & object = find_at(level.objects, item.pos + shift);
-		if(object && object.openable && !object.opened) {
-			message(format("{0} hit {1}.", item.name, object.name));
-			level.items.push_back(item);
-			break;
-		}
 		if(object) {
 			if(object.containable) {
 				message(format("{0} falls into {1}.", item.name, object.name));
 				object.items.push_back(item);
 				break;
-			} else {
+			} else if(object.drinkable) {
 				message(format("{0} falls into {1}. Forever lost.", item.name, object.name));
+				break;
+			} else if(!object.is_transparent()) {
+				message(format("{0} hit {1}.", item.name, object.name));
+				level.items.push_back(item);
 				break;
 			}
 		}
