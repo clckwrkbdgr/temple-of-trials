@@ -2,7 +2,7 @@
 #include "../game.h"
 #include "../test.h"
 
-SUITE(objects) {
+SUITE(monsters) {
 
 TEST(monster_with_nonzero_hp_should_be_alive)
 {
@@ -101,93 +101,68 @@ TEST(should_get_const_monster_worn_item)
 	EQUAL(monster.worn_item(), armor);
 }
 
-TEST(should_get_door_opened_sprite_when_opened)
-{
-	Object door = Object::Builder().opened_sprite(1).closed_sprite(2).openable().opened(true);
-	EQUAL(door.get_sprite(), 1);
 }
 
-TEST(should_get_door_closed_sprite_when_closed)
+SUITE(objects) {
+
+TEST(should_get_opened_sprite_when_object_is_opened)
 {
-	Object door = Object::Builder().opened_sprite(1).closed_sprite(2).openable().opened(false);
-	EQUAL(door.get_sprite(), 2);
+	Object object = Object::Builder().opened_sprite(1).closed_sprite(2).openable().opened(true);
+	EQUAL(object.get_sprite(), 1);
 }
 
-TEST(opened_door_should_be_passable)
+TEST(should_get_closed_sprite_when_object_is_closed)
 {
-	Object door = Object::Builder().opened(true).passable();
-	ASSERT(door.is_passable());
+	Object object = Object::Builder().opened_sprite(1).closed_sprite(2).openable().opened(false);
+	EQUAL(object.get_sprite(), 2);
 }
 
-TEST(closed_door_should_be_impassable)
+TEST(opened_object_should_be_passable)
 {
-	Object door = Object::Builder().opened(false);
-	ASSERT(!door.is_passable());
+	Object object = Object::Builder().opened(true).passable();
+	ASSERT(object.is_passable());
 }
 
-TEST(container_should_be_impassable)
+TEST(closed_object_should_be_impassable)
 {
-	Object container;
-	ASSERT(!container.is_passable());
+	Object object = Object::Builder().opened(false);
+	ASSERT(!object.is_passable());
 }
 
-TEST(fountain_should_be_impassable)
+TEST(object_should_be_impassable_by_default)
 {
-	Object fountain;
-	ASSERT(!fountain.is_passable());
+	Object object;
+	ASSERT(!object.is_passable());
 }
 
-TEST(stairs_should_be_passable)
+TEST(passable_object_should_be_passable)
 {
-	Object stairs = Object::Builder().passable();
-	ASSERT(stairs.is_passable());
+	Object object = Object::Builder().passable();
+	ASSERT(object.is_passable());
 }
 
-TEST(trap_should_be_passable)
+TEST(opened_object_should_be_transparent)
 {
-	Object trap;
-	trap.passable = true;
-	ASSERT(trap.is_passable());
+	Object object = Object::Builder().openable().opened(true).transparent();
+	ASSERT(object.is_transparent());
 }
 
-TEST(opened_door_should_be_transparent)
+TEST(closed_object_should_be_opaque)
 {
-	Object door = Object::Builder().openable().opened(true).transparent();
-	ASSERT(door.is_transparent());
+	Object object = Object::Builder().openable().opened(false).transparent();
+	ASSERT(!object.is_transparent());
 }
 
-TEST(closed_door_should_be_opaque)
+TEST(transparent_object_should_be_transparent)
 {
-	Object door = Object::Builder().openable().opened(false).transparent();
-	ASSERT(!door.is_transparent());
+	Object object = Object::Builder().transparent();
+	ASSERT(object.is_transparent());
 }
 
-TEST(container_should_be_transparent)
+TEST(object_should_be_opaque_by_default)
 {
-	Object container;
-	container.transparent = true;
-	ASSERT(container.is_transparent());
-}
-
-TEST(fountain_should_be_transparent)
-{
-	Object fountain;
-	fountain.transparent = true;
-	ASSERT(fountain.is_transparent());
-}
-
-TEST(stairs_should_be_transparent)
-{
-	Object stairs;
-	stairs.transparent = true;
-	ASSERT(stairs.is_transparent());
-}
-
-TEST(trap_should_be_transparent)
-{
-	Object trap;
-	trap.transparent = true;
-	ASSERT(trap.is_transparent());
+	Object object;
+	ASSERT(!object.is_transparent());
 }
 
 }
