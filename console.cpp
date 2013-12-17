@@ -261,7 +261,7 @@ Point Console::draw_and_get_direction(Game & game)
 int Console::see_messages(Game & game)
 {
 	draw_game(game);
-	bool ask_control = !game.done || game.completed || game.player_died;
+	bool ask_control = game.state != Game::SUSPENDED;
 	int ch = (!ask_control && game.messages.size() == messages_seen) ? 0 : get_control();
 	while(game.messages.size() > messages_seen) {
 		if(ch == ' ') {

@@ -24,26 +24,23 @@ Control::Control(int control_value, int control_slot)
 
 
 Game::Game(LevelGenerator * level_generator)
-	: log_messages(false), current_level(0), generator(level_generator),
-	done(false), player_died(false), completed(false), turn_ended(false),
-	turns(0)
+	: log_messages(false), current_level(0), generator(level_generator), state(PLAYING), turns(0)
 {
 }
 
 void Game::run(ControllerFactory controller_factory)
 {
-	while(!done) {
-		turn_ended = false;
+	while(state == PLAYING) {
 		foreach(Monster & monster, level.monsters) {
 			if(monster.is_dead()) {
 				continue;
 			}
-			level.invalidate_fov(monster);
 			Controller controller = controller_factory(monster.ai);
 			if(!controller) {
 				log(format("No controller found for AI #{0}!", monster.ai));
 				continue;
 			}
+			level.invalidate_fov(monster);
 			Control control = controller(monster, *this);
 			switch(control.control) {
 				case Control::SMART_MOVE: smart_move(monster, control.direction); break;
@@ -65,18 +62,19 @@ void Game::run(ControllerFactory controller_factory)
 				case Control::WAIT: break;
 				default: log("Unknown control: {0}", control.control); break;
 			}
-			if(turn_ended) {
+			if(state == TURN_ENDED) {
 				break;
 			}
 
 			process_environment(monster);
 
-			if(done) {
+			if(state != PLAYING) {
 				break;
 			}
 		}
 		level.erase_dead_monsters();
 		++turns;
+		state = PLAYING;
 	}
 }
 
@@ -100,7 +98,7 @@ void Game::generate(int level_index)
 		level.get_player() = player;
 	}
 	current_level = level_index;
-	turn_ended = true;
+	state = TURN_ENDED;
 }
 
 void Game::message(std::string text)
@@ -152,8 +150,7 @@ void Game::die(Monster & someone)
 	someone.inventory.clear();
 	if(someone.faction == Monster::PLAYER) {
 		message("You died.");
-		done = true;
-		player_died = true;
+		state = PLAYER_DIED;
 	}
 }
 
@@ -480,8 +477,7 @@ void Game::go_up(Monster & someone)
 		const Item & quest_item = someone.quest_item();
 		if(quest_item) {
 			message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, quest_item.name));
-			done = true;
-			completed = true;
+			state = COMPLETED;
 		} else {
 			message(format("{0} must complete mission in order to go back to the surface.", someone.name));
 		}
@@ -499,8 +495,7 @@ void Game::go_down(Monster & someone)
 		const Item & quest_item = someone.quest_item();
 		if(quest_item) {
 			message(format("{0} have brought {1} to the surface. Yay! Game if finished.", someone.name, quest_item.name));
-			done = true;
-			completed = true;
+			state = COMPLETED;
 		} else {
 			message(format("{0} must complete mission in order to go back to the surface.", someone.name));
 		}

@@ -45,7 +45,7 @@ int main()
 	game.run(get_controller);
 
 	Console::instance().see_messages(game);
-	if(!game.player_died && !game.completed) {
+	if(game.state == Game::SUSPENDED) {
 		try {
 			std::ofstream out(SAVEFILE.c_str(), std::ios::out);
 			if(!out) {

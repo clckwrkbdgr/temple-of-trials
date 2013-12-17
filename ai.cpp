@@ -9,7 +9,7 @@
 Control player_control(Monster & player, Game & game)
 {
 	Console & console = Console::instance();
-	while(!game.done) {
+	while(game.state == Game::PLAYING) {
 		if(!player.plan.empty()) {
 			console.draw_game(game);
 			delay(10);
@@ -20,10 +20,10 @@ Control player_control(Monster & player, Game & game)
 		int ch = console.draw_and_get_control(game);
 		switch(ch) {
 			case 'Q':
-				game.player_died = true;
+				game.state = Game::PLAYER_DIED;
 				game.message("You commited suicide.");
 			case 'q':
-				game.done = true;
+				game.state = Game::SUSPENDED;
 				break;
 			case KEY_F(1):
 				player.godmode = true;

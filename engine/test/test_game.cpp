@@ -72,7 +72,7 @@ TEST_FIXTURE(GameWithLevels, should_generated_newly_visited_level)
 TEST_FIXTURE(GameWithLevels, should_end_turn_after_generation)
 {
 	game.generate(1);
-	ASSERT(game.turn_ended);
+	EQUAL(game.state, Game::TURN_ENDED);
 }
 
 
@@ -183,8 +183,7 @@ TEST_FIXTURE(GameWithDummy, should_end_game_if_player_is_dead)
 {
 	game.level.monsters.front().faction = Monster::PLAYER;
 	game.die(game.level.monsters.front());
-	ASSERT(game.done);
-	ASSERT(game.player_died);
+	EQUAL(game.state, Game::PLAYER_DIED);
 	EQUAL(game.messages, MakeVector<std::string>("Dummy drops item.")("You died.").result);
 }
 
@@ -858,8 +857,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_upstairs_when_have_quest
 	dummy().inventory.push_back(Item::Builder().sprite(1).quest().name("Yendor"));
 	stairs().up_destination = -1;
 	game.go_up(dummy());
-	ASSERT(game.done);
-	ASSERT(game.completed);
+	EQUAL(game.state, Game::COMPLETED);
 	EQUAL(game.messages, MakeVector<std::string>("Dummy have brought Yendor to the surface. Yay! Game if finished.").result);
 }
 
@@ -890,8 +888,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_downstairs_when_have_que
 	dummy().inventory.push_back(Item::Builder().sprite(1).quest().name("Yendor"));
 	stairs().down_destination = -1;
 	game.go_down(dummy());
-	ASSERT(game.done);
-	ASSERT(game.completed);
+	EQUAL(game.state, Game::COMPLETED);
 	EQUAL(game.messages, MakeVector<std::string>("Dummy have brought Yendor to the surface. Yay! Game if finished.").result);
 }
 
