@@ -5,7 +5,7 @@
 class Monster;
 class Item;
 class Object;
-class Control;
+class Action;
 
 struct Level {
 	Map map;
@@ -24,7 +24,7 @@ struct Level {
 	const Monster & get_player() const;
 	Monster & get_player();
 
-	std::list<Control> find_path(const Point & player_pos, const Point & target);
+	std::list<Point> find_path(const Point & player_pos, const Point & target);
 	void invalidate_fov(Monster & monster);
 	void erase_dead_monsters();
 };

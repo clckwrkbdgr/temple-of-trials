@@ -230,27 +230,19 @@ struct LevelWithPath {
 
 TEST_FIXTURE(LevelWithPath, should_find_path_between_points)
 {
-	std::list<Control> path = level.find_path(Point(0, 3), Point(2, 3));
-	EQUAL(path.size(), (unsigned)5);
-	std::list<Control>::const_iterator it = path.begin();
-	EQUAL((*it++).direction, Point(0, -1));
-	EQUAL((*it++).direction, Point(1, -1));
-	EQUAL((*it++).direction, Point(1,  0));
-	EQUAL((*it++).direction, Point(1,  1));
-	EQUAL((*it++).direction, Point(-1, 1));
+	std::list<Point> path = level.find_path(Point(0, 3), Point(2, 3));
+	EQUAL_CONTAINERS(path, MakeVector<Point>(Point(0, -1))(Point(1, -1))(Point(1,  0))(Point(1,  1))(Point(-1, 1)).result);
 }
 
 TEST_FIXTURE(LevelWithPath, should_find_path_between_close_points)
 {
-	std::list<Control> path = level.find_path(Point(0, 3), Point(0, 2));
-	EQUAL(path.size(), (unsigned)1);
-	std::list<Control>::const_iterator it = path.begin();
-	EQUAL((*it++).direction, Point(0, -1));
+	std::list<Point> path = level.find_path(Point(0, 3), Point(0, 2));
+	EQUAL_CONTAINERS(path, MakeVector<Point>(Point(0, -1)).result);
 }
 
 TEST_FIXTURE(LevelWithPath, should_not_find_path_if_target_is_the_same_as_start)
 {
-	std::list<Control> path = level.find_path(Point(0, 3), Point(0, 3));
+	std::list<Point> path = level.find_path(Point(0, 3), Point(0, 3));
 	ASSERT(path.empty());
 }
 

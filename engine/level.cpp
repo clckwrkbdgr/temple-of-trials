@@ -172,9 +172,9 @@ void Level::invalidate_fov(Monster & monster)
 	}
 }
 
-std::list<Control> Level::find_path(const Point & player_pos, const Point & target)
+std::list<Point> Level::find_path(const Point & player_pos, const Point & target)
 {
-	std::list<Control> best_path;
+	std::list<Point> best_path;
 	if(!target || !is_passable(target.x, target.y) || player_pos == target) {
 		return best_path;
 	}
@@ -234,7 +234,7 @@ std::list<Control> Level::find_path(const Point & player_pos, const Point & targ
 			bool is_close = std::abs(shift.x) <= 1 && std::abs(shift.y) <= 1;
 			if(shift && is_close) {
 				prev = point;
-				best_path.push_back(Control(Control::MOVE, shift));
+				best_path.push_back(shift);
 				break;
 			}
 		}

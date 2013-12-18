@@ -1,8 +1,8 @@
 #pragma once
 #include "util.h"
 #include <list>
-class Control;
 class Item;
+class Action;
 
 struct Monster {
 	enum Faction { NEUTRAL, PLAYER, MONSTER };
@@ -21,8 +21,9 @@ struct Monster {
 	int worn;
 	bool poisonous;
 	int poisoning;
-	std::list<Control> plan;
+	std::list<Action*> plan;
 	Monster();
+	~Monster();
 	operator bool() const;
 	bool is_dead() const { return hp <= 0; }
 	int damage() const;
@@ -33,6 +34,7 @@ struct Monster {
 	const Item & quest_item() const;
 	bool is_valid_slot(unsigned slot) const;
 	bool has_key(int key_type) const;
+	void add_path(const std::list<Point> & path);
 
 	struct Builder;
 };

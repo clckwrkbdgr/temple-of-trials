@@ -9,22 +9,6 @@
 #define GAME_ASSERT(condition, text) \
 	do { if(!(condition)) { message(text); return; } } while(0)
 
-Control::Control(int control_value)
-	: control(control_value), slot(-1)
-{
-}
-
-Control::Control(int control_value, const Point & control_direction)
-	: control(control_value), direction(control_direction), slot(-1)
-{
-}
-
-Control::Control(int control_value, int control_slot)
-	: control(control_value), slot(control_slot)
-{
-}
-
-
 Game::Game(LevelGenerator * level_generator)
 	: log_messages(false), current_level(0), generator(level_generator), state(PLAYING), turns(0)
 {
@@ -44,30 +28,11 @@ void Game::run(ControllerFactory controller_factory)
 				continue;
 			}
 			level.invalidate_fov(monster);
-			Control control = controller(monster, *this);
-			Action * action = 0;
-			switch(control.control) {
-				case Control::SMART_MOVE: action = new SmartMove(control.direction); break;
-				case Control::MOVE: action = new Move(control.direction); break;
-				case Control::OPEN: action = new Open(control.direction); break;
-				case Control::CLOSE: action = new Close(control.direction); break;
-				case Control::SWING: action = new Swing(control.direction); break;
-				case Control::FIRE: action = new Fire(control.direction); break;
-				case Control::DRINK: action = new Drink(control.direction); break;
-				case Control::GRAB: action = new Grab(); break;
-				case Control::DROP: action = new Drop(control.slot); break;
-				case Control::WIELD: action = new Wield(control.slot); break;
-				case Control::UNWIELD: action = new Unwield(); break;
-				case Control::WEAR: action = new Wear(control.slot); break;
-				case Control::TAKE_OFF: action = new TakeOff(); break;
-				case Control::EAT: action = new Eat(control.slot); break;
-				case Control::GO_UP: action = new GoUp(); break;
-				case Control::GO_DOWN: action = new GoDown(); break;
-				case Control::WAIT: break;
-				default: log("Unknown control: {0}", control.control); break;
-			}
+			Action * action = controller(monster, *this);
 			if(action) {
 				action->commit(monster, *this);
+				delete action;
+				action = 0;
 			}
 			if(state == TURN_ENDED) {
 				break;

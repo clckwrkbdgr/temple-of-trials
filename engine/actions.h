@@ -11,20 +11,25 @@ public:
 
 class DirectedAction : public Action {
 public:
+	const Point & shift;
+
 	DirectedAction(const Point & action_direction) : shift(action_direction) {}
 	virtual ~DirectedAction() {}
-protected:
-	const Point & shift;
 };
 
 class SlotAction : public Action {
 public:
+	int slot;
+
 	SlotAction(int action_slot) : slot(action_slot) {}
 	virtual ~SlotAction() {}
-protected:
-	int slot;
 };
 
+
+class Wait : public Action {
+public:
+	virtual void commit(Monster &, Game &) {}
+};
 
 class SmartMove : public DirectedAction {
 public:

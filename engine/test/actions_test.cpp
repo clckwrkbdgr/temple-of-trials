@@ -2,11 +2,6 @@
 #include "../game.h"
 #include "../test.h"
 
-std::string to_string(const Control & control)
-{
-	return format("Control({0}, dir={1}, slot={2})", control.control, control.direction, control.slot);
-}
-
 SUITE(actions) {
 
 struct GameWithDummy {
@@ -43,7 +38,10 @@ TEST_FIXTURE(GameWithDummy, should_plan_to_move_in_just_opened_door_on_smart)
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).openable().opened(false).name("door"));
 	SmartMove action(Point(0, -1));
 	action.commit(dummy(), game);
-	EQUAL_CONTAINERS(dummy().plan, MakeVector<Control>(Control(Control::MOVE, Point(0, -1))).result);
+	EQUAL(dummy().plan.size(), 1);
+	Move * next_action = dynamic_cast<Move*>(dummy().plan.front());
+	ASSERT(next_action);
+	EQUAL(next_action->shift, Point(0, -1));
 }
 
 TEST_FIXTURE(GameWithDummy, should_open_container_on_smart_move_if_exists)

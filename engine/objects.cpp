@@ -1,10 +1,18 @@
 #include "objects.h"
 #include "game.h"
+#include "actions.h"
 
 Monster::Monster()
 	: faction(NEUTRAL), godmode(false), sprite(0), sight(0), ai(0), max_hp(1), hp(max_hp),
 	hit_strength(0), wielded(-1), worn(-1), poisonous(false), poisoning(0)
 {
+}
+
+Monster::~Monster()
+{
+	foreach(Action * action, plan) {
+		delete action;
+	}
 }
 
 Monster::operator bool() const
@@ -127,6 +135,13 @@ bool Monster::has_key(int key_type) const
 		}
 	}
 	return false;
+}
+
+void Monster::add_path(const std::list<Point> & path)
+{
+	foreach(const Point & shift, path) {
+		plan.push_back(new Move(shift));
+	}
 }
 
 Monster::Builder & Monster::Builder::faction(int value) { result.faction = value; return *this; }

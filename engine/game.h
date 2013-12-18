@@ -6,27 +6,7 @@
 #include <list>
 class Game;
 
-struct Control {
-	enum {
-		NONE,
-		OPEN, CLOSE, MOVE, SMART_MOVE, SWING, WAIT,
-		GRAB, DROP, WIELD, UNWIELD, WEAR, TAKE_OFF, FIRE,
-		DRINK, EAT,
-		GO_UP, GO_DOWN,
-		COUNT
-	};
-	int control;
-	Point direction;
-	int slot;
-	Control(int control = NONE);
-	Control(int control, const Point & direction);
-	Control(int control, int slot);
-	bool done() const { return control != NONE; }
-	bool operator==(const Control & other) const { return control == other.control && direction == other.direction && slot == other.slot; }
-	bool operator!=(const Control & other) const { return !operator==(other); }
-};
-
-typedef Control (*Controller)(Monster&, Game&);
+typedef Action* (*Controller)(Monster&, Game&);
 typedef Controller (*ControllerFactory)(int ai);
 
 struct Game {

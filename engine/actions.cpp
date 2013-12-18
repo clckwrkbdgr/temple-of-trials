@@ -19,7 +19,7 @@ void SmartMove::commit(Monster & someone, Game & game)
 	Object & object = find_at(game.level.objects, new_pos);
 	if(object) {
 		if(object.openable && !object.opened) {
-			someone.plan.push_front(Control(Control::MOVE, shift));
+			someone.plan.push_front(new Move(shift));
 			Open open(shift);
 			open.commit(someone, game);
 			return;

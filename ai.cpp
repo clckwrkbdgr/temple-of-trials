@@ -1,21 +1,22 @@
 #include "ai.h"
 #include "console.h"
 #include "engine/game.h"
+#include "engine/actions.h"
 #include "engine/level.h"
 #include "engine/objects.h"
 #include <ncurses.h>
 #include <cstdlib>
 
-Control player_control(Monster & player, Game & game)
+Action * player_control(Monster & player, Game & game)
 {
 	Console & console = Console::instance();
 	while(game.state == Game::PLAYING) {
 		if(!player.plan.empty()) {
 			console.draw_game(game);
 			delay(10);
-			Control control = player.plan.front();
+			Action * action = player.plan.front();
 			player.plan.pop_front();
-			return control;
+			return action;
 		}
 		int ch = console.draw_and_get_control(game);
 		switch(ch) {
@@ -30,36 +31,36 @@ Control player_control(Monster & player, Game & game)
 				player.godmode = true;
 				break;
 			case 'x':
-				player.plan = game.level.find_path(player.pos, console.target_mode(game, player.pos));
+				player.add_path(game.level.find_path(player.pos, console.target_mode(game, player.pos)));
 				break;
 			case 'i':
 				console.draw_inventory(game, player);
 				console.get_control();
 				break;
 			case 'h': case 'j': case 'k': case 'l': case 'y': case 'u': case 'b': case 'n':
-				return Control(Control::SMART_MOVE, console.directions[ch]);
-			case '<': return Control(Control::GO_UP);
-			case '>': return Control(Control::GO_DOWN);
-			case 'g': return Control(Control::GRAB);
-			case 'w': return Control(Control::WIELD, console.get_inventory_slot(game, player));
-			case 'W': return Control(Control::WEAR, console.get_inventory_slot(game, player));
-			case 't': return Control(Control::UNWIELD);
-			case 'T': return Control(Control::TAKE_OFF);
-			case 'e': return Control(Control::EAT, console.get_inventory_slot(game, player));
-			case 'd': return Control(Control::DROP, console.get_inventory_slot(game, player));
-			case '.': return Control(Control::WAIT);
-			case 'D': return Control(Control::DRINK, console.draw_and_get_direction(game));
-			case 'f': return Control(Control::FIRE, console.draw_and_get_direction(game));
-			case 's': return Control(Control::SWING, console.draw_and_get_direction(game));
-			case 'o': return Control(Control::OPEN, console.draw_and_get_direction(game));
-			case 'c': return Control(Control::CLOSE, console.draw_and_get_direction(game));
+				return new SmartMove(console.directions[ch]);
+			case '<': return new GoUp();
+			case '>': return new GoDown();
+			case 'g': return new Grab();
+			case 'w': return new Wield(console.get_inventory_slot(game, player));
+			case 'W': return new Wear(console.get_inventory_slot(game, player));
+			case 't': return new Unwield();
+			case 'T': return new TakeOff();
+			case 'e': return new Eat(console.get_inventory_slot(game, player));
+			case 'd': return new Drop(console.get_inventory_slot(game, player));
+			case '.': return new Wait();
+			case 'D': return new Drink(console.draw_and_get_direction(game));
+			case 'f': return new Fire(console.draw_and_get_direction(game));
+			case 's': return new Swing(console.draw_and_get_direction(game));
+			case 'o': return new Open(console.draw_and_get_direction(game));
+			case 'c': return new Close(console.draw_and_get_direction(game));
 			default: console.notification(format("Unknown control '{0}'", char(ch)));
 		}
 	}
-	return Control();
+	return 0;
 }
 
-Control angry_and_wander(Monster & monster, Game & game)
+Action * angry_and_wander(Monster & monster, Game & game)
 {
 	const Monster & player = game.level.get_player();
 	bool sees_player = game.level.map.cell_properties(player.pos).visible;
@@ -69,19 +70,19 @@ Control angry_and_wander(Monster & monster, Game & game)
 			sign(player.pos.y - monster.pos.y)
 			);
 	if(sees_player && 1 < d && d <= monster.sight) {
-		return Control(Control::MOVE, shift);
+		return new Move(shift);
 	}
 	if(sees_player && d == 1) {
-		return Control(Control::SWING, shift);
+		return new Swing(shift);
 	}
 	Point direction = Point(rand() % 3 - 1, rand() % 3 - 1);
 	if(direction) {
-		return Control(Control::MOVE, direction);
+		return new Move(direction);
 	}
-	return Control(Control::WAIT);
+	return new Wait();
 }
 
-Control angry_and_still(Monster & monster, Game & game)
+Action * angry_and_still(Monster & monster, Game & game)
 {
 	const Monster & player = game.level.get_player();
 	bool sees_player = game.level.map.cell_properties(player.pos).visible;
@@ -91,15 +92,15 @@ Control angry_and_still(Monster & monster, Game & game)
 		sign(player.pos.y - monster.pos.y)
 		);
 	if(sees_player && 1 < d && d <= monster.sight) {
-		return Control(Control::MOVE, shift);
+		return new Move(shift);
 	}
 	if(sees_player && d == 1) {
-		return Control(Control::SWING, shift);
+		return new Swing(shift);
 	}
-	return Control(Control::WAIT);
+	return new Wait();
 }
 
-Control calm_and_still(Monster & monster, Game & game)
+Action * calm_and_still(Monster & monster, Game & game)
 {
 	const Monster & player = game.level.get_player();
 	bool sees_player = game.level.map.cell_properties(player.pos).visible;
@@ -109,9 +110,9 @@ Control calm_and_still(Monster & monster, Game & game)
 		sign(player.pos.y - monster.pos.y)
 		);
 	if(sees_player && d == 1) {
-		return Control(Control::SWING, shift);
+		return new Swing(shift);
 	}
-	return Control(Control::WAIT);
+	return new Wait();
 }
 
 Controller get_controller(int ai)
