@@ -32,6 +32,7 @@ struct Monster {
 	const Item & worn_item() const;
 	const Item & quest_item() const;
 	bool is_valid_slot(unsigned slot) const;
+	bool has_key(int key_type) const;
 
 	struct Builder;
 };
@@ -63,6 +64,7 @@ struct Item {
 	int antidote;
 	int healing;
 	bool quest;
+	int key_type;
 	Item();
 	operator bool() const;
 
@@ -81,6 +83,7 @@ struct Item::Builder {
 	Builder & antidote(int value);
 	Builder & healing(int value);
 	Builder & quest();
+	Builder & key_type(int value);
 };
 
 struct Object {
@@ -95,6 +98,8 @@ struct Object {
 	bool triggerable;
 	bool openable, opened;
 	int up_destination, down_destination;
+	bool locked;
+	int lock_type;
 	Object();
 	operator bool() const;
 	bool is_passable() const;
@@ -124,6 +129,8 @@ struct Object::Builder {
 	Builder & opened_sprite(const int & value);
 	Builder & closed_sprite(const int & value);
 	Builder & opened(bool value);
+	Builder & locked(bool value);
+	Builder & lock_type(int value);
 };
 
 

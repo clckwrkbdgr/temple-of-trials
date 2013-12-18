@@ -254,6 +254,11 @@ void Game::open(Monster & someone, const Point & shift)
     Object & object = find_at(level.objects, new_pos);
     if(object && object.openable) {
 		GAME_ASSERT(!object.opened, format("{0} is already opened.", object.name));
+		if(object.locked) {
+			GAME_ASSERT(someone.has_key(object.lock_type), format("{0} is locked.", object.name));
+			message(format("{0} unlocked the {1}.", someone.name, object.name));
+			object.locked = false;
+		}
 		object.opened = true;
 		message(format("{0} opened the {1}.", someone.name, object.name));
 		return;

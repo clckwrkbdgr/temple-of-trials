@@ -119,6 +119,16 @@ bool Monster::is_valid_slot(unsigned slot) const
 	return false;
 }
 
+bool Monster::has_key(int key_type) const
+{
+	foreach(const Item & item, inventory) {
+		if(item.key_type == key_type) {
+			return true;
+		}
+	}
+	return false;
+}
+
 Monster::Builder & Monster::Builder::faction(int value) { result.faction = value; return *this; }
 Monster::Builder & Monster::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Monster::Builder & Monster::Builder::sprite(const int & value) { result.sprite = value; return *this; }
@@ -153,6 +163,7 @@ Item::Builder & Item::Builder::edible() { result.edible = true; return *this; }
 Item::Builder & Item::Builder::antidote(int value) { result.antidote = value; return *this; }
 Item::Builder & Item::Builder::healing(int value) { result.healing = value; return *this; }
 Item::Builder & Item::Builder::quest() { result.quest = true; return *this; }
+Item::Builder & Item::Builder::key_type(int value) { result.key_type = value; return *this; }
 
 
 Object::Object()
@@ -215,4 +226,6 @@ Object::Builder & Object::Builder::opened_sprite(const int & value) { result.ope
 Object::Builder & Object::Builder::closed_sprite(const int & value) { result.sprite = value; return *this; }
 Object::Builder & Object::Builder::openable() { result.openable = true; return *this; }
 Object::Builder & Object::Builder::opened(bool value) { result.opened = value; return *this; }
+Object::Builder & Object::Builder::locked(bool value) { result.locked = value; return *this; }
+Object::Builder & Object::Builder::lock_type(int value) { result.lock_type = value; return *this; }
 

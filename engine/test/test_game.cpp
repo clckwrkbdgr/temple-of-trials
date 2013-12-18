@@ -387,6 +387,25 @@ TEST_FIXTURE(GameWithDummy, should_open_closed_doors)
 	EQUAL(game.messages, MakeVector<std::string>("Dummy opened the door.").result);
 }
 
+TEST_FIXTURE(GameWithDummy, should_open_locked_doors_without_a_key)
+{
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("door").openable().opened(false).locked(true).lock_type(1));
+	game.open(dummy(), Point(0, -1));
+	ASSERT(game.level.objects[0].locked);
+	ASSERT(!game.level.objects[0].opened);
+	EQUAL(game.messages, MakeVector<std::string>("Door is locked.").result);
+}
+
+TEST_FIXTURE(GameWithDummy, should_open_locked_doors_with_a_key)
+{
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("door").openable().opened(false).locked(true).lock_type(1));
+	dummy().inventory.push_back(Item::Builder().sprite(1).key_type(1));
+	game.open(dummy(), Point(0, -1));
+	ASSERT(!game.level.objects[0].locked);
+	ASSERT(game.level.objects[0].opened);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy unlocked the door.")("Dummy opened the door.").result);
+}
+
 TEST_FIXTURE(GameWithDummy, should_not_open_empty_cell)
 {
 	game.open(dummy(), Point(0, -1));
