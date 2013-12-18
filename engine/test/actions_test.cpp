@@ -15,66 +15,6 @@ struct GameWithDummy {
 	Monster & dummy() { return game.level.monsters[0]; }
 };
 
-TEST_FIXTURE(GameWithDummy, should_move_on_smart_move_if_passable)
-{
-	SmartMove action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().pos, Point(1, 0));
-	ASSERT(game.messages.empty());
-}
-
-TEST_FIXTURE(GameWithDummy, should_open_door_on_smart_move_if_exists)
-{
-	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).openable().opened(false).name("door"));
-	SmartMove action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(game.level.objects.front().opened);
-	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages, MakeVector<std::string>("Dummy opened the door.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_plan_to_move_in_just_opened_door_on_smart)
-{
-	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).openable().opened(false).name("door"));
-	SmartMove action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().plan.size(), 1);
-	Move * next_action = dynamic_cast<Move*>(dummy().plan.front());
-	ASSERT(next_action);
-	EQUAL(next_action->shift, Point(0, -1));
-}
-
-TEST_FIXTURE(GameWithDummy, should_open_container_on_smart_move_if_exists)
-{
-	Item apple = Item::Builder().sprite(1).name("apple");
-	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("pot").containable().item(apple));
-	SmartMove action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(game.level.objects.front().items.empty());
-	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.level.items, MakeVector<Item>(Item::Builder().sprite(1).name("apple").pos(Point(1, 1))).result);
-	EQUAL(game.messages, MakeVector<std::string>("Dummy took up a apple from pot.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_drink_from_fountain_on_smart_move_if_exists)
-{
-	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("well").drinkable());
-	SmartMove action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages, MakeVector<std::string>("Dummy drink from well.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_swing_at_monster_on_smart_move_if_exists)
-{
-	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 0)).name("stub"));
-	SmartMove action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages, MakeVector<std::string>("Dummy hit stub for 0 hp.").result);
-}
-
-
 TEST_FIXTURE(GameWithDummy, should_not_drink_monsters)
 {
 	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 0)).name("stub"));

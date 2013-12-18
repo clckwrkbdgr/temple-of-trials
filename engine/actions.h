@@ -1,7 +1,7 @@
 #pragma once
+#include "util.h"
 class Game;
 class Monster;
-class Point;
 
 class Action {
 public:
@@ -11,7 +11,7 @@ public:
 
 class DirectedAction : public Action {
 public:
-	const Point & shift;
+	const Point shift;
 
 	DirectedAction(const Point & action_direction) : shift(action_direction) {}
 	virtual ~DirectedAction() {}
@@ -29,12 +29,6 @@ public:
 class Wait : public Action {
 public:
 	virtual void commit(Monster &, Game &) {}
-};
-
-class SmartMove : public DirectedAction {
-public:
-	SmartMove(const Point & shift) : DirectedAction(shift) {}
-	virtual void commit(Monster & someone, Game & game);
 };
 
 class Move : public DirectedAction {

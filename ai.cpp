@@ -38,7 +38,27 @@ Action * player_control(Monster & player, Game & game)
 				console.get_control();
 				break;
 			case 'h': case 'j': case 'k': case 'l': case 'y': case 'u': case 'b': case 'n':
-				return new SmartMove(console.directions[ch]);
+			{
+				Point shift = console.directions[ch];
+				Point new_pos = player.pos + shift;
+				if(find_at(game.level.monsters, new_pos)) {
+					return new Swing(shift);
+				}
+				Object & object = find_at(game.level.objects, new_pos);
+				if(object) {
+					if(object.openable && !object.opened) {
+						player.plan.push_front(new Move(shift));
+						return new Open(shift);
+					}
+					if(object.containable) {
+						return new Open(shift);
+					}
+					if(object.drinkable) {
+						return new Drink(shift);
+					}
+				}
+				return new Move(shift);
+			}
 			case '<': return new GoUp();
 			case '>': return new GoDown();
 			case 'g': return new Grab();

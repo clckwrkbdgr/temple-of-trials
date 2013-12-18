@@ -7,38 +7,6 @@
 #define ACTION_ASSERT(condition, text) \
 	do { if(!(condition)) { game.message(text); return; } } while(0)
 
-void SmartMove::commit(Monster & someone, Game & game)
-{
-	assert(shift);
-	Point new_pos = someone.pos + shift;
-	if(find_at(game.level.monsters, new_pos)) {
-		Swing swing(shift);
-		swing.commit(someone, game);
-		return;
-	}
-	Object & object = find_at(game.level.objects, new_pos);
-	if(object) {
-		if(object.openable && !object.opened) {
-			someone.plan.push_front(new Move(shift));
-			Open open(shift);
-			open.commit(someone, game);
-			return;
-		}
-		if(object.containable) {
-			Open open(shift);
-			open.commit(someone, game);
-			return;
-		}
-		if(object.drinkable) {
-			Drink drink(shift);
-			drink.commit(someone, game);
-			return;
-		}
-	}
-	Move move(shift);
-	move.commit(someone, game);
-}
-
 void Move::commit(Monster & someone, Game & game)
 {
 	assert(shift);
