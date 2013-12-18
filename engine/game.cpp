@@ -26,7 +26,6 @@ Control::Control(int control_value, int control_slot)
 Game::Game(LevelGenerator * level_generator)
 	: log_messages(false), current_level(0), generator(level_generator), state(PLAYING), turns(0)
 {
-	TRACE(state);
 }
 
 void Game::run(ControllerFactory controller_factory)
@@ -219,7 +218,11 @@ void Game::move(Monster & someone, const Point & shift)
     Object & object = find_at(level.objects, new_pos);
 	if(object) {
 		if(object.openable) {
-			GAME_ASSERT(object.opened, format("{0} is closed.", object.name));
+			if(object.locked) {
+				GAME_ASSERT(object.opened, format("{0} is locked.", object.name));
+			} else {
+				GAME_ASSERT(object.opened, format("{0} is closed.", object.name));
+			}
 		}
 		GAME_ASSERT(object.passable, format("{0} bump into {1}.", someone.name, object.name));
 	}
