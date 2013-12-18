@@ -7,34 +7,39 @@
 #define ACTION_ASSERT(condition, text) \
 	do { if(!(condition)) { game.message(text); return; } } while(0)
 
-void smart_move(Game & game, Monster & someone, const Point & shift)
+void SmartMove::commit(Monster & someone, Game & game)
 {
 	assert(shift);
 	Point new_pos = someone.pos + shift;
 	if(find_at(game.level.monsters, new_pos)) {
-		swing(game, someone, shift);
+		Swing swing(shift);
+		swing.commit(someone, game);
 		return;
 	}
 	Object & object = find_at(game.level.objects, new_pos);
 	if(object) {
 		if(object.openable && !object.opened) {
 			someone.plan.push_front(Control(Control::MOVE, shift));
-			open(game, someone, shift);
+			Open open(shift);
+			open.commit(someone, game);
 			return;
 		}
 		if(object.containable) {
-			open(game, someone, shift);
+			Open open(shift);
+			open.commit(someone, game);
 			return;
 		}
 		if(object.drinkable) {
-			drink(game, someone, shift);
+			Drink drink(shift);
+			drink.commit(someone, game);
 			return;
 		}
 	}
-	move(game, someone, shift);
+	Move move(shift);
+	move.commit(someone, game);
 }
 
-void move(Game & game, Monster & someone, const Point & shift)
+void Move::commit(Monster & someone, Game & game)
 {
 	assert(shift);
 	Point new_pos = someone.pos + shift;
@@ -55,7 +60,7 @@ void move(Game & game, Monster & someone, const Point & shift)
     someone.pos = new_pos;
 }
 
-void drink(Game & game, Monster & someone, const Point & shift)
+void Drink::commit(Monster & someone, Game & game)
 {
 	assert(shift);
 	Point new_pos = someone.pos + shift;
@@ -78,7 +83,7 @@ void drink(Game & game, Monster & someone, const Point & shift)
 	}
 }
 
-void open(Game & game, Monster & someone, const Point & shift)
+void Open::commit(Monster & someone, Game & game)
 {
 	assert(shift);
     Point new_pos = someone.pos + shift;
@@ -104,7 +109,7 @@ void open(Game & game, Monster & someone, const Point & shift)
 	object.items.clear();
 }
 
-void close(Game & game, Monster & someone, const Point & shift)
+void Close::commit(Monster & someone, Game & game)
 {
 	assert(shift);
     Point new_pos = someone.pos + shift;
@@ -115,7 +120,7 @@ void close(Game & game, Monster & someone, const Point & shift)
     game.message(format("{0} closed the {1}.", someone.name, object.name));
 }
 
-void swing(Game & game, Monster & someone, const Point & shift)
+void Swing::commit(Monster & someone, Game & game)
 {
 	assert(shift);
     Point new_pos = someone.pos + shift;
@@ -123,7 +128,8 @@ void swing(Game & game, Monster & someone, const Point & shift)
     Object & object = find_at(game.level.objects, new_pos);
     if(object && object.openable && !object.opened) {
 		game.message(format("{0} swing at {1}.", someone.name, object.name));
-		open(game, someone, shift);
+		Open open(shift);
+		open.commit(someone, game);
 		return;
     }
     Monster & monster = find_at(game.level.monsters, new_pos);
@@ -135,7 +141,7 @@ void swing(Game & game, Monster & someone, const Point & shift)
     game.message(format("{0} swing at nothing.", someone.name));
 }
 
-void fire(Game & game, Monster & someone, const Point & shift)
+void Fire::commit(Monster & someone, Game & game)
 {
 	assert(shift);
 	Item item = someone.wielded_item();
@@ -177,17 +183,19 @@ void fire(Game & game, Monster & someone, const Point & shift)
 	}
 }
 
-void drop(Game & game, Monster & someone, int slot)
+void Drop::commit(Monster & someone, Game & game)
 {
 	assert(slot > -1);
 	ACTION_ASSERT(!someone.inventory.empty(), format("{0} have nothing to drop.", someone.name));
 	ACTION_ASSERT(slot < int(someone.inventory.size()), "No such object.");
 	ACTION_ASSERT(someone.inventory[slot], "No such object.");
 	if(someone.wielded == slot) {
-		unwield(game, someone);
+		Unwield unwield;
+		unwield.commit(someone, game);
 	}
 	if(someone.worn == slot) {
-		take_off(game, someone);
+		TakeOff takeoff;
+		takeoff.commit(someone, game);
 	}
 	Item item = someone.inventory[slot];
 	someone.inventory[slot] = Item();
@@ -196,7 +204,7 @@ void drop(Game & game, Monster & someone, int slot)
 	game.message(format("{0} dropped {1} on the {2}.", someone.name, item.name, game.level.map.cell(someone.pos).name));
 }
 
-void grab(Game & game, Monster & someone)
+void Grab::commit(Monster & someone, Game & game)
 {
 	std::vector<Item>::iterator item_index;
 	Item item = find_at(game.level.items, someone.pos, &item_index);
@@ -220,7 +228,7 @@ void grab(Game & game, Monster & someone)
 	}
 }
 
-void wield(Game & game, Monster & someone, int slot)
+void Wield::commit(Monster & someone, Game & game)
 {
 	assert(slot > -1);
 	ACTION_ASSERT(!someone.inventory.empty(), format("{0} have nothing to wield.", someone.name));
@@ -228,16 +236,18 @@ void wield(Game & game, Monster & someone, int slot)
 	ACTION_ASSERT(someone.inventory[slot], "No such object.");
 	Item item = someone.inventory[slot];
 	if(someone.wielded > -1) {
-		unwield(game, someone);
+		Unwield unwield;
+		unwield.commit(someone, game);
 	}
 	if(someone.worn == slot) {
-		take_off(game, someone);
+		TakeOff takeoff;
+		takeoff.commit(someone, game);
 	}
 	someone.wielded = slot;
 	game.message(format("{0} wields {1}.", someone.name, item.name));
 }
 
-void unwield(Game & game, Monster & someone)
+void Unwield::commit(Monster & someone, Game & game)
 {
 	ACTION_ASSERT(someone.wielded > -1, format("{0} is wielding nothing.", someone.name));
 	Item & item = someone.wielded_item();
@@ -246,7 +256,7 @@ void unwield(Game & game, Monster & someone)
 	someone.wielded = -1;
 }
 
-void wear(Game & game, Monster & someone, int slot)
+void Wear::commit(Monster & someone, Game & game)
 {
 	assert(slot > -1);
 	ACTION_ASSERT(!someone.inventory.empty(), format("{0} have nothing to wear.", someone.name));
@@ -255,16 +265,18 @@ void wear(Game & game, Monster & someone, int slot)
 	Item item = someone.inventory[slot];
 	ACTION_ASSERT(item.wearable, format("{0} cannot be worn.", item.name));
 	if(someone.worn > -1) {
-		take_off(game, someone);
+		TakeOff takeoff;
+		takeoff.commit(someone, game);
 	}
 	if(someone.wielded == slot) {
-		unwield(game, someone);
+		Unwield unwield;
+		unwield.commit(someone, game);
 	}
 	someone.worn = slot;
 	game.message(format("{0} wear {1}.", someone.name, item.name));
 }
 
-void take_off(Game & game, Monster & someone)
+void TakeOff::commit(Monster & someone, Game & game)
 {
 	ACTION_ASSERT(someone.worn > -1, format("{0} is wearing nothing.", someone.name));
 	Item & item = someone.worn_item();
@@ -273,7 +285,7 @@ void take_off(Game & game, Monster & someone)
 	someone.worn = -1;
 }
 
-void eat(Game & game, Monster & someone, int slot)
+void Eat::commit(Monster & someone, Game & game)
 {
 	assert(slot > -1);
 	ACTION_ASSERT(!someone.inventory.empty(), format("{0} have nothing to eat.", someone.name));
@@ -281,10 +293,12 @@ void eat(Game & game, Monster & someone, int slot)
 	Item & item = someone.inventory[slot];
 	ACTION_ASSERT(item.edible, format("{0} isn't edible.", item.name));
 	if(someone.worn == slot) {
-		take_off(game, someone);
+		TakeOff takeoff;
+		takeoff.commit(someone, game);
 	}
 	if(someone.wielded == slot) {
-		unwield(game, someone);
+		Unwield unwield;
+		unwield.commit(someone, game);
 	}
 	game.message(format("{0} eats {1}.", someone.name, item.name));
 	if(item.antidote > 0 && someone.poisoning > 0) {
@@ -304,7 +318,7 @@ void eat(Game & game, Monster & someone, int slot)
 	someone.inventory[slot] = Item();
 }
 
-void go_up(Game & game, Monster & someone)
+void GoUp::commit(Monster & someone, Game & game)
 {
     Object & object = find_at(game.level.objects, someone.pos);
 	ACTION_ASSERT(object && object.transporting && object.up_destination, format("{0} cannot go up from there.", someone.name));
@@ -322,7 +336,7 @@ void go_up(Game & game, Monster & someone)
 	}
 }
 
-void go_down(Game & game, Monster & someone)
+void GoDown::commit(Monster & someone, Game & game)
 {
     Object & object = find_at(game.level.objects, someone.pos);
 	ACTION_ASSERT(object && object.transporting && object.down_destination, format("{0} cannot go down from there.", someone.name));

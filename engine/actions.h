@@ -3,19 +3,117 @@ class Game;
 class Monster;
 class Point;
 
-void smart_move(Game & game, Monster & someone, const Point & shift);
-void move(Game & game, Monster & someone, const Point & shift);
-void open(Game & game, Monster & someone, const Point & shift);
-void close(Game & game, Monster & someone, const Point & shift);
-void swing(Game & game, Monster & someone, const Point & shift);
-void fire(Game & game, Monster & someone, const Point & shift);
-void drink(Game & game, Monster & someone, const Point & shift);
-void grab(Game & game, Monster & someone);
-void drop(Game & game, Monster & someone, int slot);
-void wield(Game & game, Monster & someone, int slot);
-void unwield(Game & game, Monster & someone);
-void wear(Game & game, Monster & someone, int slot);
-void take_off(Game & game, Monster & someone);
-void eat(Game & game, Monster & someone, int slot);
-void go_up(Game & game, Monster & someone);
-void go_down(Game & game, Monster & someone);
+class Action {
+public:
+	virtual ~Action() {}
+	virtual void commit(Monster & someone, Game & game) = 0;
+};
+
+class DirectedAction : public Action {
+public:
+	DirectedAction(const Point & action_direction) : shift(action_direction) {}
+	virtual ~DirectedAction() {}
+protected:
+	const Point & shift;
+};
+
+class SlotAction : public Action {
+public:
+	SlotAction(int action_slot) : slot(action_slot) {}
+	virtual ~SlotAction() {}
+protected:
+	int slot;
+};
+
+
+class SmartMove : public DirectedAction {
+public:
+	SmartMove(const Point & shift) : DirectedAction(shift) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Move : public DirectedAction {
+public:
+	Move(const Point & shift) : DirectedAction(shift) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Open : public DirectedAction {
+public:
+	Open(const Point & shift) : DirectedAction(shift) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Close : public DirectedAction {
+public:
+	Close(const Point & shift) : DirectedAction(shift) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Swing : public DirectedAction {
+public:
+	Swing(const Point & shift) : DirectedAction(shift) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Fire : public DirectedAction {
+public:
+	Fire(const Point & shift) : DirectedAction(shift) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Drink : public DirectedAction {
+public:
+	Drink(const Point & shift) : DirectedAction(shift) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Grab : public Action {
+public:
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Drop : public SlotAction {
+public:
+	Drop(int slot) : SlotAction(slot) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Wield : public SlotAction {
+public:
+	Wield(int slot) : SlotAction(slot) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Unwield : public Action {
+public:
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Wear : public SlotAction {
+public:
+	Wear(int slot) : SlotAction(slot) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class TakeOff : public Action {
+public:
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class Eat : public SlotAction {
+public:
+	Eat(int slot) : SlotAction(slot) {}
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class GoUp : public Action {
+public:
+	virtual void commit(Monster & someone, Game & game);
+};
+
+class GoDown : public Action {
+public:
+	virtual void commit(Monster & someone, Game & game);
+};
+
