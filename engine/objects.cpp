@@ -109,6 +109,16 @@ const Item & Monster::quest_item() const
 	return empty;
 }
 
+bool Monster::is_valid_slot(unsigned slot) const
+{
+	if(0 <= slot && slot < inventory.size()) {
+		if(inventory[slot]) {
+			return true;
+		}
+	}
+	return false;
+}
+
 Monster::Builder & Monster::Builder::faction(int value) { result.faction = value; return *this; }
 Monster::Builder & Monster::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Monster::Builder & Monster::Builder::sprite(const int & value) { result.sprite = value; return *this; }

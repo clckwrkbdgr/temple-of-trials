@@ -31,6 +31,7 @@ struct Monster {
 	Item & worn_item();
 	const Item & worn_item() const;
 	const Item & quest_item() const;
+	bool is_valid_slot(unsigned slot) const;
 
 	struct Builder;
 };

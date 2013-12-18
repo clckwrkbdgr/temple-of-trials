@@ -441,9 +441,8 @@ void Game::eat(Monster & someone, int slot)
 {
 	assert(slot > -1);
 	GAME_ASSERT(!someone.inventory.empty(), format("{0} have nothing to eat.", someone.name));
-	GAME_ASSERT(slot < int(someone.inventory.size()), "No such object.");
+	GAME_ASSERT(someone.is_valid_slot(slot), "No such object.");
 	Item & item = someone.inventory[slot];
-	GAME_ASSERT(item, "No such object.");
 	GAME_ASSERT(item.edible, format("{0} isn't edible.", item.name));
 	if(someone.worn == slot) {
 		take_off(someone);

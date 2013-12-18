@@ -109,6 +109,18 @@ TEST(should_get_quest_items_when_carrying_one)
 	ASSERT(item.quest);
 }
 
+TEST(missing_slot_should_not_be_valid)
+{
+	Monster monster = Monster::Builder().item(Item()).item(Item::Builder().quest().sprite(1));
+	ASSERT(!monster.is_valid_slot(2));
+}
+
+TEST(empty_slot_should_not_be_valid)
+{
+	Monster monster = Monster::Builder().item(Item()).item(Item::Builder().quest().sprite(1));
+	ASSERT(!monster.is_valid_slot(0));
+}
+
 }
 
 SUITE(objects) {
