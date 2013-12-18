@@ -94,12 +94,17 @@ void Swing::commit(Monster & someone, Game & game)
     Point new_pos = someone.pos + shift;
 	ACTION_ASSERT(game.level.map.cell(new_pos).passable, format("{0} hit {1}.", someone.name, game.level.map.cell(new_pos).name));
     Object & object = find_at(game.level.objects, new_pos);
-    if(object && object.openable && !object.opened) {
+	if(object && object.openable && !object.opened) {
 		game.message(format("{0} swing at {1}.", someone.name, object.name));
-		Open open(shift);
-		open.commit(someone, game);
+		if(object.locked) {
+			ACTION_ASSERT(someone.has_key(object.lock_type), format("{0} is locked.", object.name));
+			game.message(format("{0} unlocked the {1}.", someone.name, object.name));
+			object.locked = false;
+		}
+		object.opened = true;
+		game.message(format("{0} opened the {1}.", someone.name, object.name));
 		return;
-    }
+	}
     Monster & monster = find_at(game.level.monsters, new_pos);
 	if(monster) {
 		game.hit(someone, monster, someone.damage());
@@ -158,12 +163,12 @@ void Drop::commit(Monster & someone, Game & game)
 	ACTION_ASSERT(slot < int(someone.inventory.size()), "No such object.");
 	ACTION_ASSERT(someone.inventory[slot], "No such object.");
 	if(someone.wielded == slot) {
-		Unwield unwield;
-		unwield.commit(someone, game);
+		game.message(format("{0} unwields {1}.", someone.name, someone.wielded_item().name));
+		someone.wielded = -1;
 	}
 	if(someone.worn == slot) {
-		TakeOff takeoff;
-		takeoff.commit(someone, game);
+		game.message(format("{0} takes off {1}.", someone.name, someone.worn_item().name));
+		someone.worn = -1;
 	}
 	Item item = someone.inventory[slot];
 	someone.inventory[slot] = Item();
@@ -204,12 +209,12 @@ void Wield::commit(Monster & someone, Game & game)
 	ACTION_ASSERT(someone.inventory[slot], "No such object.");
 	Item item = someone.inventory[slot];
 	if(someone.wielded > -1) {
-		Unwield unwield;
-		unwield.commit(someone, game);
+		game.message(format("{0} unwields {1}.", someone.name, someone.wielded_item().name));
+		someone.wielded = -1;
 	}
 	if(someone.worn == slot) {
-		TakeOff takeoff;
-		takeoff.commit(someone, game);
+		game.message(format("{0} takes off {1}.", someone.name, someone.worn_item().name));
+		someone.worn = -1;
 	}
 	someone.wielded = slot;
 	game.message(format("{0} wields {1}.", someone.name, item.name));
@@ -233,12 +238,12 @@ void Wear::commit(Monster & someone, Game & game)
 	Item item = someone.inventory[slot];
 	ACTION_ASSERT(item.wearable, format("{0} cannot be worn.", item.name));
 	if(someone.worn > -1) {
-		TakeOff takeoff;
-		takeoff.commit(someone, game);
+		game.message(format("{0} takes off {1}.", someone.name, someone.worn_item().name));
+		someone.worn = -1;
 	}
 	if(someone.wielded == slot) {
-		Unwield unwield;
-		unwield.commit(someone, game);
+		game.message(format("{0} unwields {1}.", someone.name, someone.wielded_item().name));
+		someone.wielded = -1;
 	}
 	someone.worn = slot;
 	game.message(format("{0} wear {1}.", someone.name, item.name));
@@ -261,12 +266,12 @@ void Eat::commit(Monster & someone, Game & game)
 	Item & item = someone.inventory[slot];
 	ACTION_ASSERT(item.edible, format("{0} isn't edible.", item.name));
 	if(someone.worn == slot) {
-		TakeOff takeoff;
-		takeoff.commit(someone, game);
+		game.message(format("{0} takes off {1}.", someone.name, someone.worn_item().name));
+		someone.worn = -1;
 	}
 	if(someone.wielded == slot) {
-		Unwield unwield;
-		unwield.commit(someone, game);
+		game.message(format("{0} unwields {1}.", someone.name, someone.wielded_item().name));
+		someone.wielded = -1;
 	}
 	game.message(format("{0} eats {1}.", someone.name, item.name));
 	if(item.antidote > 0 && someone.poisoning > 0) {
