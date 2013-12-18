@@ -27,6 +27,7 @@ enum {
 	STAIRS_DOWN,
 	TRAP,
 	SHARPENED_POLE,
+	KEY,
 
 	COUNT
 };

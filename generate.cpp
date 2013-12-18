@@ -65,6 +65,11 @@ Item apple(const Point & pos = Point())
 	return Item::Builder().pos(pos).sprite(Sprites::APPLE).name("apple").edible().healing(10);
 }
 
+Item key(int key_type, const Point & pos = Point())
+{
+	return Item::Builder().pos(pos).sprite(Sprites::KEY).name("key").key_type(key_type);
+}
+
 Monster player(const Point & monster_pos)
 {
 	return Monster::Builder().faction(Monster::PLAYER).pos(monster_pos).sprite(Sprites::PLAYER).sight(10).hp(20).ai(AI::PLAYER).name("you").hit_strength(3);
@@ -84,6 +89,11 @@ Monster scorpion(int ai, const Point & monster_pos)
 Object door(const Point & pos)
 {
 	return Object::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).name("door").openable().opened(false).passable().transparent();
+}
+
+Object locked_door(const Point & pos, int lock_type)
+{
+	return Object::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).name("door").openable().opened(false).passable().transparent().locked(true).lock_type(lock_type);
 }
 
 Object pot(const Point & pos)
@@ -180,6 +190,13 @@ void LinearGenerator::generate(Level & level, int level_index)
 	}
 
 	for(unsigned i = 0; i < rooms.size(); ++i) {
+		bool is_last_room = i == rooms.size() - 1;
+		if(is_last_room) {
+			if(!level.monsters.empty()) {
+				int key_holder = rand() % level.monsters.size();
+				level.monsters[key_holder].inventory.push_back(World::key(level_index));
+			}
+		}
 		fill_room(level.map, rooms[i], floor_type);
 		foreach(char cell, room_content[i]) {
 			Point pos = random_pos(level, rooms[i]);
@@ -231,7 +248,11 @@ void LinearGenerator::generate(Level & level, int level_index)
 			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], floor_type);
 			if(doors.first && doors.second) {
 				level.objects.push_back(World::door(doors.first));
-				level.objects.push_back(World::door(doors.second));
+				if(is_last_room) {
+					level.objects.push_back(World::locked_door(doors.second, level_index));
+				} else {
+					level.objects.push_back(World::door(doors.second));
+				}
 			}
 		}
 	}

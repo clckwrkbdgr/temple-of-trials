@@ -26,10 +26,12 @@ Control::Control(int control_value, int control_slot)
 Game::Game(LevelGenerator * level_generator)
 	: log_messages(false), current_level(0), generator(level_generator), state(PLAYING), turns(0)
 {
+	TRACE(state);
 }
 
 void Game::run(ControllerFactory controller_factory)
 {
+	state = PLAYING;
 	while(state == PLAYING) {
 		foreach(Monster & monster, level.monsters) {
 			if(monster.is_dead()) {
@@ -74,7 +76,9 @@ void Game::run(ControllerFactory controller_factory)
 		}
 		level.erase_dead_monsters();
 		++turns;
-		state = PLAYING;
+		if(state == TURN_ENDED) {
+			state = PLAYING;
+		}
 	}
 }
 
