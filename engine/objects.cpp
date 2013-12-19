@@ -19,6 +19,17 @@ bool Inventory::empty() const
 	return true;
 }
 
+unsigned Inventory::size() const
+{
+	unsigned result = 0;
+	foreach(const Item & item, items) {
+		if(item) {
+			++result;
+		}
+	}
+	return result;
+}
+
 bool Inventory::set_item(unsigned slot, const Item & item)
 {
 	if(slot < 0 || SLOT_COUNT <= slot) {

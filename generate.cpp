@@ -194,7 +194,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 		if(is_last_room) {
 			if(!level.monsters.empty()) {
 				int key_holder = rand() % level.monsters.size();
-				level.monsters[key_holder].inventory.push_back(World::key(level_index));
+				level.monsters[key_holder].inventory.insert(World::key(level_index));
 			}
 		}
 		fill_room(level.map, rooms[i], floor_type);

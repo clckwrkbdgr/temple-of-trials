@@ -69,7 +69,7 @@ SAVEFILE_STORE_EXT(Monster, monster)
 	if(savefile.version() < 2) {
 		savefile.store(monster.inventory.items, "inventory item");
 	} else {
-		savefile.store(monster.inventory);
+		store_ext(savefile, monster.inventory);
 	}
 }
 

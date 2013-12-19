@@ -14,6 +14,7 @@ struct Inventory {
 	Inventory();
 	bool empty() const;
 	void clear();
+	unsigned size() const;
 	bool set_item(unsigned slot, const Item & item);
 	const Item & get_item(unsigned slot) const;
 	Item & get_item(unsigned slot);

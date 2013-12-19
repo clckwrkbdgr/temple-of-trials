@@ -181,8 +181,8 @@ void Console::draw_game(const Game & game)
 	print_stat(row++, format("Turns: {0}", game.turns));
 	print_stat(row++, format("HP   : {0}/{1}", player.hp, player.max_hp));
 	print_stat(row++, format("Items: {0}", player.inventory.size()));
-	print_stat(row++, format("Wield: {0}", player.wielded_item() ? player.wielded_item().name : "none"));
-	print_stat(row++, format("Wear : {0}", player.worn_item() ? player.worn_item().name : "none"));
+	print_stat(row++, format("Wield: {0}", player.inventory.wielded_item() ? player.inventory.wielded_item().name : "none"));
+	print_stat(row++, format("Wear : {0}", player.inventory.worn_item() ? player.inventory.worn_item().name : "none"));
 	print_stat(row++, format("Dmg  : {0}", player.damage()));
 	row++;
 	if(player.poisoning > 0) {
@@ -280,22 +280,22 @@ void Console::draw_inventory(const Game & game, const Monster & monster)
 	getmaxyx(stdscr, height, width);
 	(void)height;
 	int pos = 0, index = 0;
-	foreach(const Item & item, monster.inventory) {
+	foreach(const Item & item, monster.inventory.items) {
 		if(item) {
 			int x = (pos < 13) ? 0 : width / 2;
 			int y = 1 + ((pos < 13) ? pos : pos - 13);
 			std::string text = format("{0} - {1}", char(index + 'a'), item.name);
-			if(monster.wielded == index) {
+			if(monster.inventory.wields(index)) {
 				text += " (wielded)";
 			}
-			if(monster.worn == index) {
+			if(monster.inventory.wears(index)) {
 				text += " (worn)";
 			}
 			mvprintw(y, x, text.c_str());
 			++pos;
 		}
 		++index;
-		if(index > 26) {
+		if(index > Inventory::SLOT_COUNT) {
 			break;
 		}
 	}
@@ -331,7 +331,7 @@ int Console::get_inventory_slot(const Game & game, const Monster & monster)
 			continue;
 		}
 		slot = ch - 'a';
-		if(slot >= int(monster.inventory.size()) || !monster.inventory[slot]) {
+		if(!monster.inventory.get_item(slot)) {
 			error = "Slot is empty; nothing is here.";
 			continue;
 		}
