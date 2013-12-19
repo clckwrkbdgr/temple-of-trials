@@ -113,6 +113,19 @@ Reader & Reader::store(std::string & value)
 	return *this;
 }
 
+Reader & Reader::store(Point & value)
+{
+	bool valid;
+	int x, y;
+	store(valid).store(x).store(y);
+	if(valid) {
+		value = Point(x, y);
+	} else {
+		value = Point();
+	}
+	return *this;
+}
+
 Reader & Reader::size_of(Map & map)
 {
 	unsigned width = 0, height = 0;
@@ -174,6 +187,12 @@ Writer & Writer::store(bool value)
 Writer & Writer::store(const std::string & value)
 {
 	out << escaped(value) << ' ';
+	return *this;
+}
+
+Writer & Writer::store(const Point & value)
+{
+	store(value.valid()).store(value.x).store(value.y);
 	return *this;
 }
 

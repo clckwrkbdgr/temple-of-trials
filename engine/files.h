@@ -32,6 +32,7 @@ public:
 	Reader & store(char & value);
 	Reader & store(bool & value);
 	Reader & store(std::string & value);
+	Reader & store(Point & value);
 	Reader & size_of(Map & map);
 	template<class T>
 	Reader & size_of(std::vector<T> & v)
@@ -76,6 +77,7 @@ public:
 	Writer & store(char value);
 	Writer & store(bool value);
 	Writer & store(const std::string & value);
+	Writer & store(const Point & value);
 	Writer & size_of(const Map & map);
 	template<class T>
 	Writer & size_of(const std::vector<T> & v)
