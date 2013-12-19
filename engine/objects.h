@@ -59,7 +59,7 @@ struct Monster {
 	std::list<Action*> plan;
 	Monster();
 	~Monster();
-	operator bool() const;
+	bool valid() const;
 	bool is_dead() const { return hp <= 0; }
 	int damage() const;
 	void add_path(const std::list<Point> & path);
@@ -96,7 +96,7 @@ struct Item {
 	bool quest;
 	int key_type;
 	Item();
-	operator bool() const;
+	bool valid() const;
 
 	struct Builder;
 };
@@ -131,7 +131,7 @@ struct Object {
 	bool locked;
 	int lock_type;
 	Object();
-	operator bool() const;
+	bool valid() const;
 	bool is_passable() const;
 	bool is_transparent() const;
 	int get_sprite() const;

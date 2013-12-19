@@ -45,11 +45,11 @@ bool Level::is_passable(int x, int y) const
 		return false;
 	}
     const Object & object = find_at(objects, new_pos);
-	if(object && !object.is_passable()) {
+	if(object.valid() && !object.is_passable()) {
 		return false;
 	}
     const Monster & monster = find_at(monsters, new_pos);
-	if(monster) {
+	if(monster.valid()) {
 		return false;
 	}
 	return true;
@@ -59,7 +59,7 @@ bool Level::is_transparent(int x, int y) const
 {
 	Point new_pos(x, y);
     const Object & object = find_at(objects, new_pos);
-	if(object && !object.is_transparent()) {
+	if(object.valid() && !object.is_transparent()) {
 		return false;
 	}
 	return map.cell(x, y).transparent;
@@ -175,14 +175,14 @@ void Level::invalidate_fov(Monster & monster)
 std::list<Point> Level::find_path(const Point & player_pos, const Point & target)
 {
 	std::list<Point> best_path;
-	if(!target || !is_passable(target.x, target.y) || player_pos == target) {
+	if(!target.valid() || !is_passable(target.x, target.y) || player_pos == target) {
 		return best_path;
 	}
 
 	std::vector<Point> shifts;
 	for(Point shift(-1, 0); shift.x <= 1; ++shift.x) {
 		for(shift.y = -1; shift.y <= 1; ++shift.y) {
-			if(shift) {
+			if(!shift.null()) {
 				shifts.push_back(shift);
 			}
 		}
@@ -232,7 +232,7 @@ std::list<Point> Level::find_path(const Point & player_pos, const Point & target
 		foreach(const Point & point, wave) {
 			Point shift = Point(point.x - prev.x, point.y - prev.y);
 			bool is_close = std::abs(shift.x) <= 1 && std::abs(shift.y) <= 1;
-			if(shift && is_close) {
+			if(!shift.null() && is_close) {
 				prev = point;
 				best_path.push_back(shift);
 				break;

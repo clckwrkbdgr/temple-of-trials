@@ -173,7 +173,7 @@ void Console::draw_game(const Game & game)
 	notification_text.clear();
 
 	const Monster & player = game.level.get_player();
-	if(!player) {
+	if(!player.valid()) {
 		return;
 	}
 	int row = 0;
@@ -181,8 +181,8 @@ void Console::draw_game(const Game & game)
 	print_stat(row++, format("Turns: {0}", game.turns));
 	print_stat(row++, format("HP   : {0}/{1}", player.hp, player.max_hp));
 	print_stat(row++, format("Items: {0}", player.inventory.size()));
-	print_stat(row++, format("Wield: {0}", player.inventory.wielded_item() ? player.inventory.wielded_item().name : "none"));
-	print_stat(row++, format("Wear : {0}", player.inventory.worn_item() ? player.inventory.worn_item().name : "none"));
+	print_stat(row++, format("Wield: {0}", player.inventory.wielded_item().valid() ? player.inventory.wielded_item().name : "none"));
+	print_stat(row++, format("Wear : {0}", player.inventory.worn_item().valid() ? player.inventory.worn_item().name : "none"));
 	print_stat(row++, format("Dmg  : {0}", player.damage()));
 	row++;
 	if(player.poisoning > 0) {
@@ -281,7 +281,7 @@ void Console::draw_inventory(const Game & game, const Monster & monster)
 	(void)height;
 	int pos = 0, index = 0;
 	foreach(const Item & item, monster.inventory.items) {
-		if(item) {
+		if(item.valid()) {
 			int x = (pos < 13) ? 0 : width / 2;
 			int y = 1 + ((pos < 13) ? pos : pos - 13);
 			std::string text = format("{0} - {1}", char(index + 'a'), item.name);
@@ -331,7 +331,7 @@ int Console::get_inventory_slot(const Game & game, const Monster & monster)
 			continue;
 		}
 		slot = ch - 'a';
-		if(!monster.inventory.get_item(slot)) {
+		if(!monster.inventory.get_item(slot).valid()) {
 			error = "Slot is empty; nothing is here.";
 			continue;
 		}

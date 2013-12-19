@@ -12,7 +12,7 @@ Inventory::Inventory()
 bool Inventory::empty() const
 {
 	foreach(const Item & item, items) {
-		if(item) {
+		if(item.valid()) {
 			return false;
 		}
 	}
@@ -23,7 +23,7 @@ unsigned Inventory::size() const
 {
 	unsigned result = 0;
 	foreach(const Item & item, items) {
-		if(item) {
+		if(item.valid()) {
 			++result;
 		}
 	}
@@ -61,7 +61,7 @@ Item Inventory::take_item(unsigned slot)
 Item Inventory::take_first_item()
 {
 	for(unsigned slot = 0; slot < items.size(); ++slot) {
-		if(items[slot]) {
+		if(items[slot].valid()) {
 			return take_item(slot);
 		}
 	}
@@ -148,7 +148,7 @@ unsigned Inventory::insert(const Item & item)
 		return NOTHING;
 	}
 	for(unsigned slot = 0; slot < items.size(); ++slot) {
-		if(!items[slot]) {
+		if(!items[slot].valid()) {
 			items[slot] = item;
 			return slot;
 		}
@@ -188,6 +188,11 @@ Monster::Monster()
 {
 }
 
+bool Monster::valid() const
+{
+	return pos.valid();
+}
+
 Monster::~Monster()
 {
 	foreach(Action * action, plan) {
@@ -195,14 +200,9 @@ Monster::~Monster()
 	}
 }
 
-Monster::operator bool() const
-{
-    return bool(pos);
-}
-
 int Monster::damage() const
 {
-	if(inventory.wielded_item()) {
+	if(inventory.wielded_item().valid()) {
 		return inventory.wielded_item().damage;
 	}
 	return hit_strength;
@@ -234,7 +234,7 @@ Item::Item()
 {
 }
 
-Item::operator bool() const
+bool Item::valid() const
 {
 	return bool(sprite);
 }
@@ -257,9 +257,9 @@ Object::Object()
 {
 }
 
-Object::operator bool() const
+bool Object::valid() const
 {
-	return bool(pos);
+	return pos.valid();
 }
 
 int Object::get_sprite() const

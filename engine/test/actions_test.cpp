@@ -211,14 +211,14 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_item_from_monster_wh
 {
 	Fire action(Point(0, -1));
 	action.commit(dummy(), game);
-	ASSERT(!dummy().inventory.get_item(0));
+	ASSERT(!dummy().inventory.get_item(0).valid());
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_from_monster_when_thrown)
 {
 	Fire action(Point(0, -1));
 	action.commit(dummy(), game);
-	ASSERT(!dummy().inventory.wielded_item());
+	ASSERT(!dummy().inventory.wielded_item().valid());
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_item_before_it)
@@ -292,7 +292,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_droppin
 {
 	Drop action(0);
 	action.commit(dummy(), game);
-	ASSERT(!dummy().inventory.wielded_item());
+	ASSERT(!dummy().inventory.wielded_item().valid());
 	EQUAL(game.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy dropped spear on the floor.").result);
 }
 
@@ -300,7 +300,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_before_droppi
 {
 	Drop action(1);
 	action.commit(dummy(), game);
-	ASSERT(!dummy().inventory.worn_item());
+	ASSERT(!dummy().inventory.worn_item().valid());
 	EQUAL(game.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy dropped armor on the floor.").result);
 }
 
@@ -308,7 +308,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_item_from_inventory_
 {
 	Drop action(0);
 	action.commit(dummy(), game);
-	ASSERT(!dummy().inventory.get_item(0));
+	ASSERT(!dummy().inventory.get_item(0).valid());
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_place_item_on_the_floor_when_dropped)

@@ -231,7 +231,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 					}
 					break;
 				case '@' :
-					if(player) {
+					if(player.valid()) {
 						player.pos = pos;
 						level.monsters.push_back(player);
 					} else {
@@ -246,7 +246,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 		}
 		if(i > 0) {
 			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], floor_type);
-			if(doors.first && doors.second) {
+			if(doors.first.valid() && doors.second.valid()) {
 				level.objects.push_back(World::door(doors.first));
 				if(is_last_room) {
 					level.objects.push_back(World::locked_door(doors.second, level_index));

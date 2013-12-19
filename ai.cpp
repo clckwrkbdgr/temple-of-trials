@@ -41,11 +41,11 @@ Action * player_control(Monster & player, Game & game)
 			{
 				Point shift = console.directions[ch];
 				Point new_pos = player.pos + shift;
-				if(find_at(game.level.monsters, new_pos)) {
+				if(find_at(game.level.monsters, new_pos).valid()) {
 					return new Swing(shift);
 				}
 				Object & object = find_at(game.level.objects, new_pos);
-				if(object) {
+				if(object.valid()) {
 					if(object.openable && !object.opened) {
 						player.plan.push_front(new Move(shift));
 						return new Open(shift);
@@ -96,7 +96,7 @@ Action * angry_and_wander(Monster & monster, Game & game)
 		return new Swing(shift);
 	}
 	Point direction = Point(rand() % 3 - 1, rand() % 3 - 1);
-	if(direction) {
+	if(!direction.null()) {
 		return new Move(direction);
 	}
 	return new Wait();

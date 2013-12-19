@@ -15,7 +15,7 @@ TEST(should_get_empty_item_when_out_of_bounds)
 {
 	Inventory inventory;
 	inventory.set_item(1, Item::Builder().sprite(1));
-	ASSERT(!inventory.get_item(2));
+	ASSERT(!inventory.get_item(2).valid());
 }
 
 TEST(should_set_item)
@@ -65,7 +65,7 @@ TEST(should_take_item_from_inventory)
 	Inventory inventory;
 	inventory.set_item(0, Item::Builder().sprite(1));
 	Item item = inventory.take_item(0);
-	ASSERT(!inventory.get_item(0));
+	ASSERT(!inventory.get_item(0).valid());
 	EQUAL(item.sprite, 1);
 }
 
@@ -74,7 +74,7 @@ TEST(should_take_first_item_from_inventory)
 	Inventory inventory;
 	inventory.set_item(0, Item::Builder().sprite(1));
 	Item item = inventory.take_first_item();
-	ASSERT(!inventory.get_item(0));
+	ASSERT(!inventory.get_item(0).valid());
 	EQUAL(item.sprite, 1);
 }
 
@@ -83,7 +83,7 @@ TEST(should_not_take_first_item_from_inventory_if_empty)
 	Inventory inventory;
 	inventory.set_item(0, Item());
 	Item item = inventory.take_first_item();
-	ASSERT(!item);
+	ASSERT(!item.valid());
 }
 
 TEST(should_get_quest_items_when_carrying_one)
@@ -91,7 +91,7 @@ TEST(should_get_quest_items_when_carrying_one)
 	Inventory inventory;
 	inventory.insert(Item::Builder().quest().sprite(1));
 	const Item & item = inventory.quest_item();
-	ASSERT(item);
+	ASSERT(item.valid());
 	ASSERT(item.quest);
 }
 

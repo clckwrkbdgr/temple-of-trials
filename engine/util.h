@@ -102,12 +102,16 @@ struct Point {
 	int x, y;
 	Point(int _x, int _y);
 	Point();
+	bool valid() const;
+	bool null() const;
 	bool operator==(const Point & other) const;
+	bool operator!=(const Point & other) const { return !(*this == other); }
 	Point & operator+=(const Point & other);
 	Point & operator-=(const Point & other);
 	Point & operator*=(int factor);
 	Point & operator/=(int factor);
-	operator bool() const;
+private:
+	bool is_valid;
 };
 Point operator+(const Point & a, const Point & b);
 Point operator-(const Point & a, const Point & b);

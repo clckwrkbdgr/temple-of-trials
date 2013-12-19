@@ -67,7 +67,7 @@ void Game::generate(int level_index)
 	} else {
 		return;
 	}
-	if(player) {
+	if(player.valid()) {
 		player.pos = level.get_player().pos;
 		level.get_player() = player;
 	}
@@ -94,7 +94,7 @@ void Game::process_environment(Monster & someone)
 		hurt(someone, 1);
 	}
 	Object & object = find_at(level.objects, someone.pos);
-	if(object && object.triggerable) {
+	if(object.valid() && object.triggerable) {
 		if(object.items.empty()) {
 			message(format("{0} is already triggered.", object.name));
 		} else {
@@ -116,7 +116,7 @@ void Game::process_environment(Monster & someone)
 
 void Game::die(Monster & someone)
 {
-	for(Item item; item = someone.inventory.take_first_item(); ) {
+	for(Item item = someone.inventory.take_first_item(); item.valid(); item = someone.inventory.take_first_item()) {
 		item.pos = someone.pos;
 		level.items.push_back(item);
 		message(format("{0} drops {1}.", someone.name, item.name));

@@ -37,13 +37,23 @@ void log(const std::string & message)
 
 
 Point::Point(int _x, int _y)
-	: x(_x), y(_y)
+	: x(_x), y(_y), is_valid(true)
 {
 }
 
 Point::Point()
-	: x(0), y(0)
+	: x(0), y(0), is_valid(false)
 {
+}
+
+bool Point::valid() const
+{
+	return is_valid;
+}
+
+bool Point::null() const
+{
+	return x == 0 && y == 0;
 }
 
 bool Point::operator==(const Point & other) const
@@ -77,11 +87,6 @@ Point & Point::operator/=(int factor)
 	x /= factor;
 	y /= factor;
 	return *this;
-}
-
-Point::operator bool() const
-{
-	return x != 0 || y != 0;
 }
 
 Point operator+(const Point & a, const Point & b)

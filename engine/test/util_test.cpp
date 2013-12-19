@@ -124,16 +124,28 @@ TEST(should_make_point_from_two_coords)
 	EQUAL(p.y, 2);
 }
 
-TEST(should_consider_non_zero_point_valid)
+TEST(should_consider_default_constructed_point_invalid)
 {
-	Point p(1, 2);
-	ASSERT(p);
+	Point p;
+	ASSERT(!p.valid());
 }
 
-TEST(should_consider_zero_point_invalid)
+TEST(should_consider_valid_constructed_point_valid)
+{
+	Point p(1, 2);
+	ASSERT(p.valid());
+}
+
+TEST(should_consider_non_zero_point_non_null)
+{
+	Point p(1, 2);
+	ASSERT(!p.null());
+}
+
+TEST(should_consider_zero_point_null)
 {
 	Point p(0, 0);
-	ASSERT(!p);
+	ASSERT(p.null());
 }
 
 TEST(should_make_point_from_point)
@@ -203,7 +215,7 @@ TEST(should_return_empty_item_if_not_found_in_vector)
 	std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
 	PosInt & i = find_at(v, Point(1, 1));
 	EQUAL(i.value, 0);
-	ASSERT(!i.pos);
+	ASSERT(!i.pos.valid());
 }
 
 TEST(should_find_item_in_const_vector)
@@ -218,7 +230,7 @@ TEST(should_return_empty_item_if_not_found_in_const_vector)
 	const std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
 	PosInt i = find_at(v, Point(1, 1));
 	EQUAL(i.value, 0);
-	ASSERT(!i.pos);
+	ASSERT(!i.pos.valid());
 }
 
 TEST(should_push_back_value_to_vector)
