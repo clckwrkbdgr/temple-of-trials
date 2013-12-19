@@ -5,7 +5,7 @@
 unsigned Inventory::NOTHING = static_cast<unsigned>(-1);
 
 Inventory::Inventory()
-	: wielded(0), worn(0)
+	: wielded(NOTHING), worn(NOTHING)
 {
 }
 
@@ -133,6 +133,9 @@ void Inventory::clear()
 
 unsigned Inventory::insert(const Item & item)
 {
+	if(items.size() >= SLOT_COUNT) {
+		return NOTHING;
+	}
 	for(unsigned slot = 0; slot < items.size(); ++slot) {
 		if(!items[slot]) {
 			items[slot] = item;

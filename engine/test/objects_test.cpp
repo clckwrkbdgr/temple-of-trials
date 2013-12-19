@@ -29,9 +29,8 @@ TEST(should_set_item)
 TEST(should_not_set_item_if_slot_is_too_large)
 {
 	Inventory inventory;
-	bool ok = inventory.set_item(1, Item::Builder().sprite(1));
+	bool ok = inventory.set_item(26, Item::Builder().sprite(1));
 	ASSERT(!ok);
-	ASSERT(!inventory.get_item(26));
 }
 
 TEST(should_unwield_any_item)

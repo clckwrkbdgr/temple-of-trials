@@ -472,7 +472,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_wearing
 	dummy().inventory.get_item(0).wearable = true;
 	Wear action(0);
 	action.commit(dummy(), game);
-	EQUAL(game.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy unwields spear.")("Dummy wear spear.").result);
+	EQUAL(game.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy takes off armor.")("Dummy wear spear.").result);
 }
 
 
@@ -504,15 +504,12 @@ struct GameWithDummyAndFood {
 		Item megasphere = Item::Builder().sprite(4).name("megasphere").edible().healing(100);
 		Item antidote = Item::Builder().sprite(4).name("antidote").edible().antidote(5);
 		Item empty;
-		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").wield(1).wear(0));
-		dummy().inventory.insert(armor);
-		dummy().inventory.insert(spear);
-		dummy().inventory.insert(junk);
-		dummy().inventory.insert(food);
-		dummy().inventory.insert(medkit);
-		dummy().inventory.insert(megasphere);
-		dummy().inventory.insert(antidote);
-		dummy().inventory.insert(empty);
+		game.level.monsters.push_back(
+				Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy")
+				.item(armor).item(spear).wear(0).wield(1)
+				.item(junk).item(food).item(medkit).item(megasphere).item(antidote)
+				.item(empty)
+				);
 		dummy().hp = 90;
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
