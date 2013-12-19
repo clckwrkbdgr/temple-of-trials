@@ -4,6 +4,42 @@
 class Item;
 class Action;
 
+struct Inventory {
+	enum { SLOT_COUNT = 26 };
+	static unsigned NOTHING;
+
+	unsigned wielded, worn;
+	std::vector<Item> items;
+
+	Inventory();
+	bool empty() const;
+	void clear();
+	bool set_item(unsigned slot, const Item & item);
+	const Item & get_item(unsigned slot) const;
+	Item & get_item(unsigned slot);
+
+	unsigned insert(const Item & item);
+	Item take_item(unsigned slot);
+	Item take_first_item();
+	Item take_wielded_item();
+	Item take_worn_item();
+
+	bool wield(unsigned slot);
+	bool wields(unsigned slot) const;
+	void unwield();
+	const Item & wielded_item() const { return get_item(wielded); }
+	Item & wielded_item() { return get_item(wielded); }
+
+	bool wear(unsigned slot);
+	bool wears(unsigned slot) const;
+	void take_off();
+	const Item & worn_item() const { return get_item(worn); }
+	Item & worn_item() { return get_item(worn); }
+
+	const Item & quest_item() const;
+	bool has_key(int key_type) const;
+};
+
 struct Monster {
 	enum Faction { NEUTRAL, PLAYER, MONSTER };
 
@@ -16,9 +52,7 @@ struct Monster {
 	int max_hp, hp;
 	int hit_strength;
 	std::string name;
-	std::vector<Item> inventory;
-	int wielded;
-	int worn;
+	Inventory inventory;
 	bool poisonous;
 	int poisoning;
 	std::list<Action*> plan;
@@ -27,13 +61,6 @@ struct Monster {
 	operator bool() const;
 	bool is_dead() const { return hp <= 0; }
 	int damage() const;
-	Item & wielded_item();
-	const Item & wielded_item() const;
-	Item & worn_item();
-	const Item & worn_item() const;
-	const Item & quest_item() const;
-	bool is_valid_slot(unsigned slot) const;
-	bool has_key(int key_type) const;
 	void add_path(const std::list<Point> & path);
 
 	struct Builder;

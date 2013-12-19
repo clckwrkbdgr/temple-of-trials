@@ -2,7 +2,7 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 24, SAVEFILE_MINOR_VERSION = 1 };
+enum { SAVEFILE_MAJOR_VERSION = 24, SAVEFILE_MINOR_VERSION = 2 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -43,20 +43,34 @@ SAVEFILE_STORE_EXT(Object, object)
 	savefile.store(object.items, "object item");
 }
 
+SAVEFILE_STORE_EXT(Inventory, inventory)
+{
+	savefile.store(inventory.wielded);
+	savefile.store(inventory.worn);
+	savefile.newline();
+	savefile.store(inventory.items, "inventory item");
+}
+
 SAVEFILE_STORE_EXT(Monster, monster)
 {
 	savefile.store(monster.pos.x).store(monster.pos.y).store(monster.sprite);
 	savefile.store(monster.sight);
 	savefile.store(monster.hp).store(monster.max_hp);
-	savefile.store(monster.wielded);
-	savefile.store(monster.worn);
+	if(savefile.version() < 2) {
+		savefile.store(monster.inventory.wielded);
+		savefile.store(monster.inventory.worn);
+	}
 	savefile.store(monster.hit_strength);
 	savefile.store(monster.poisonous).store(monster.poisoning);
 	savefile.store(monster.ai);
 	savefile.store(monster.name);
 	savefile.store(monster.faction);
 	savefile.newline();
-	savefile.store(monster.inventory, "inventory item");
+	if(savefile.version() < 2) {
+		savefile.store(monster.inventory.items, "inventory item");
+	} else {
+		savefile.store(monster.inventory);
+	}
 }
 
 SAVEFILE_STORE_EXT(Level, level)

@@ -116,12 +116,11 @@ void Game::process_environment(Monster & someone)
 
 void Game::die(Monster & someone)
 {
-	foreach(Item & item, someone.inventory) {
+	for(Item item; item = someone.inventory.take_first_item(); ) {
 		item.pos = someone.pos;
 		level.items.push_back(item);
 		message(format("{0} drops {1}.", someone.name, item.name));
 	}
-	someone.inventory.clear();
 	if(someone.faction == Monster::PLAYER) {
 		message("You died.");
 		state = PLAYER_DIED;
@@ -130,7 +129,7 @@ void Game::die(Monster & someone)
 
 void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 {
-	int received_damage = damage - (pierce_armour ? 0 : someone.worn_item().defence);
+	int received_damage = damage - (pierce_armour ? 0 : someone.inventory.worn_item().defence);
 	if(!someone.godmode) {
 		someone.hp -= received_damage;
 	}
@@ -141,7 +140,7 @@ void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 
 void Game::hit(Monster & someone, Monster & other, int damage)
 {
-	int received_damage = damage - other.worn_item().defence;
+	int received_damage = damage - other.inventory.worn_item().defence;
 	if(!other.godmode) {
 		other.hp -= received_damage;
 	}
