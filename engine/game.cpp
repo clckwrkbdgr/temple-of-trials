@@ -6,9 +6,6 @@
 #include <cassert>
 #include <cmath>
 
-#define GAME_ASSERT(condition, expression) \
-	do { if(!(condition)) { (expression); return; } } while(0)
-
 Game::Game(LevelGenerator * level_generator)
 	: current_level(0), generator(level_generator), state(PLAYING), turns(0)
 {
@@ -104,7 +101,8 @@ void Game::process_environment(Monster & someone)
 
 void Game::die(Monster & someone)
 {
-	for(Item item = someone.inventory.take_first_item(); item.valid(); item = someone.inventory.take_first_item()) {
+	Item item;
+	while((item = someone.inventory.take_first_item()).valid()) {
 		item.pos = someone.pos;
 		level.items.push_back(item);
 		messages.drops(someone, item);
@@ -118,26 +116,24 @@ void Game::die(Monster & someone)
 void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 {
 	int received_damage = damage - (pierce_armour ? 0 : someone.inventory.worn_item().defence);
-	if(!someone.godmode) {
-		someone.hp -= received_damage;
+	someone.hp -= received_damage;
+	messages.hurts(someone, received_damage);
+	if(someone.is_dead()) {
+		die(someone);
 	}
-	GAME_ASSERT(someone.is_dead(), messages.hurts(someone, received_damage));
-	messages.hurts_and_dies(someone, received_damage);
-	die(someone);
 }
 
 void Game::hit(Monster & someone, Monster & other, int damage)
 {
 	int received_damage = damage - other.inventory.worn_item().defence;
-	if(!other.godmode) {
-		other.hp -= received_damage;
-	}
+	other.hp -= received_damage;
 	if(someone.poisonous) {
 		messages.poisons(someone, other);
 		other.poisoning = std::min(5, std::max(5, other.poisoning));
 	}
-	GAME_ASSERT(other.is_dead(), messages.hits(someone, other, received_damage));
-	messages.hits_and_kills(someone, other, received_damage);
-	die(other);
+	messages.hits(someone, other, received_damage);
+	if(other.is_dead()) {
+		die(other);
+	}
 }
 

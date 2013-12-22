@@ -27,9 +27,6 @@ Action * player_control(Monster & player, Game & game)
 			case 'q':
 				game.state = Game::SUSPENDED;
 				break;
-			case KEY_F(1):
-				player.godmode = true;
-				break;
 			case 'x':
 				player.add_path(game.level.find_path(player.pos, console.target_mode(game, player.pos)));
 				break;

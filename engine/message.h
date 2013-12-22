@@ -28,10 +28,7 @@ struct Messages {
 	void closed(const Monster & someone, const Object & object);
 	void cures_poisoning_a_little(const Item & item);
 	void cures_poisoning_fully(const Item & item);
-	void drink_container(const Object & object);
-	void drink_empty_container(const Object & object);
 	void drinks(const Monster & someone, const Object & object);
-	void drinks_and_heals(const Monster & someone, const Object & object);
 	void drops(const Monster & someone, const Item & item, const CellType & cell);
 	void drops(const Monster & someone, const Item & item);
 	void eats(const Monster & someone, const Item & item);
@@ -47,16 +44,14 @@ struct Messages {
 	void hits(const Item & item, const Object & object);
 	void hits(const Item & item, const Monster & monster);
 	void hits(const Monster & someone, const Monster & other, int damage);
-	void hits_and_kills(const Monster & someone, const Monster & other, int damage);
 	void terrain_hurts();
 	void hurts(const Monster & someone, int received_damage);
-	void hurts_and_dies(const Monster & someone, int received_damage);
 	void is_closed(const Object & object);
 	void is_empty(const Object & object);
 	void is_locked(const Object & object);
 	void no_such_object_in_inventory();
 	void nothing_to_close();
-	void nothing_to_drink();
+	void nothing_to_drink(const Object & object);
 	void nothing_to_drop(const Monster & someone);
 	void nothing_to_eat(const Monster & someone);
 	void nothing_to_open();

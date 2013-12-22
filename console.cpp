@@ -188,9 +188,6 @@ void Console::draw_game(const Game & game)
 	if(player.poisoning > 0) {
 		print_stat(row++, "Poisoned");
 	}
-	if(player.godmode) {
-		print_stat(row++, "!GODMODE!");
-	}
 }
 
 Point Console::target_mode(Game & game, const Point & start)

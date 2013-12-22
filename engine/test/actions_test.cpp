@@ -8,11 +8,63 @@ struct GameWithDummy {
 	Game game;
 	GameWithDummy() {
 		game.level.map = Map(2, 2);
-		game.level.map.celltypes.front().passable = true;
+		game.level.map.fill(game.level.map.add_cell_type(CellType::Builder().name("floor").passable(true)));
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
 };
+
+TEST_FIXTURE(GameWithDummy, should_move_when_cell_is_empty)
+{
+	Move action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(dummy().pos, Point(1, 0));
+}
+
+TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_cell)
+{
+	game.level.map.celltypes.back().passable = false;
+	Move action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(dummy().pos, Point(1, 1));
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into the floor.").result);
+}
+
+TEST_FIXTURE(GameWithDummy, should_not_move_into_monster)
+{
+	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 0)).name("stub"));
+	Move action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(dummy().pos, Point(1, 1));
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into stub.").result);
+}
+
+TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_object)
+{
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("stub"));
+	Move action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(dummy().pos, Point(1, 1));
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into stub.").result);
+}
+
+TEST_FIXTURE(GameWithDummy, should_move_into_opened_object)
+{
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("door").passable().openable().opened(true));
+	Move action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(dummy().pos, Point(1, 0));
+}
+
+TEST_FIXTURE(GameWithDummy, should_not_move_into_closed_object)
+{
+	game.level.objects.push_back(Object::Builder().pos(Point(1, 0)).name("door").passable().openable().opened(false));
+	Move action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(dummy().pos, Point(1, 1));
+	EQUAL(game.messages.messages, MakeVector<std::string>("Door is closed.").result);
+}
+
 
 TEST_FIXTURE(GameWithDummy, should_not_drink_monsters)
 {

@@ -31,19 +31,17 @@ void Messages::return_to_gates_with_item()
 	message("Now bring it back to the surface!");
 }
 
-void Messages::nothing_to_drink()
+void Messages::nothing_to_drink(const Object & object)
 {
-	message("There is nothing to drink.");
-}
-
-void Messages::drink_container(const Object & object)
-{
-	message(format("Unfortunately, {0} has no water left. But there is something else inside.", object.name));
-}
-
-void Messages::drink_empty_container(const Object & object)
-{
-	message(format("Unfortunately, {0} is totally empty.", object.name));
+	if(object.containable) {
+		if(object.items.empty()) {
+			message(format("Unfortunately, {0} is totally empty.", object.name));
+		} else {
+			message(format("Unfortunately, {0} has no water left. But there is something else inside.", object.name));
+		}
+	} else {
+		message("There is nothing to drink.");
+	}
 }
 
 void Messages::player_died()
@@ -64,11 +62,6 @@ void Messages::cures_poisoning_a_little(const Item & item)
 void Messages::cures_poisoning_fully(const Item & item)
 {
 	message(format("{0} cures poisoning.", item.name));
-}
-
-void Messages::drinks_and_heals(const Monster & someone, const Object & object)
-{
-	message(format("{0} drink from {1}. It helps a bit.", someone.name, object.name));
 }
 
 void Messages::drops(const Monster & someone, const Item & item, const CellType & cell)
@@ -118,12 +111,11 @@ void Messages::heals(const Item & item, const Monster & someone)
 
 void Messages::hits(const Monster & someone, const Monster & other, int damage)
 {
-	message(format("{0} hit {1} for {2} hp.", someone.name, other.name, damage));
-}
-
-void Messages::hits_and_kills(const Monster & someone, const Monster & other, int damage)
-{
-	message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, damage));
+	if(other.is_dead()) {
+		message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, damage));
+	} else {
+		message(format("{0} hit {1} for {2} hp.", someone.name, other.name, damage));
+	}
 }
 
 void Messages::hits(const Item & item, const CellType & cell)
@@ -168,12 +160,11 @@ void Messages::poisoned(const Monster & someone)
 
 void Messages::hurts(const Monster & someone, int received_damage)
 {
-	message(format("{0} loses {1} hp.", someone.name, received_damage));
-}
-
-void Messages::hurts_and_dies(const Monster & someone, int received_damage)
-{
-	message(format("{0} loses {1} hp and dies.", someone.name, received_damage));
+	if(someone.is_dead()) {
+		message(format("{0} loses {1} hp and dies.", someone.name, received_damage));
+	} else {
+		message(format("{0} loses {1} hp.", someone.name, received_damage));
+	}
 }
 
 void Messages::sending_to_quest(const Monster & someone)
@@ -283,6 +274,15 @@ void Messages::bumps_into(const Monster & someone, const Monster & monster)
 
 void Messages::bumps_into(const Monster & someone, const Object & object)
 {
+	if(object.openable) {
+		if(object.locked) {
+			message(format("{0} is locked.", object.name));
+			return;
+		} else {
+			message(format("{0} is closed.", object.name));
+			return;
+		}
+	}
 	message(format("{0} bump into {1}.", someone.name, object.name));
 }
 
@@ -308,7 +308,11 @@ void Messages::carries_too_much_items(const Monster & someone)
 
 void Messages::drinks(const Monster & someone, const Object & object)
 {
-	message(format("{0} drink from {1}.", someone.name, object.name));
+	if(someone.hp < someone.max_hp) {
+		message(format("{0} drink from {1}. It helps a bit.", someone.name, object.name));
+	} else {
+		message(format("{0} drink from {1}.", someone.name, object.name));
+	}
 }
 
 void Messages::nothing_to_drop(const Monster & someone)

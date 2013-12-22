@@ -183,7 +183,7 @@ bool Inventory::has_key(int key_type) const
 
 
 Monster::Monster()
-	: faction(NEUTRAL), godmode(false), sprite(0), sight(0), ai(0), max_hp(1), hp(max_hp),
+	: faction(NEUTRAL), sprite(0), sight(0), ai(0), max_hp(1), hp(max_hp),
 	hit_strength(0), poisonous(false), poisoning(0)
 {
 }

@@ -45,7 +45,6 @@ struct Monster {
 	enum Faction { NEUTRAL, PLAYER, MONSTER };
 
 	int faction;
-	bool godmode;
 	Point pos;
 	int sprite;
 	int sight;
