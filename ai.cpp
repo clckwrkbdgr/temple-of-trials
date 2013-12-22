@@ -22,7 +22,7 @@ Action * player_control(Monster & player, Game & game)
 		switch(ch) {
 			case 'Q':
 				game.state = Game::PLAYER_DIED;
-				game.message("You commited suicide.");
+				game.messages.message("You commited suicide.");
 				break;
 			case 'q':
 				game.state = Game::SUSPENDED;

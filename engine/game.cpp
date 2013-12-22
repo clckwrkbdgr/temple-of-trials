@@ -6,11 +6,11 @@
 #include <cassert>
 #include <cmath>
 
-#define GAME_ASSERT(condition, text) \
-	do { if(!(condition)) { message(text); return; } } while(0)
+#define GAME_ASSERT(condition, expression) \
+	do { if(!(condition)) { (expression); return; } } while(0)
 
 Game::Game(LevelGenerator * level_generator)
-	: log_messages(false), current_level(0), generator(level_generator), state(PLAYING), turns(0)
+	: current_level(0), generator(level_generator), state(PLAYING), turns(0)
 {
 }
 
@@ -75,30 +75,18 @@ void Game::generate(int level_index)
 	state = TURN_ENDED;
 }
 
-void Game::message(std::string text)
-{
-	if(text.empty()) {
-		return;
-	}
-	text[0] = toupper(text[0]);
-	messages.push_back(text);
-	if(log_messages) {
-		log("Message: " + text);
-	}
-}
-
 void Game::process_environment(Monster & someone)
 {
 	if(level.map.cell(someone.pos).hurts) {
-		message("It hurts!");
+		messages.terrain_hurts();
 		hurt(someone, 1);
 	}
 	Object & object = find_at(level.objects, someone.pos);
 	if(object.valid() && object.triggerable) {
 		if(object.items.empty()) {
-			message(format("{0} is already triggered.", object.name));
+			messages.trap_is_dead(object);
 		} else {
-			message(format("{0} trigger the {1}.", someone.name, object.name));
+			messages.triggers_trap(someone, object);
 			object.items.back().pos = object.pos;
 			level.items.push_back(object.items.back());
 			object.items.pop_back();
@@ -106,7 +94,7 @@ void Game::process_environment(Monster & someone)
 		}
 	}
 	if(someone.poisoning > 0) {
-		message(format("{0} is poisoned.", someone.name));
+		messages.poisoned(someone);
 		--someone.poisoning;
 		hurt(someone, 1, true);
 	} else if(someone.poisoning < 0) {
@@ -119,10 +107,10 @@ void Game::die(Monster & someone)
 	for(Item item = someone.inventory.take_first_item(); item.valid(); item = someone.inventory.take_first_item()) {
 		item.pos = someone.pos;
 		level.items.push_back(item);
-		message(format("{0} drops {1}.", someone.name, item.name));
+		messages.drops(someone, item);
 	}
 	if(someone.faction == Monster::PLAYER) {
-		message("You died.");
+		messages.player_died();
 		state = PLAYER_DIED;
 	}
 }
@@ -133,8 +121,8 @@ void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 	if(!someone.godmode) {
 		someone.hp -= received_damage;
 	}
-	GAME_ASSERT(someone.is_dead(), format("{0} loses {1} hp.", someone.name, received_damage));
-	message(format("{0} loses {1} hp and dies.", someone.name, received_damage));
+	GAME_ASSERT(someone.is_dead(), messages.hurts(someone, received_damage));
+	messages.hurts_and_dies(someone, received_damage);
 	die(someone);
 }
 
@@ -145,11 +133,11 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 		other.hp -= received_damage;
 	}
 	if(someone.poisonous) {
-		message(format("{0} poisons {1}.", someone.name, other.name));
+		messages.poisons(someone, other);
 		other.poisoning = std::min(5, std::max(5, other.poisoning));
 	}
-	GAME_ASSERT(other.is_dead(), format("{0} hit {1} for {2} hp.", someone.name, other.name, received_damage));
-	message(format("{0} hit {1} for {2} hp and kills it.", someone.name, other.name, received_damage));
+	GAME_ASSERT(other.is_dead(), messages.hits(someone, other, received_damage));
+	messages.hits_and_kills(someone, other, received_damage);
 	die(other);
 }
 

@@ -147,18 +147,18 @@ void Console::draw_game(const Game & game)
 		}
 	}
 
-	if(game.messages.size() > messages_seen) {
+	if(game.messages.messages.size() > messages_seen) {
 		int width, height;
 		getmaxyx(stdscr, height, width);
 		(void)width;
 		int message_pan = height - MAP_HEIGHT;
 		if(message_pan <= 0) {
-			messages_seen = game.messages.size();
+			messages_seen = game.messages.messages.size();
 		} else {
-			int messages_left = game.messages.size() - messages_seen;
+			int messages_left = game.messages.messages.size() - messages_seen;
 			int message_count = std::min(messages_left, message_pan);
 			for(int i = 0; i < message_count; ++i) {
-				const std::string & message = game.messages[messages_seen + i];
+				const std::string & message = game.messages.messages[messages_seen + i];
 				if(message_count < messages_left && i == message_count - 1) {
 					mvprintw(MAP_HEIGHT + i, 0, "%s", (message + " (...)").c_str());
 				} else {
@@ -263,8 +263,8 @@ int Console::see_messages(Game & game)
 {
 	draw_game(game);
 	bool ask_control = game.state != Game::SUSPENDED;
-	int ch = (!ask_control && game.messages.size() == messages_seen) ? 0 : get_control();
-	while(game.messages.size() > messages_seen) {
+	int ch = (!ask_control && game.messages.messages.size() == messages_seen) ? 0 : get_control();
+	while(game.messages.messages.size() > messages_seen) {
 		if(ch == ' ') {
 			draw_game(game);
 		}
