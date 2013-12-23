@@ -23,7 +23,7 @@ struct CellType::Builder {
 };
 
 struct Cell {
-	int type;
+	unsigned type;
 	bool visible;
 	int seen_sprite;
 	explicit Cell(int cell_type = 0);
@@ -32,22 +32,18 @@ struct Cell {
 class Map {
 public:
 	unsigned width, height;
-	std::vector<CellType> celltypes;
 	std::vector<Cell> cells;
 
 	Map(unsigned map_width, unsigned map_height);
 	bool valid(const Point & pos) const;
 	bool valid(int x, int y) const;
-	const CellType & cell(int x, int y) const;
-	const CellType & cell(const Point & pos) const;
-	Cell & cell_properties(int x, int y);
-	Cell & cell_properties(const Point & pos);
-	const Cell & cell_properties(int x, int y) const;
-	const Cell & cell_properties(const Point & pos) const;
+	Cell & cell(const Point & pos);
+	Cell & cell(int x, int y);
+	const Cell & cell(const Point & pos) const;
+	const Cell & cell(int x, int y) const;
 
 	void fill(int celltype);
 	void fill(int * map_of_celltypes);
-	int add_cell_type(const CellType & celltype);
 	void set_cell_type(const Point & pos, int value);
 };
 

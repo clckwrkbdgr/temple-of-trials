@@ -8,7 +8,7 @@ struct GameWithDummy {
 	Game game;
 	GameWithDummy() {
 		game.level.map = Map(2, 2);
-		game.level.map.fill(game.level.map.add_cell_type(CellType::Builder().name("floor").passable(true)));
+		game.level.map.fill(game.add_cell_type(CellType::Builder().name("floor").passable(true)));
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
@@ -23,7 +23,7 @@ TEST_FIXTURE(GameWithDummy, should_move_when_cell_is_empty)
 
 TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_cell)
 {
-	game.level.map.celltypes.back().passable = false;
+	game.cell_types.back().passable = false;
 	Move action(Point(0, -1));
 	action.commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
@@ -204,7 +204,7 @@ TEST_FIXTURE(GameWithDummy, should_not_close_empty_cell)
 
 TEST_FIXTURE(GameWithDummy, should_hit_impassable_cells_on_swing)
 {
-	int wall = game.level.map.add_cell_type(CellType::Builder().name("wall").passable(false));
+	int wall = game.add_cell_type(CellType::Builder().name("wall").passable(false));
 	game.level.map.set_cell_type(Point(1, 0), wall);
 	Swing action(Point(0, -1));
 	action.commit(dummy(), game);
@@ -240,7 +240,7 @@ struct GameWithDummyWieldingAndWearing {
 	Game game;
 	GameWithDummyWieldingAndWearing() {
 		game.level.map = Map(2, 3);
-		int floor = game.level.map.add_cell_type(CellType::Builder().passable(true).transparent(true).name("floor"));
+		int floor = game.add_cell_type(CellType::Builder().passable(true).transparent(true).name("floor"));
 		game.level.map.fill(floor);
 		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("armor");
 		Item spear = Item::Builder().sprite(2).damage(3).name("spear");
@@ -273,7 +273,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_from_monster_w
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_item_before_it)
 {
-	int wall = game.level.map.add_cell_type(CellType::Builder().name("wall").transparent(false));
+	int wall = game.add_cell_type(CellType::Builder().name("wall").transparent(false));
 	game.level.map.set_cell_type(Point(1, 0), wall);
 	Fire action(Point(0, -1));
 	action.commit(dummy(), game);
@@ -418,7 +418,7 @@ struct GameWithDummyWithItems {
 	Game game;
 	GameWithDummyWithItems() {
 		game.level.map = Map(2, 3);
-		int floor = game.level.map.add_cell_type(CellType::Builder().passable(true).transparent(true).name("floor"));
+		int floor = game.add_cell_type(CellType::Builder().passable(true).transparent(true).name("floor"));
 		game.level.map.fill(floor);
 		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("armor");
 		Item spear = Item::Builder().sprite(2).damage(3).name("spear");

@@ -22,15 +22,33 @@ Cell::Cell(int cell_type)
 Map::Map(unsigned map_width, unsigned map_height)
 	: width(map_width), height(map_height), cells(width * height, Cell(0))
 {
-	celltypes.push_back(CellType());
 }
 
-const CellType & Map::cell(int x, int y) const
+const Cell & Map::cell(int x, int y) const
 {
-	return celltypes[cell_properties(x, y).type];
+	static Cell empty;
+	if(!valid(x, y)) {
+		return empty;
+	}
+	return cells[x + y * width];
 }
 
-const CellType & Map::cell(const Point & pos) const
+const Cell & Map::cell(const Point & pos) const
+{
+	return cell(pos.x, pos.y);
+}
+
+Cell & Map::cell(int x, int y)
+{
+	static Cell empty;
+	empty = Cell();
+	if(!valid(x, y)) {
+		return empty;
+	}
+	return cells[x + y * width];
+}
+
+Cell & Map::cell(const Point & pos)
 {
 	return cell(pos.x, pos.y);
 }
@@ -55,43 +73,8 @@ void Map::fill(int * map_of_celltypes)
 	cells = std::vector<Cell>(map_of_celltypes, map_of_celltypes + width * height);
 }
 
-int Map::add_cell_type(const CellType & celltype)
-{
-	celltypes.push_back(celltype);
-	return celltypes.size() - 1;
-}
-
 void Map::set_cell_type(const Point & pos, int value)
 {
-	cell_properties(pos).type = value;
-}
-
-Cell & Map::cell_properties(int x, int y)
-{
-	static Cell empty;
-	empty = Cell();
-	if(!valid(x, y)) {
-		return empty;
-	}
-	return cells[x + y * width];
-}
-
-Cell & Map::cell_properties(const Point & pos)
-{
-	return cell_properties(pos.x, pos.y);
-}
-
-const Cell & Map::cell_properties(int x, int y) const
-{
-	static Cell empty;
-	if(!valid(x, y)) {
-		return empty;
-	}
-	return cells[x + y * width];
-}
-
-const Cell & Map::cell_properties(const Point & pos) const
-{
-	return cell_properties(pos.x, pos.y);
+	cell(pos).type = value;
 }
 

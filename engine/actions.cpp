@@ -13,7 +13,7 @@ void Move::commit(Monster & someone, Game & game)
 	ACTION_ASSERT(!monster.valid(), game.messages.bumps_into(someone, monster));
     Object & object = find_at(game.level.objects, new_pos);
 	ACTION_ASSERT(!object.valid() || object.is_passable(), game.messages.bumps_into(someone, object));
-	ACTION_ASSERT(game.level.map.cell(new_pos).passable, game.messages.bumps_into(someone, game.level.map.cell(new_pos)));
+	ACTION_ASSERT(game.cell_type(new_pos).passable, game.messages.bumps_into(someone, game.cell_type(new_pos)));
     someone.pos = new_pos;
 }
 
@@ -90,8 +90,8 @@ void Swing::commit(Monster & someone, Game & game)
 		}
 		return;
 	}
-	if(!game.level.map.cell(new_pos).passable) {
-		game.messages.hits(someone, game.level.map.cell(new_pos));
+	if(!game.cell_type(new_pos).passable) {
+		game.messages.hits(someone, game.cell_type(new_pos));
 		return;
 	}
     game.messages.swings_at_nothing(someone);
@@ -104,8 +104,11 @@ void Fire::commit(Monster & someone, Game & game)
     item.pos = someone.pos;
 	game.messages.throws(someone, item);
 	while(true) {
-		if(!game.level.map.cell(item.pos + shift).transparent) {
-			game.messages.hits(item, game.level.map.cell(item.pos + shift));
+		if(!game.level.map.valid(item.pos)) {
+			break;
+		}
+		if(!game.cell_type(item.pos + shift).transparent) {
+			game.messages.hits(item, game.cell_type(item.pos + shift));
 			game.level.items.push_back(item);
 			break;
 		}
@@ -151,7 +154,7 @@ void Drop::commit(Monster & someone, Game & game)
 	Item item = someone.inventory.take_item(slot);
 	item.pos = someone.pos;
 	game.level.items.push_back(item);
-	game.messages.drops(someone, item, game.level.map.cell(someone.pos));
+	game.messages.drops(someone, item, game.cell_type(someone.pos));
 }
 
 void Grab::commit(Monster & someone, Game & game)
@@ -162,7 +165,7 @@ void Grab::commit(Monster & someone, Game & game)
 	unsigned slot = someone.inventory.insert(item);
 	ACTION_ASSERT(slot != Inventory::NOTHING, game.messages.carries_too_much_items(someone));
 	game.level.items.erase(item_index);
-	game.messages.picks_up(someone, item, game.level.map.cell(someone.pos));
+	game.messages.picks_up(someone, item, game.cell_type(someone.pos));
 	if(item.quest) {
 		game.messages.return_to_gates_with_item();
 	}
