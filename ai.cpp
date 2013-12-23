@@ -28,7 +28,7 @@ Action * player_control(Monster & player, Game & game)
 				game.state = Game::SUSPENDED;
 				break;
 			case 'x':
-				player.add_path(game.level.find_path(player.pos, console.target_mode(game, player.pos)));
+				player.add_path(game.find_path(player.pos, console.target_mode(game, player.pos)));
 				break;
 			case 'i':
 				console.draw_inventory(game, player);
@@ -79,8 +79,8 @@ Action * player_control(Monster & player, Game & game)
 
 Action * angry_and_wander(Monster & monster, Game & game)
 {
-	const Monster & player = game.level.get_player();
-	bool sees_player = game.level.map.cell_properties(player.pos).visible;
+	const Monster & player = game.get_player();
+	bool sees_player = game.level.map.cell(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 			sign(player.pos.x - monster.pos.x),
@@ -101,8 +101,8 @@ Action * angry_and_wander(Monster & monster, Game & game)
 
 Action * angry_and_still(Monster & monster, Game & game)
 {
-	const Monster & player = game.level.get_player();
-	bool sees_player = game.level.map.cell_properties(player.pos).visible;
+	const Monster & player = game.get_player();
+	bool sees_player = game.level.map.cell(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 		sign(player.pos.x - monster.pos.x),
@@ -119,8 +119,8 @@ Action * angry_and_still(Monster & monster, Game & game)
 
 Action * calm_and_still(Monster & monster, Game & game)
 {
-	const Monster & player = game.level.get_player();
-	bool sees_player = game.level.map.cell_properties(player.pos).visible;
+	const Monster & player = game.get_player();
+	bool sees_player = game.level.map.cell(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 		sign(player.pos.x - monster.pos.x),

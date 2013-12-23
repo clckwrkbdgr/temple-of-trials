@@ -11,6 +11,9 @@ Game::Game(LevelGenerator * level_generator)
 	: current_level(0), generator(level_generator), state(PLAYING), turns(0)
 {
 	cell_types.push_back(CellType());
+	if(generator) {
+		generator->create_types(*this);
+	}
 }
 
 void Game::run(ControllerFactory controller_factory)

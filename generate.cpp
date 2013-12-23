@@ -128,18 +128,20 @@ Object trap(const Point & pos)
 
 }
 
+void LinearGenerator::create_types(Game & game)
+{
+	floor_type = game.add_cell_type(World::floor());
+	wall_type = game.add_cell_type(World::wall());
+	goo_type = game.add_cell_type(World::goo());
+	torch_type = game.add_cell_type(World::torch());
+}
+
 void LinearGenerator::generate(Level & level, int level_index)
 {
 	log("Generating level {0}...", level_index);
 
-	Monster player = level.get_player();
 	level = Level(60, 23);
-	log("Game cleared.");
-
-	int floor_type = level.map.add_cell_type(World::floor());
-	int wall_type = level.map.add_cell_type(World::wall());
-	int goo_type = level.map.add_cell_type(World::goo());
-	int torch_type = level.map.add_cell_type(World::torch());
+	log("Level cleared.");
 
 	level.map.fill(wall_type);
 	log("Map filled.");
@@ -198,8 +200,10 @@ void LinearGenerator::generate(Level & level, int level_index)
 			}
 		}
 		fill_room(level.map, rooms[i], floor_type);
+		std::vector<Point> positions = random_positions(rooms[i], room_content[i].size());
 		foreach(char cell, room_content[i]) {
-			Point pos = random_pos(level, rooms[i]);
+			Point pos = positions.back();
+			positions.pop_back();
 			switch(cell) {
 				case '#' : level.map.set_cell_type(pos, wall_type); break;
 				case '~' : level.map.set_cell_type(pos, goo_type); break;
@@ -231,12 +235,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 					}
 					break;
 				case '@' :
-					if(player.valid()) {
-						player.pos = pos;
-						level.monsters.push_back(player);
-					} else {
-						level.monsters.push_back(World::player(pos));
-					}
+					level.monsters.push_back(World::player(pos));
 					break;
 				case 'a' : level.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;
 				case 'A' : level.monsters.push_back(World::ant(AI::ANGRY_AND_WANDER, pos)); break;

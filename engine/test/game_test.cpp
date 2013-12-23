@@ -7,6 +7,9 @@ class TestLevelGenerator : public LevelGenerator {
 public:
 	TestLevelGenerator(const Point & player_pos1, const Point & player_pos2)
 		: generated(false), pos1(player_pos1), pos2(player_pos2) { }
+	virtual void create_types(Game & game)
+	{
+	}
 	virtual void generate(Level & level, int level_index)
 	{
 		generated = true;

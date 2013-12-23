@@ -139,10 +139,10 @@ void Console::draw_game(const Game & game)
 
 	for(unsigned x = 0; x < map.width; ++x) {
 		for(unsigned y = 0; y < map.height; ++y) {
-			if(map.cell_properties(x, y).visible) {
-				print_tile(x, y, game.level.get_sprite_at(Point(x, y)));
-			} else if(map.cell_properties(x, y).seen_sprite) {
-				print_fow(x, y, map.cell_properties(x, y).seen_sprite);
+			if(map.cell(x, y).visible) {
+				print_tile(x, y, game.get_sprite_at(Point(x, y)));
+			} else if(map.cell(x, y).seen_sprite) {
+				print_fow(x, y, map.cell(x, y).seen_sprite);
 			}
 		}
 	}
@@ -172,7 +172,7 @@ void Console::draw_game(const Game & game)
 	mvprintw(0, 0, "%s", notification_text.c_str());
 	notification_text.clear();
 
-	const Monster & player = game.level.get_player();
+	const Monster & player = game.get_player();
 	if(!player.valid()) {
 		return;
 	}
@@ -197,10 +197,10 @@ Point Console::target_mode(Game & game, const Point & start)
 	curs_set(1);
 	while(ch != 'x' && ch != 27 && ch != '.') {
 		if(game.level.map.valid(target)) {
-			if(game.level.map.cell_properties(target).visible) {
-				notification(format("You see {0}.", game.level.name_at(target)));
-			} else if(game.level.map.cell_properties(target).seen_sprite) {
-				notification(format("You recall {0}.", game.level.name_at(target)));
+			if(game.level.map.cell(target).visible) {
+				notification(format("You see {0}.", game.name_at(target)));
+			} else if(game.level.map.cell(target).seen_sprite) {
+				notification(format("You recall {0}.", game.name_at(target)));
 			} else {
 				notification("You cannot see there.");
 			}
@@ -231,7 +231,7 @@ Point Console::target_mode(Game & game, const Point & start)
 	}
 	curs_set(0);
 	if(ch == '.') {
-		if(game.level.map.cell_properties(target).seen_sprite == 0) {
+		if(game.level.map.cell(target).seen_sprite == 0) {
 			notification("You don't know how to get there.");
 		} else {
 			return target;

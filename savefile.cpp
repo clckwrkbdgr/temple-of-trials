@@ -2,7 +2,7 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 25, SAVEFILE_MINOR_VERSION = 0 };
+enum { SAVEFILE_MAJOR_VERSION = 26, SAVEFILE_MINOR_VERSION = 0 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -65,12 +65,10 @@ SAVEFILE_STORE_EXT(Level, level)
 {
 	savefile.size_of(level.map);
 	savefile.newline();
-	savefile.store(level.map.celltypes, "celltype");
-	savefile.newline();
 	savefile.check("map size");
 	for(unsigned y = 0; y < level.map.height; ++y) {
 		for(unsigned x = 0; x < level.map.width; ++x) {
-			store_ext(savefile, level.map.cell_properties(x, y));
+			store_ext(savefile, level.map.cell(x, y));
 			savefile.check("map cell");
 		}
 		savefile.newline();
@@ -122,6 +120,9 @@ SAVEFILE_STORE_EXT(Game, game)
 
 	savefile.store(game.current_level);
 	savefile.store(game.turns);
+	savefile.newline();
+
+	savefile.store(game.cell_types, "celltype");
 	savefile.newline();
 
 	store_ext(savefile, game.level);

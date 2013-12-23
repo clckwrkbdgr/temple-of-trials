@@ -25,19 +25,26 @@ void LevelGenerator::fill_room(Map & map, const std::pair<Point, Point> & room, 
 	}
 }
 
-Point LevelGenerator::random_pos(const Game & game, const std::pair<Point, Point> & room)
+std::vector<Point> LevelGenerator::random_positions(const std::pair<Point, Point> & room, int count)
 {
-	int width = (room.second.x - room.first.x);
-	int height = (room.second.y - room.first.y);
-	int counter = width * height;
-	while(--counter > 0) {
-		int x = rand() % width + room.first.x;
-		int y = rand() % height + room.first.y;
-		if(game.is_passable(x, y)) {
-			return Point(x, y);
+	std::vector<Point> result;
+	for(int i = 0; i < count; ++i) {
+		int width = (room.second.x - room.first.x);
+		int height = (room.second.y - room.first.y);
+		int counter = width * height;
+		while(--counter > 0) {
+			int x = rand() % width + room.first.x;
+			int y = rand() % height + room.first.y;
+			if(result.end() == std::find(result.begin(), result.end(), Point(x, y))) {
+				result << Point(x, y);
+				break;
+			}
 		}
 	}
-	return room.first;
+	for(int i = result.size(); i < count; ++i) {
+		result << room.first;
+	}
+	return result;
 }
 
 std::pair<Point, Point> LevelGenerator::connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, int type)
