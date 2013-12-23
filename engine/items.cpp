@@ -1,4 +1,5 @@
 #include "items.h"
+#include "util.h"
 
 Item::Item()
 	: sprite(0), damage(0), wearable(false), defence(0), edible(false), antidote(0), healing(0), quest(false)

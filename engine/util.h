@@ -98,59 +98,6 @@ int sign(T val)
 	return (T(0) < val) - (val < T(0));
 }
 
-struct Point {
-	int x, y;
-	Point(int _x, int _y);
-	Point();
-	bool valid() const;
-	bool null() const;
-	bool operator==(const Point & other) const;
-	bool operator!=(const Point & other) const { return !(*this == other); }
-	Point & operator+=(const Point & other);
-	Point & operator-=(const Point & other);
-	Point & operator*=(int factor);
-	Point & operator/=(int factor);
-private:
-	bool is_valid;
-};
-Point operator+(const Point & a, const Point & b);
-Point operator-(const Point & a, const Point & b);
-Point operator*(const Point & a, int factor);
-Point operator/(const Point & a, int factor);
-
-template<class T>
-const T & find_at(const std::vector<T> & container, const Point & pos, typename std::vector<T>::const_iterator * index = 0)
-{
-	typename std::vector<T>::const_iterator i;
-    for(i = container.begin(); i != container.end(); ++i) {
-        if(i->pos == pos) {
-			if(index) {
-				*index = i;
-			}
-            return *i;
-        }
-    }
-    static T empty;
-    return empty;
-}
-
-template<class T>
-T & find_at(std::vector<T> & container, const Point & pos, typename std::vector<T>::iterator * index = 0)
-{
-	typename std::vector<T>::iterator i;
-    for(i = container.begin(); i != container.end(); ++i) {
-        if(i->pos == pos) {
-			if(index) {
-				*index = i;
-			}
-            return *i;
-        }
-    }
-    static T empty;
-	empty = T();
-    return empty;
-}
-
 template<class T>
 std::vector<T> & operator<<(std::vector<T> & out, const T & t)
 {
@@ -186,6 +133,4 @@ bool equal_containers(IteratorA a_begin, IteratorA a_end, IteratorB b_begin, Ite
 	}
 	return a_begin == a_end && b_begin == b_end;
 }
-
-int distance(const Point & a, const Point & b);
 

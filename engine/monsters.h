@@ -1,5 +1,6 @@
 #pragma once
 #include "items.h"
+#include <list>
 class Action;
 
 struct Monster {

@@ -1,5 +1,6 @@
 #include "monsters.h"
 #include "actions.h"
+#include "util.h"
 
 Monster::Monster()
 	: faction(NEUTRAL), sprite(0), sight(0), ai(0), max_hp(1), hp(max_hp),
