@@ -1,4 +1,5 @@
 #pragma once
+#include "monsters.h"
 #include "util.h"
 #include <fstream>
 #include <vector>

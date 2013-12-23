@@ -1,12 +1,18 @@
 #include "level.h"
 #include "game.h"
 #include "objects.h"
+#include "monsters.h"
+#include "items.h"
 #include <cmath>
 #include <algorithm>
 #include <cstdlib>
 
 Level::Level()
 	: map(1, 1)
+{
+}
+
+Level::~Level()
 {
 }
 

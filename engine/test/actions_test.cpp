@@ -1,5 +1,6 @@
 #include "../actions.h"
 #include "../game.h"
+#include "../monsters.h"
 #include "../test.h"
 
 SUITE(actions) {

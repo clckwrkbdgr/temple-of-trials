@@ -1,6 +1,7 @@
 #include "actions.h"
 #include "game.h"
 #include "objects.h"
+#include "monsters.h"
 #include "util.h"
 
 #define ACTION_ASSERT(condition, expression) \

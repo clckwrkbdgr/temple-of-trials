@@ -15,6 +15,7 @@ struct Level {
 	std::vector<Object> objects;
 
 	Level();
+	~Level();
 	Level(int map_width, int map_height);
 };
 

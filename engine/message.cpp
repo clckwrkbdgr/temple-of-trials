@@ -1,5 +1,6 @@
 #include "message.h"
 #include "objects.h"
+#include "monsters.h"
 #include "map.h"
 #include "util.h"
 

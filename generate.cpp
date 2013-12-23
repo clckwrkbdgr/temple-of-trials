@@ -1,6 +1,7 @@
 #include "generate.h"
 #include "ai.h"
 #include "sprites.h"
+#include "engine/monsters.h"
 #include <cstdlib>
 
 namespace World {

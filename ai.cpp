@@ -4,6 +4,7 @@
 #include "engine/actions.h"
 #include "engine/level.h"
 #include "engine/objects.h"
+#include "engine/monsters.h"
 #include <ncurses.h>
 #include <cstdlib>
 

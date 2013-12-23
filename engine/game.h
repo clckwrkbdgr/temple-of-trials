@@ -11,6 +11,7 @@ typedef Action* (*Controller)(Monster&, Game&);
 typedef Controller (*ControllerFactory)(int ai);
 
 struct Game {
+	// TODO all level stuff compile in one Dungeon class.
 	int current_level;
 	LevelGenerator * generator;
 	Level level;
@@ -29,8 +30,6 @@ struct Game {
 	void run(ControllerFactory controller_factory);
 
 	void generate(int level);
-
-	Point find_random_free_cell() const;
 
 	void process_environment(Monster & someone);
 	void die(Monster & someone);
