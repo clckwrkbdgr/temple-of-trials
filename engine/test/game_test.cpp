@@ -1,5 +1,6 @@
 #include "../game.h"
 #include "../monsters.h"
+#include "../cell.h"
 #include "../test.h"
 
 SUITE(game) {

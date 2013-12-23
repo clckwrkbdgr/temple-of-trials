@@ -2,6 +2,7 @@
 #include "game.h"
 #include "objects.h"
 #include "monsters.h"
+#include "cell.h"
 #include "util.h"
 
 #define ACTION_ASSERT(condition, expression) \
