@@ -239,28 +239,10 @@ TEST_FIXTURE(GameWithDummyAndKiller, should_die_if_hit_was_too_much)
 }
 
 
-TEST(should_have_default_cell_type_at_start)
-{
-	Game game;
-	game.level.map = Map(2, 2);
-	EQUAL(game.cell_types.size(), 1);
-}
-
-TEST(cell_type_should_be_appended_to_the_end)
-{
-	Game game;
-	game.level.map = Map(2, 2);
-	int new_type = game.add_cell_type(CellType());
-	EQUAL(new_type, 1);
-}
-
 TEST(should_return_default_empty_type_for_unknown_cell_type)
 {
 	Game game;
-	game.level.map = Map(2, 2);
-	game.add_cell_type(CellType::Builder().sprite(1));
-	game.level.map.cell(Point(1, 1)).type = 2;
-	EQUAL(game.cell_type(game.level.map.cell(Point(1, 1))).sprite, 0);
+	EQUAL(game.cell_type(1).sprite, 0);
 }
 
 }
@@ -461,8 +443,8 @@ struct LevelWithPath {
 	LevelWithPath()
 	{
 		game.level = Level(4, 4);
-		game.add_cell_type(CellType::Builder().passable(true));
-		game.add_cell_type(CellType::Builder().passable(false));
+		game.set_cell_type(1, CellType::Builder().passable(true));
+		game.set_cell_type(2, CellType::Builder().passable(false));
 		int a[] = {
 			1, 2, 1, 1,
 			2, 1, 1, 2,
@@ -496,8 +478,8 @@ struct LevelForSeeing {
 	LevelForSeeing()
 	{
 		game.level = Level(3, 2);
-		game.add_cell_type(CellType::Builder().sprite(1).passable(true).transparent(true));
-		game.add_cell_type(CellType::Builder().sprite(2).passable(false).transparent(false));
+		game.set_cell_type(1, CellType::Builder().sprite(1).passable(true).transparent(true));
+		game.set_cell_type(2, CellType::Builder().sprite(2).passable(false).transparent(false));
 		int a[] = {
 			2, 1, 2,
 			1, 2, 1,

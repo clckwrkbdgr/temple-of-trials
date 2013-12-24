@@ -10,7 +10,8 @@ struct GameWithDummy {
 	Game game;
 	GameWithDummy() {
 		game.level.map = Map(2, 2);
-		game.level.map.fill(game.add_cell_type(CellType::Builder().name("floor").passable(true)));
+		game.set_cell_type(1, CellType::Builder().name("floor").passable(true));
+		game.level.map.fill(1);
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy"));
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
@@ -25,11 +26,11 @@ TEST_FIXTURE(GameWithDummy, should_move_when_cell_is_empty)
 
 TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_cell)
 {
-	game.cell_types.back().passable = false;
+	game.set_cell_type(1, CellType::Builder().name("wall").passable(false));
 	Move action(Point(0, -1));
 	action.commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into the floor.").result);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into the wall.").result);
 }
 
 TEST_FIXTURE(GameWithDummy, should_not_move_into_monster)
@@ -206,8 +207,8 @@ TEST_FIXTURE(GameWithDummy, should_not_close_empty_cell)
 
 TEST_FIXTURE(GameWithDummy, should_hit_impassable_cells_on_swing)
 {
-	int wall = game.add_cell_type(CellType::Builder().name("wall").passable(false));
-	game.level.map.set_cell_type(Point(1, 0), wall);
+	game.set_cell_type(2, CellType::Builder().name("wall").passable(false));
+	game.level.map.set_cell_type(Point(1, 0), 2);
 	Swing action(Point(0, -1));
 	action.commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy hit wall.").result);
@@ -242,8 +243,8 @@ struct GameWithDummyWieldingAndWearing {
 	Game game;
 	GameWithDummyWieldingAndWearing() {
 		game.level.map = Map(2, 3);
-		int floor = game.add_cell_type(CellType::Builder().passable(true).transparent(true).name("floor"));
-		game.level.map.fill(floor);
+		game.set_cell_type(1, CellType::Builder().passable(true).transparent(true).name("floor"));
+		game.level.map.fill(1);
 		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("armor");
 		Item spear = Item::Builder().sprite(2).damage(3).name("spear");
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 2)).hp(100).name("dummy").item(spear).item(armor).wield(0).wear(1));
@@ -275,8 +276,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_from_monster_w
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_item_before_it)
 {
-	int wall = game.add_cell_type(CellType::Builder().name("wall").transparent(false));
-	game.level.map.set_cell_type(Point(1, 0), wall);
+	game.set_cell_type(2, CellType::Builder().name("wall").transparent(false));
+	game.level.map.set_cell_type(Point(1, 0), 2);
 	Fire action(Point(0, -1));
 	action.commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hit wall.").result);
@@ -420,8 +421,8 @@ struct GameWithDummyWithItems {
 	Game game;
 	GameWithDummyWithItems() {
 		game.level.map = Map(2, 3);
-		int floor = game.add_cell_type(CellType::Builder().passable(true).transparent(true).name("floor"));
-		game.level.map.fill(floor);
+		game.set_cell_type(1, CellType::Builder().passable(true).transparent(true).name("floor"));
+		game.level.map.fill(1);
 		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("armor");
 		Item spear = Item::Builder().sprite(2).damage(3).name("spear");
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 2)).hp(100).name("dummy").item(spear).item(armor).item(Item()));

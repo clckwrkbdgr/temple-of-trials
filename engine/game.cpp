@@ -11,7 +11,6 @@
 Game::Game(LevelGenerator * level_generator)
 	: current_level(0), generator(level_generator), state(PLAYING), turns(0)
 {
-	cell_types.push_back(CellType());
 	if(generator) {
 		generator->create_types(*this);
 	}
@@ -144,12 +143,18 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 }
 
 
+const CellType & Game::cell_type(int id) const
+{
+	if(cell_types.count(id) > 0) {
+		return cell_types.find(id)->second;
+	}
+	static CellType empty;
+	return empty;
+}
+
 const CellType & Game::cell_type(const Cell & cell) const
 {
-	if(cell.type && cell.type < cell_types.size()) {
-		return cell_types[cell.type];
-	}
-	return cell_types[0];
+	return cell_type(cell.type);
 }
 
 const CellType & Game::cell_type(const Point & pos) const
@@ -157,10 +162,9 @@ const CellType & Game::cell_type(const Point & pos) const
 	return cell_type(level.map.cell(pos));
 }
 
-int Game::add_cell_type(const CellType & celltype)
+void Game::set_cell_type(int id, const CellType & celltype)
 {
-	cell_types.push_back(celltype);
-	return cell_types.size() - 1;
+	cell_types[id] = celltype;
 }
 
 

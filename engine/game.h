@@ -21,10 +21,11 @@ struct Game {
 	Messages messages;
 	int turns;
 
-	std::vector<CellType> cell_types;
+	std::map<int, CellType> cell_types;
+	const CellType & cell_type(int id) const;
 	const CellType & cell_type(const Cell & cell) const;
 	const CellType & cell_type(const Point & pos) const;
-	int add_cell_type(const CellType & cell);
+	void set_cell_type(int id, const CellType & type);
 
 	Game(LevelGenerator * level_generator = 0);
 	void run(ControllerFactory controller_factory);

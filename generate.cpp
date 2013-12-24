@@ -129,12 +129,14 @@ Object trap(const Point & pos)
 
 }
 
+enum { FLOOR_TYPE, WALL_TYPE, GOO_TYPE, TORCH_TYPE };
+
 void LinearGenerator::create_types(Game & game)
 {
-	floor_type = game.add_cell_type(World::floor());
-	wall_type = game.add_cell_type(World::wall());
-	goo_type = game.add_cell_type(World::goo());
-	torch_type = game.add_cell_type(World::torch());
+	game.set_cell_type(FLOOR_TYPE, World::floor());
+	game.set_cell_type(WALL_TYPE, World::wall());
+	game.set_cell_type(GOO_TYPE, World::goo());
+	game.set_cell_type(TORCH_TYPE, World::torch());
 }
 
 void LinearGenerator::generate(Level & level, int level_index)
@@ -144,7 +146,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 	level = Level(60, 23);
 	log("Level cleared.");
 
-	level.map.fill(wall_type);
+	level.map.fill(WALL_TYPE);
 	log("Map filled.");
 
 	std::vector<std::pair<Point, Point> > rooms;
@@ -200,16 +202,16 @@ void LinearGenerator::generate(Level & level, int level_index)
 				level.monsters[key_holder].inventory.insert(World::key(level_index));
 			}
 		}
-		fill_room(level.map, rooms[i], floor_type);
+		fill_room(level.map, rooms[i], FLOOR_TYPE);
 		std::vector<Point> positions = random_positions(rooms[i], room_content[i].size());
 		foreach(char cell, room_content[i]) {
 			Point pos = positions.back();
 			positions.pop_back();
 			switch(cell) {
-				case '#' : level.map.set_cell_type(pos, wall_type); break;
-				case '~' : level.map.set_cell_type(pos, goo_type); break;
-				case ' ' : level.map.set_cell_type(pos, floor_type); break;
-				case '&' : level.map.set_cell_type(pos, torch_type); break;
+				case '#' : level.map.set_cell_type(pos, WALL_TYPE); break;
+				case '~' : level.map.set_cell_type(pos, GOO_TYPE); break;
+				case ' ' : level.map.set_cell_type(pos, FLOOR_TYPE); break;
+				case '&' : level.map.set_cell_type(pos, TORCH_TYPE); break;
 
 				case '$' : level.items.push_back(World::money(pos)); break;
 				case '%' : level.items.push_back(World::apple(pos)); break;
@@ -245,7 +247,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 			}
 		}
 		if(i > 0) {
-			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], floor_type);
+			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], FLOOR_TYPE);
 			if(doors.first.valid() && doors.second.valid()) {
 				level.objects.push_back(World::door(doors.first));
 				if(is_last_room) {
