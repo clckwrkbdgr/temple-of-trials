@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <map>
 #include <list>
 #include <cstdarg>
 class Point;
@@ -34,6 +35,11 @@ std::string to_string(long unsigned value);
 std::string to_string(char value);
 std::string to_string(const std::string & value);
 std::string to_string(const Point & value);
+template<class K, class V>
+std::string to_string(const std::pair<K, V> & value)
+{
+	return "(" + to_string(value.first) + ", " + to_string(value.second) + ")";
+}
 
 template<class Iterator>
 std::string to_string(Iterator begin, Iterator current, Iterator end)
@@ -45,6 +51,11 @@ std::string to_string(Iterator begin, Iterator current, Iterator end)
 	} else {
 		return (current != end) ? "|" + to_string(*current) + to_string(begin, next, end) : "";
 	}
+}
+template<class K, class V>
+std::string to_string(const std::map<K, V> & m)
+{
+	return to_string(m.begin(), m.begin(), m.end());
 }
 template<class T>
 std::string to_string(const std::vector<T> & v)

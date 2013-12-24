@@ -72,11 +72,12 @@ Reader & Reader::version(int major_version, int minor_version)
 	return *this;
 }
 
-void Reader::check(const std::string & section)
+Reader & Reader::check(const std::string & section)
 {
 	if(!in.good()) {
 		throw Exception("Error: savefile is corrupted (reading " + to_string(section) + ") .");
 	}
+	return *this;
 }
 
 Reader & Reader::store(int & value)
@@ -153,11 +154,12 @@ Writer & Writer::version(int major_version, int minor_version)
 	return *this;
 }
 
-void Writer::check(const std::string & section)
+Writer & Writer::check(const std::string & section)
 {
 	if(!out.good()) {
 		throw Exception("Error: savefile is corrupted (writing " + to_string(section) + ") .");
 	}
+	return *this;
 }
 
 Writer & Writer::store(int value)

@@ -25,6 +25,12 @@ void store_ext(Reader & savefile, int & i)
 	savefile.store(i);
 }
 
+typedef std::pair<int, char> KeyValue;
+bool operator != (const std::pair<const int, char> & a, const std::pair<int, char> & b)
+{
+	return a.first != b.first || a.second != b.second;
+}
+
 SUITE(files_reader) {
 
 TEST(reader_should_skip_newline)
@@ -186,6 +192,16 @@ TEST(reader_should_resize_vector_and_read_it)
 	EQUAL(v, MakeVector<int>(1)(2)(3).result);
 }
 
+TEST(reader_should_read_map)
+{
+	std::istringstream in("3 1 65 2 66 3 67 ");
+	Reader reader(in);
+	std::map<int, char> m;
+	reader.store(m, "map");
+	std::vector<KeyValue> v = MakeVector<KeyValue>(KeyValue(1, 'A'))(KeyValue(2, 'B'))(KeyValue(3, 'C')).result;
+	EQUAL_CONTAINERS(m, v);
+}
+
 
 TEST(should_read_complex_type_by_store_ext)
 {
@@ -315,6 +331,17 @@ TEST(writer_should_write_vector_preceeded_by_size)
 	int a[] = {1, 2, 3};
 	writer.store(make_vector(a), "vector");
 	EQUAL(out.str(), "3 \n1 \n2 \n3 \n");
+}
+
+TEST(writer_should_write_map)
+{
+	std::ostringstream out;
+	Writer writer(out);
+	typedef std::pair<int, char> KeyValue;
+	std::vector<KeyValue> v = MakeVector<KeyValue>(KeyValue(1, 'A'))(KeyValue(2, 'B'))(KeyValue(3, 'C')).result;
+	std::map<int, char> m(v.begin(), v.end());
+	writer.store(m, "map");
+	EQUAL(out.str(), "3 \n1 65 \n2 66 \n3 67 \n");
 }
 
 

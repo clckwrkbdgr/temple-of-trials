@@ -3,6 +3,7 @@
 #include "util.h"
 #include <fstream>
 #include <vector>
+#include <map>
 class Map;
 
 bool file_exists(const std::string & filename);
@@ -26,7 +27,7 @@ public:
 	Reader & newline();
 	Reader & version(int major_version, int minor_version);
 	int version() const { return actual_minor_version; }
-	void check(const std::string & section);
+	Reader & check(const std::string & section);
 	
 	template<class T>
 	Reader & store(T & value)
@@ -53,13 +54,20 @@ public:
 	template<class T>
 	void store(std::vector<T> & v, const std::string & name)
 	{
-		size_of(v);
-		newline();
-		check(name + " count");
+		size_of(v).newline().check(name + " count");
 		for(decltype(v.begin()) item = v.begin(); item != v.end(); ++item) {
-			store_ext(*this, *item);
-			newline();
-			check(name);
+			store(*item).newline().check(name);
+		}
+	}
+	template<class K, class V>
+	void store(std::map<K, V> & map, const std::string & name)
+	{
+		int count;
+		store(count).newline().check(name + " count");
+		while(count --> 0) {
+			K key;
+			store(key);
+			store(map[key]).newline().check(name);
 		}
 	}
 private:
@@ -78,7 +86,7 @@ public:
 	Writer & newline();
 	Writer & version(int major_version, int minor_version);
 	int version() const { return actual_minor_version; }
-	void check(const std::string & section);
+	Writer & check(const std::string & section);
 	
 	template<class T>
 	Writer & store(const T & value)
@@ -103,13 +111,18 @@ public:
 	template<class T>
 	void store(const std::vector<T> & v, const std::string & name)
 	{
-		size_of(v);
-		newline();
-		check(name + " count");
+		size_of(v).newline().check(name + " count");
 		for(decltype(v.begin()) item = v.begin(); item != v.end(); ++item) {
-			store_ext(*this, *item);
-			newline();
-			check(name);
+			store(*item).newline().check(name);
+		}
+	}
+	template<class K, class V>
+	void store(const std::map<K, V> & map, const std::string & name)
+	{
+		store(unsigned(map.size())).newline().check(name + " count");
+		typename std::map<K, V>::const_iterator i;
+		for(i = map.begin(); i != map.end(); ++i) {
+			store(i->first).store(i->second).newline().check(name);
 		}
 	}
 private:

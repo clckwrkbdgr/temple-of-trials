@@ -84,35 +84,6 @@ SAVEFILE_STORE_EXT(Level, level)
 	savefile.store(level.objects, "object");
 }
 
-void store_ext(Writer & savefile, const std::map<int, Level> & saved_levels)
-{
-	savefile.store(unsigned(saved_levels.size()));
-	savefile.newline();
-	std::map<int, Level>::const_iterator i;
-	for(i = saved_levels.begin(); i != saved_levels.end(); ++i) {
-		int level_index = i->first;
-		const Level & level = i->second;
-		savefile.store(level_index);
-		savefile.newline();
-		savefile.store(level);
-		savefile.newline();
-	}
-}
-
-void store_ext(Reader & savefile, std::map<int, Level> & saved_levels)
-{
-	int count;
-	savefile.store(count);
-	savefile.newline();
-	while(count --> 0) {
-		int level_index;
-		savefile.store(level_index);
-		savefile.newline();
-		savefile.store(saved_levels[level_index]);
-		savefile.newline();
-	}
-}
-
 SAVEFILE_STORE_EXT(Game, game)
 {
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
@@ -128,7 +99,7 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.store(game.level);
 	savefile.newline();
 
-	savefile.store(game.saved_levels);
+	savefile.store(game.saved_levels, "levels");
 	savefile.newline();
 }
 
