@@ -12,8 +12,8 @@ CellType::Builder & CellType::Builder::transparent(bool value) { result.transpar
 CellType::Builder & CellType::Builder::name(const std::string & value) { result.name = value; return *this; }
 
 
-Cell::Cell(int cell_type)
-	: type(cell_type), visible(false), seen_sprite(0)
+Cell::Cell(const std::string & cell_type)
+	: type_id(cell_type), visible(false), seen_sprite(0)
 {
 }
 

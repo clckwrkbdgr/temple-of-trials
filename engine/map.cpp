@@ -88,7 +88,7 @@ int distance(const Point & a, const Point & b)
 
 
 Map::Map(unsigned map_width, unsigned map_height)
-	: width(map_width), height(map_height), cells(width * height, Cell(0))
+	: width(map_width), height(map_height), cells(width * height, Cell())
 {
 }
 
@@ -135,18 +135,18 @@ bool Map::valid(const Point & pos) const
 	return (pos.x >= 0 && pos.x < int(width) && pos.y >= 0 && pos.y < int(height));
 }
 
-void Map::fill(int celltype)
+void Map::fill(const std::string & celltype)
 {
 	cells = std::vector<Cell>(width * height, Cell(celltype));
 }
 
-void Map::fill(int * map_of_celltypes)
+void Map::fill(const std::string * map_of_celltypes)
 {
 	cells = std::vector<Cell>(map_of_celltypes, map_of_celltypes + width * height);
 }
 
-void Map::set_cell_type(const Point & pos, int value)
+void Map::set_cell_type(const Point & pos, const std::string & value)
 {
-	cell(pos).type = value;
+	cell(pos).type_id = value;
 }
 

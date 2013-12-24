@@ -23,9 +23,9 @@ struct CellType::Builder {
 
 struct Cell {
 	typedef CellType Type;
-	unsigned type;
+	std::string type_id;
 	bool visible;
 	int seen_sprite;
-	explicit Cell(int cell_type = 0);
+	explicit Cell(const std::string & cell_type = std::string());
 };
 
