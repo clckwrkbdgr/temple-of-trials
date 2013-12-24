@@ -28,6 +28,7 @@ struct Game {
 	void run(ControllerFactory controller_factory);
 
 	void generate(int level);
+	void update_types();
 
 	void process_environment(Monster & someone);
 	void die(Monster & someone);

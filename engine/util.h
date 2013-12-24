@@ -35,6 +35,11 @@ std::string to_string(long unsigned value);
 std::string to_string(char value);
 std::string to_string(const std::string & value);
 std::string to_string(const Point & value);
+template<class T>
+std::string to_string(const T * value)
+{
+	return to_string((unsigned)value);
+}
 template<class K, class V>
 std::string to_string(const std::pair<K, V> & value)
 {
@@ -145,14 +150,19 @@ bool equal_containers(IteratorA a_begin, IteratorA a_end, IteratorB b_begin, Ite
 	return a_begin == a_end && b_begin == b_end;
 }
 
+// TODO rename all types using domains.
 template<class Value>
 struct TypeRegistry {
 	typedef typename Value::Type ValueType;
 	std::map<std::string, ValueType> types;
 
+	bool has(const std::string & id) const
+	{
+		return (types.count(id) > 0);
+	}
 	const ValueType & get(const std::string & id) const
 	{
-		if(types.count(id) > 0) {
+		if(has(id)) {
 			return types.find(id)->second;
 		}
 		static ValueType empty;
@@ -165,5 +175,11 @@ struct TypeRegistry {
 	void set(const std::string & id, const ValueType & type)
 	{
 		types[id] = type;
+	}
+	void update_types(std::vector<Value> & values)
+	{
+		foreach(Value & value, values) {
+			value.type = has(value.type_id) ? &get(value.type_id) : 0;
+		}
 	}
 };

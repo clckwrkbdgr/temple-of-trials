@@ -106,6 +106,7 @@ SAVEFILE_STORE_EXT(Game, game)
 void load(Reader & savefile, Game & game)
 {
 	savefile.store(game);
+	game.update_types();
 }
 
 void save(Writer & savefile, const Game & game)

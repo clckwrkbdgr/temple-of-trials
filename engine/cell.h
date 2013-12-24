@@ -23,6 +23,7 @@ struct CellType::Builder {
 
 struct Cell {
 	typedef CellType Type;
+	const Type * type;
 	std::string type_id;
 	bool visible;
 	int seen_sprite;

@@ -13,7 +13,7 @@ CellType::Builder & CellType::Builder::name(const std::string & value) { result.
 
 
 Cell::Cell(const std::string & cell_type)
-	: type_id(cell_type), visible(false), seen_sprite(0)
+	: type(0), type_id(cell_type), visible(false), seen_sprite(0)
 {
 }
 

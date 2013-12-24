@@ -176,9 +176,10 @@ struct Value {
 		Type() : valid(false), sprite(0) {}
 		Type(int type_sprite) : valid(true), sprite(type_sprite) {}
 	};
+	const Type * type;
 	std::string type_id;
-	Value() {}
-	Value(const std::string & value_type) : type_id(value_type) {}
+	Value() : type(0) {}
+	Value(const std::string & value_type) : type(0), type_id(value_type) {}
 };
 
 TEST(should_get_type_for_value)
@@ -195,6 +196,18 @@ TEST(should_return_default_empty_type_for_unknown_cell_type)
 	reg.set("known", Value::Type(1));
 	ASSERT(!reg.get("unknown").valid);
 	EQUAL(reg.get("unknown").sprite, 0);
+}
+
+TEST(should_update_values_type_pointers)
+{
+	TypeRegistry<Value> reg;
+	reg.set("one", Value::Type(1));
+	reg.set("two", Value::Type(2));
+	std::vector<Value> v = MakeVector<Value>(Value("one"))(Value("two"))(Value("unknown")).result;
+	reg.update_types(v);
+	EQUAL(v[0].type, &reg.get("one"));
+	EQUAL(v[1].type, &reg.get("two"));
+	ASSERT(!v[2].type);
 }
 
 }

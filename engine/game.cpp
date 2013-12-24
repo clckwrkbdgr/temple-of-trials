@@ -16,6 +16,11 @@ Game::Game(LevelGenerator * level_generator)
 	}
 }
 
+void Game::update_types()
+{
+	cell_types.update_types(level.map.cells);
+}
+
 void Game::run(ControllerFactory controller_factory)
 {
 	state = PLAYING;
@@ -66,6 +71,7 @@ void Game::generate(int level_index)
 		saved_levels.erase(level_index);
 	} else if(generator) {
 		generator->generate(level, level_index);
+		update_types();
 	} else {
 		return;
 	}

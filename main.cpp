@@ -40,6 +40,7 @@ int main()
 	} catch(const Reader::Exception & e) {
 		log(e.message);
 		game.generate(1);
+		game.update_types();
 	}
 
 	game.run(get_controller);
