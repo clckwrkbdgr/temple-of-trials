@@ -1,6 +1,8 @@
 #include "../message.h"
 #include "../test.h"
 
+SUITE(messages) {
+
 TEST(game_should_start_with_empty_messages)
 {
 	Messages messages;
@@ -28,3 +30,4 @@ TEST(should_titlecase_messages)
 	EQUAL(messages.messages.front(), "Hello");
 }
 
+}

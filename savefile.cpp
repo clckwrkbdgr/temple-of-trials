@@ -58,7 +58,7 @@ SAVEFILE_STORE_EXT(Monster, monster)
 	savefile.store(monster.name);
 	savefile.store(monster.faction);
 	savefile.newline();
-	store_ext(savefile, monster.inventory);
+	savefile.store(monster.inventory);
 }
 
 SAVEFILE_STORE_EXT(Level, level)
@@ -68,7 +68,7 @@ SAVEFILE_STORE_EXT(Level, level)
 	savefile.check("map size");
 	for(unsigned y = 0; y < level.map.height; ++y) {
 		for(unsigned x = 0; x < level.map.width; ++x) {
-			store_ext(savefile, level.map.cell(x, y));
+			savefile.store(level.map.cell(x, y));
 			savefile.check("map cell");
 		}
 		savefile.newline();
@@ -94,7 +94,7 @@ void store_ext(Writer & savefile, const std::map<int, Level> & saved_levels)
 		const Level & level = i->second;
 		savefile.store(level_index);
 		savefile.newline();
-		store_ext(savefile, level);
+		savefile.store(level);
 		savefile.newline();
 	}
 }
@@ -108,7 +108,7 @@ void store_ext(Reader & savefile, std::map<int, Level> & saved_levels)
 		int level_index;
 		savefile.store(level_index);
 		savefile.newline();
-		store_ext(savefile, saved_levels[level_index]);
+		savefile.store(saved_levels[level_index]);
 		savefile.newline();
 	}
 }
@@ -125,19 +125,19 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.store(game.cell_types, "celltype");
 	savefile.newline();
 
-	store_ext(savefile, game.level);
+	savefile.store(game.level);
 	savefile.newline();
 
-	store_ext(savefile, game.saved_levels);
+	savefile.store(game.saved_levels);
 	savefile.newline();
 }
 
 void load(Reader & savefile, Game & game)
 {
-	store_ext(savefile, game);
+	savefile.store(game);
 }
 
 void save(Writer & savefile, const Game & game)
 {
-	store_ext(savefile, game);
+	savefile.store(game);
 }

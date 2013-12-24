@@ -28,6 +28,13 @@ public:
 	int version() const { return actual_minor_version; }
 	void check(const std::string & section);
 	
+	template<class T>
+	Reader & store(T & value)
+	{
+		store_ext(*this, value);
+		return *this;
+	}
+
 	Reader & store(int & value);
 	Reader & store(unsigned int & value);
 	Reader & store(char & value);
@@ -73,6 +80,13 @@ public:
 	int version() const { return actual_minor_version; }
 	void check(const std::string & section);
 	
+	template<class T>
+	Writer & store(const T & value)
+	{
+		store_ext(*this, value);
+		return *this;
+	}
+
 	Writer & store(int value);
 	Writer & store(unsigned int value);
 	Writer & store(char value);

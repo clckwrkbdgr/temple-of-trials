@@ -25,7 +25,7 @@ void store_ext(Reader & savefile, int & i)
 	savefile.store(i);
 }
 
-SUITE(files) {
+SUITE(files_reader) {
 
 TEST(reader_should_skip_newline)
 {
@@ -187,6 +187,30 @@ TEST(reader_should_resize_vector_and_read_it)
 }
 
 
+TEST(should_read_complex_type_by_store_ext)
+{
+	std::istringstream in("-1 65 ");
+	Reader reader(in);
+	ComplexStructure c(0, 0);
+	store_ext(reader, c);
+	EQUAL(c.i, -1);
+	EQUAL(c.ch, 'A');
+}
+
+TEST(should_read_complex_type_by_inline_store_using_store_ext)
+{
+	std::istringstream in("-1 65 ");
+	Reader reader(in);
+	ComplexStructure c(0, 0);
+	reader.store(c);
+	EQUAL(c.i, -1);
+	EQUAL(c.ch, 'A');
+}
+
+}
+
+SUITE(files_writer) {
+
 TEST(writer_should_write_newline)
 {
 	std::ostringstream out;
@@ -294,21 +318,19 @@ TEST(writer_should_write_vector_preceeded_by_size)
 }
 
 
-TEST(should_read_complex_type_by_store_ext)
-{
-	std::istringstream in("-1 65 ");
-	Reader reader(in);
-	ComplexStructure c(0, 0);
-	store_ext(reader, c);
-	EQUAL(c.i, -1);
-	EQUAL(c.ch, 'A');
-}
-
 TEST(should_write_complex_type_by_store_ext)
 {
 	std::ostringstream out;
 	Writer writer(out);
 	store_ext(writer, ComplexStructure(1, 'A'));
+	EQUAL(out.str(), "1 65 ");
+}
+
+TEST(should_write_complex_type_by_inline_store_using_store_ext)
+{
+	std::ostringstream out;
+	Writer writer(out);
+	writer.store(ComplexStructure(1, 'A'));
 	EQUAL(out.str(), "1 65 ");
 }
 
