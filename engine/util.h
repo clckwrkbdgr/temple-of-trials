@@ -145,3 +145,25 @@ bool equal_containers(IteratorA a_begin, IteratorA a_end, IteratorB b_begin, Ite
 	return a_begin == a_end && b_begin == b_end;
 }
 
+template<class Value>
+struct TypeRegistry {
+	typedef typename Value::Type ValueType;
+	std::map<int, ValueType> types;
+
+	const ValueType & get(int id) const
+	{
+		if(types.count(id) > 0) {
+			return types.find(id)->second;
+		}
+		static ValueType empty;
+		return empty;
+	}
+	const ValueType & get(const Value & value) const
+	{
+		return get(value.type);
+	}
+	void set(int id, const ValueType & type)
+	{
+		types[id] = type;
+	}
+};

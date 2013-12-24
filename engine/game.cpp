@@ -79,7 +79,7 @@ void Game::generate(int level_index)
 
 void Game::process_environment(Monster & someone)
 {
-	if(cell_type(someone.pos).hurts) {
+	if(cell_type_at(someone.pos).hurts) {
 		messages.terrain_hurts();
 		hurt(someone, 1);
 	}
@@ -143,28 +143,9 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 }
 
 
-const CellType & Game::cell_type(int id) const
+const CellType & Game::cell_type_at(const Point & pos) const
 {
-	if(cell_types.count(id) > 0) {
-		return cell_types.find(id)->second;
-	}
-	static CellType empty;
-	return empty;
-}
-
-const CellType & Game::cell_type(const Cell & cell) const
-{
-	return cell_type(cell.type);
-}
-
-const CellType & Game::cell_type(const Point & pos) const
-{
-	return cell_type(level.map.cell(pos));
-}
-
-void Game::set_cell_type(int id, const CellType & celltype)
-{
-	cell_types[id] = celltype;
+	return cell_types.get(level.map.cell(pos));
 }
 
 
@@ -194,7 +175,7 @@ Monster & Game::get_player()
 bool Game::is_passable(int x, int y) const
 {
 	Point new_pos(x, y);
-	if(!cell_type(new_pos).passable) {
+	if(!cell_type_at(new_pos).passable) {
 		return false;
 	}
     const Object & object = find_at(level.objects, new_pos);
@@ -215,7 +196,7 @@ bool Game::is_transparent(int x, int y) const
 	if(object.valid() && !object.is_transparent()) {
 		return false;
 	}
-	return cell_type(new_pos).transparent;
+	return cell_type_at(new_pos).transparent;
 }
 
 int Game::get_sprite_at(int x, int y) const
@@ -240,7 +221,7 @@ int Game::get_sprite_at(const Point & pos) const
 			return object.get_sprite();
 		}
 	}
-	return cell_type(pos).sprite;
+	return cell_type_at(pos).sprite;
 }
 
 std::string Game::name_at(const Point & pos) const
@@ -260,7 +241,7 @@ std::string Game::name_at(const Point & pos) const
 			return object.name;
 		}
 	}
-	return cell_type(pos).name;
+	return cell_type_at(pos).name;
 }
 
 void Game::invalidate_fov(Monster & monster)

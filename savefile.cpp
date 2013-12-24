@@ -93,7 +93,7 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.store(game.turns);
 	savefile.newline();
 
-	savefile.store(game.cell_types, "celltype");
+	savefile.store(game.cell_types.types, "celltype");
 	savefile.newline();
 
 	savefile.store(game.level);

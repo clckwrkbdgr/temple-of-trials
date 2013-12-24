@@ -21,11 +21,8 @@ struct Game {
 	Messages messages;
 	int turns;
 
-	std::map<int, CellType> cell_types;
-	const CellType & cell_type(int id) const;
-	const CellType & cell_type(const Cell & cell) const;
-	const CellType & cell_type(const Point & pos) const;
-	void set_cell_type(int id, const CellType & type);
+	TypeRegistry<Cell> cell_types;
+	const CellType & cell_type_at(const Point & pos) const;
 
 	Game(LevelGenerator * level_generator = 0);
 	void run(ControllerFactory controller_factory);

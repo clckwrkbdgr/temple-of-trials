@@ -133,10 +133,10 @@ enum { FLOOR_TYPE, WALL_TYPE, GOO_TYPE, TORCH_TYPE };
 
 void LinearGenerator::create_types(Game & game)
 {
-	game.set_cell_type(FLOOR_TYPE, World::floor());
-	game.set_cell_type(WALL_TYPE, World::wall());
-	game.set_cell_type(GOO_TYPE, World::goo());
-	game.set_cell_type(TORCH_TYPE, World::torch());
+	game.cell_types.set(FLOOR_TYPE, World::floor());
+	game.cell_types.set(WALL_TYPE, World::wall());
+	game.cell_types.set(GOO_TYPE, World::goo());
+	game.cell_types.set(TORCH_TYPE, World::torch());
 }
 
 void LinearGenerator::generate(Level & level, int level_index)

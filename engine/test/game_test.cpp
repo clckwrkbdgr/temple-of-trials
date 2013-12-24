@@ -111,6 +111,8 @@ struct GameWithDummy {
 	Game game;
 	GameWithDummy() {
 		game.level.map = Map(2, 2);
+		game.cell_types.set(1, CellType());
+		game.level.map.fill(1);
 		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("item");
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
 	}
@@ -119,7 +121,7 @@ struct GameWithDummy {
 
 TEST_FIXTURE(GameWithDummy, should_hurt_monster_if_cell_hurts)
 {
-	game.cell_types[0].hurts = true;
+	game.cell_types.set(1, CellType::Builder().hurts(true));
 	game.process_environment(dummy());
 	EQUAL(dummy().hp, 99);
 	EQUAL(game.messages.messages, MakeVector<std::string>("It hurts!")("Dummy loses 1 hp.").result);
@@ -238,13 +240,6 @@ TEST_FIXTURE(GameWithDummyAndKiller, should_die_if_hit_was_too_much)
 	EQUAL(game.messages.messages, MakeVector<std::string>("Killer hit dummy for 105 hp and kills it.")("Dummy drops item.").result);
 }
 
-
-TEST(should_return_default_empty_type_for_unknown_cell_type)
-{
-	Game game;
-	EQUAL(game.cell_type(1).sprite, 0);
-}
-
 }
 
 SUITE(level) {
@@ -254,150 +249,133 @@ struct Game2x2 {
 	Game2x2()
 	{
 		game.level = Level(2, 2);
+		game.cell_types.set(1, CellType::Builder().sprite(1).passable(true).transparent(true));
+		game.level.map.fill(1);
 	}
 };
 
 TEST_FIXTURE(Game2x2, impassable_cells_should_be_impassable)
 {
-	game.cell_types[0].passable = false;
+	game.cell_types.set(1, CellType::Builder().passable(false));
 	ASSERT(!game.is_passable(0, 0));
 }
 
 TEST_FIXTURE(Game2x2, closed_doors_should_be_impassable)
 {
-	game.cell_types[0].passable = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).openable().opened(false));
 	ASSERT(!game.is_passable(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, opened_doors_should_be_passable)
 {
-	game.cell_types[0].passable = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).openable().opened(true).passable());
 	ASSERT(game.is_passable(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, containers_should_be_impassable)
 {
-	game.cell_types[0].passable = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)));
 	ASSERT(!game.is_passable(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, fountains_should_be_impassable)
 {
-	game.cell_types[0].passable = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)));
 	ASSERT(!game.is_passable(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, monsters_should_be_impassable)
 {
-	game.cell_types[0].passable = true;
 	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)));
 	ASSERT(!game.is_passable(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, items_should_be_passable)
 {
-	game.cell_types[0].passable = true;
 	game.level.items.push_back(Item::Builder().pos(Point(1, 1)));
 	ASSERT(game.is_passable(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, traps_should_be_passable)
 {
-	game.cell_types[0].passable = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).passable());
 	ASSERT(game.is_passable(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, stairs_should_be_passable)
 {
-	game.cell_types[0].passable = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).passable());
 	ASSERT(game.is_passable(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, passable_cells_should_be_passable)
 {
-	game.cell_types[0].passable = true;
 	ASSERT(game.is_passable(1, 1));
 }
 
 
 TEST_FIXTURE(Game2x2, opaque_cells_should_be_opaque)
 {
-	game.cell_types[0].transparent = false;
+	game.cell_types.set(1, CellType::Builder().transparent(false));
 	ASSERT(!game.is_transparent(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, closed_doors_should_be_opaque)
 {
-	game.cell_types[0].transparent = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).openable().opened(false));
 	ASSERT(!game.is_transparent(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, opened_doors_should_be_transparent)
 {
-	game.cell_types[0].transparent = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).openable().opened(true).transparent());
 	ASSERT(game.is_transparent(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, containers_should_be_transparent)
 {
-	game.cell_types[0].transparent = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).transparent());
 	ASSERT(game.is_transparent(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, fountains_should_be_transparent)
 {
-	game.cell_types[0].transparent = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).transparent());
 	ASSERT(game.is_transparent(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, monsters_should_be_transparent)
 {
-	game.cell_types[0].transparent = true;
 	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)));
 	ASSERT(game.is_transparent(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, items_should_be_transparent)
 {
-	game.cell_types[0].transparent = true;
 	game.level.items.push_back(Item::Builder().pos(Point(1, 1)));
 	ASSERT(game.is_transparent(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, traps_should_be_transparent)
 {
-	game.cell_types[0].transparent = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).transparent());
 	ASSERT(game.is_transparent(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, stairs_should_be_transparent)
 {
-	game.cell_types[0].transparent = true;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).transparent());
 	ASSERT(game.is_transparent(1, 1));
 }
 
 TEST_FIXTURE(Game2x2, transparent_cells_should_be_transparent)
 {
-	game.cell_types[0].transparent = true;
 	ASSERT(game.is_transparent(1, 1));
 }
 
 
 TEST_FIXTURE(Game2x2, monster_should_be_on_top_of_all)
 {
-	game.cell_types[0].sprite = 1;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).sprite(2));
 	game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).sprite(3));
 	game.level.items.push_back(Item::Builder().pos(Point(1, 1)).sprite(4));
@@ -407,7 +385,6 @@ TEST_FIXTURE(Game2x2, monster_should_be_on_top_of_all)
 
 TEST_FIXTURE(Game2x2, items_should_be_on_top_of_objects)
 {
-	game.cell_types[0].sprite = 1;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).sprite(2));
 	game.level.items.push_back(Item::Builder().pos(Point(1, 1)).sprite(4));
 	int sprite = game.get_sprite_at(Point(1, 1));
@@ -416,7 +393,6 @@ TEST_FIXTURE(Game2x2, items_should_be_on_top_of_objects)
 
 TEST_FIXTURE(Game2x2, objects_should_be_below_everything)
 {
-	game.cell_types[0].sprite = 1;
 	game.level.objects.push_back(Object::Builder().pos(Point(1, 1)).sprite(2));
 	int sprite = game.get_sprite_at(Point(1, 1));
 	EQUAL(sprite, 2);
@@ -443,8 +419,8 @@ struct LevelWithPath {
 	LevelWithPath()
 	{
 		game.level = Level(4, 4);
-		game.set_cell_type(1, CellType::Builder().passable(true));
-		game.set_cell_type(2, CellType::Builder().passable(false));
+		game.cell_types.set(1, CellType::Builder().passable(true));
+		game.cell_types.set(2, CellType::Builder().passable(false));
 		int a[] = {
 			1, 2, 1, 1,
 			2, 1, 1, 2,
@@ -478,8 +454,8 @@ struct LevelForSeeing {
 	LevelForSeeing()
 	{
 		game.level = Level(3, 2);
-		game.set_cell_type(1, CellType::Builder().sprite(1).passable(true).transparent(true));
-		game.set_cell_type(2, CellType::Builder().sprite(2).passable(false).transparent(false));
+		game.cell_types.set(1, CellType::Builder().sprite(1).passable(true).transparent(true));
+		game.cell_types.set(2, CellType::Builder().sprite(2).passable(false).transparent(false));
 		int a[] = {
 			2, 1, 2,
 			1, 2, 1,

@@ -168,4 +168,33 @@ TEST(should_compare_unequal_containers_unequal)
 	ASSERT(!equal_containers(v.begin(), v.end(), l.begin(), l.end()));
 }
 
+
+struct Value {
+	struct Type {
+		bool valid;
+		int sprite;
+		Type() : valid(false), sprite(0) {}
+		Type(int type_sprite) : valid(true), sprite(type_sprite) {}
+	};
+	int type;
+	Value() : type(0) {}
+	Value(int value_type) : type(value_type) {}
+};
+
+TEST(should_get_type_for_value)
+{
+	TypeRegistry<Value> reg;
+	reg.set(2, Value::Type(1));
+	ASSERT(reg.get(Value(2)).valid);
+	EQUAL(reg.get(Value(2)).sprite, 1);
+}
+
+TEST(should_return_default_empty_type_for_unknown_cell_type)
+{
+	TypeRegistry<Value> reg;
+	reg.set(2, Value::Type(1));
+	ASSERT(!reg.get(1).valid);
+	EQUAL(reg.get(1).sprite, 0);
+}
+
 }

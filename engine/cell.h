@@ -22,6 +22,7 @@ struct CellType::Builder {
 };
 
 struct Cell {
+	typedef CellType Type;
 	unsigned type;
 	bool visible;
 	int seen_sprite;
