@@ -51,22 +51,6 @@ Item key(int key_type, const Point & pos = Point())
 	return Item::Builder().pos(pos).sprite(Sprites::KEY).name("key").key_type(key_type);
 }
 
-Monster player(const Point & monster_pos)
-{
-	return Monster::Builder().faction(Monster::PLAYER).pos(monster_pos).sprite(Sprites::PLAYER).sight(10).hp(20).ai(AI::PLAYER).name("you").hit_strength(3);
-}
-
-Monster ant(int ai, const Point & monster_pos)
-{
-	return Monster::Builder().faction(Monster::MONSTER).pos(monster_pos).sprite(Sprites::ANT).sight(6).hp(3).ai(ai).name("ant").hit_strength(1);
-}
-
-Monster scorpion(int ai, const Point & monster_pos)
-{
-	return Monster::Builder().faction(Monster::MONSTER).pos(monster_pos).sprite(Sprites::SCORPION).sight(8).hp(5).ai(ai).name("scorpion").
-		item(scorpion_tail()).hit_strength(2).poisonous(true);
-}
-
 Object door(const Point & pos)
 {
 	return Object::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).name("door").openable().opened(false).passable().transparent();
@@ -115,6 +99,11 @@ void LinearGenerator::create_types(Game & game)
 	wall = game.cell_types.insert(CellType::Builder("wall").sprite(Sprites::WALL).name("wall").passable(false));
 	goo = game.cell_types.insert(CellType::Builder("goo").sprite(Sprites::GOO).name("goo").passable(true).hurts(true).transparent(true));
 	torch = game.cell_types.insert(CellType::Builder("torch").sprite(Sprites::TORCH).name("torch").passable(false).transparent(true));
+
+	player = game.monster_types.insert(MonsterType::Builder("player").faction(Monster::PLAYER).sprite(Sprites::PLAYER).sight(10).max_hp(20).ai(AI::PLAYER).name("you").hit_strength(3));
+	wander_ant = game.monster_types.insert(MonsterType::Builder("wander_ant").faction(Monster::MONSTER).sprite(Sprites::ANT).sight(6).max_hp(3).ai(AI::ANGRY_AND_WANDER).name("ant").hit_strength(1));
+	still_ant = game.monster_types.insert(MonsterType::Builder("still_ant").faction(Monster::MONSTER).sprite(Sprites::ANT).sight(6).max_hp(3).ai(AI::ANGRY_AND_STILL).name("ant").hit_strength(1));
+	scorpion = game.monster_types.insert(MonsterType::Builder("scorpion").faction(Monster::MONSTER).sprite(Sprites::SCORPION).sight(8).max_hp(5).ai(AI::ANGRY_AND_STILL).name("scorpion").hit_strength(2).poisonous(true));
 }
 
 void LinearGenerator::generate(Level & level, int level_index)
@@ -216,11 +205,11 @@ void LinearGenerator::generate(Level & level, int level_index)
 					}
 					break;
 				case '@' :
-					level.monsters.push_back(World::player(pos));
+					level.monsters.push_back(Monster::Builder(player).pos(pos));
 					break;
-				case 'a' : level.monsters.push_back(World::ant(AI::ANGRY_AND_STILL, pos)); break;
-				case 'A' : level.monsters.push_back(World::ant(AI::ANGRY_AND_WANDER, pos)); break;
-				case 'S' : level.monsters.push_back(World::scorpion(AI::ANGRY_AND_STILL, pos)); break;
+				case 'a' : level.monsters.push_back(Monster::Builder(still_ant).pos(pos)); break;
+				case 'A' : level.monsters.push_back(Monster::Builder(wander_ant).pos(pos)); break;
+				case 'S' : level.monsters.push_back(Monster::Builder(scorpion).pos(pos)); break;
 				default: log("Unknown cell: '{0}' in room {1}.", cell, i);
 			}
 		}

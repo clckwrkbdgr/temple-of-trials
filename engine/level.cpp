@@ -149,7 +149,7 @@ void LevelGenerator::pop_player_front(std::vector<Monster> & monsters)
 		return;
 	}
 	foreach(Monster & monster, monsters) {
-		if(monster.faction == Monster::PLAYER) {
+		if(monster.type->faction == Monster::PLAYER) {
 			std::swap(monster, monsters.front());
 			log("Player found.");
 			break;

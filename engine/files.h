@@ -37,13 +37,22 @@ public:
 	}
 
 	Reader & add_type_registry(const TypeRegistry<Cell> & type_registry);
+	Reader & add_type_registry(const TypeRegistry<Monster> & type_registry);
 	Reader & store(int & value);
 	Reader & store(unsigned int & value);
 	Reader & store(char & value);
 	Reader & store(bool & value);
 	Reader & store(std::string & value);
 	Reader & store(Point & value);
-	Reader & store_type(Cell & cell);
+	template<class T>
+	Reader & store_type(T & value)
+	{
+		std::string type_id;
+		store(type_id);
+		value = T(get_registry(value)->get(type_id));
+		return *this;
+	}
+
 	Reader & size_of(Map & map);
 	template<class T>
 	Reader & size_of(std::vector<T> & v)
@@ -74,8 +83,12 @@ public:
 	}
 private:
 	int actual_minor_version;
-	const TypeRegistry<Cell> * cell_types;
 	std::istream & in;
+
+	const TypeRegistry<Cell> * cell_types;
+	const TypeRegistry<Monster> * monster_types;
+	const TypeRegistry<Cell> * get_registry(const Cell &) { return cell_types; }
+	const TypeRegistry<Monster> * get_registry(const Monster &) { return monster_types; }
 };
 
 class Writer {
@@ -105,7 +118,13 @@ public:
 	Writer & store(const std::string & value);
 	Writer & store(const Point & value);
 	Writer & add_type_registry(const TypeRegistry<Cell> &) { return * this; }
-	Writer & store_type(const Cell & cell);
+	Writer & add_type_registry(const TypeRegistry<Monster> &) { return * this; }
+	template<class T>
+	Writer & store_type(const T & value)
+	{
+		return store(value.type->id);
+	}
+
 	Writer & size_of(const Map & map);
 	template<class T>
 	Writer & size_of(const std::vector<T> & v)

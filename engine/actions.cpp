@@ -27,10 +27,7 @@ void Drink::commit(Monster & someone, Game & game)
     Object & object = find_at(game.level.objects, new_pos);
 	ACTION_ASSERT(object.valid() && object.drinkable, game.messages.nothing_to_drink(object));
 	game.messages.drinks(someone, object);
-	if(someone.hp < someone.max_hp) {
-		someone.hp += 1;
-		someone.hp = std::min(someone.hp, someone.max_hp);
-	}
+	someone.heal_by(1);
 }
 
 void Open::commit(Monster & someone, Game & game)
@@ -247,10 +244,10 @@ void Eat::commit(Monster & someone, Game & game)
 			game.messages.cures_poisoning_fully(item);
 		}
 	}
-	if(item.healing > 0 && someone.hp < someone.max_hp) {
-		someone.hp += item.healing;
-		someone.hp = std::min(someone.hp, someone.max_hp);
-		game.messages.heals(item, someone);
+	if(item.healing > 0) {
+		if(someone.heal_by(item.healing)) {
+			game.messages.heals(item, someone);
+		}
 	}
 	someone.inventory.take_item(slot);
 }

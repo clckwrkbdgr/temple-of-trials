@@ -35,6 +35,7 @@ std::string to_string(long unsigned value);
 std::string to_string(char value);
 std::string to_string(const std::string & value);
 std::string to_string(const Point & value);
+std::string to_string(const char * value);
 template<class T>
 std::string to_string(const T * value)
 {

@@ -17,17 +17,51 @@ TEST(monster_with_zero_hp_should_die)
 	ASSERT(monster.is_dead());
 }
 
+TEST(should_heal_monsters)
+{
+	MonsterType type;
+	type.max_hp = 3;
+	Monster monster(&type);
+	monster.hp = 1;
+	bool ok = monster.heal_by(1);
+	ASSERT(ok);
+	EQUAL(monster.hp, 2);
+}
+
+TEST(should_heal_monsters_up_to_max_hp)
+{
+	MonsterType type;
+	type.max_hp = 3;
+	Monster monster(&type);
+	monster.hp = 1;
+	bool ok = monster.heal_by(10);
+	ASSERT(ok);
+	EQUAL(monster.hp, 3);
+}
+
+TEST(should_not_heal_monsters_when_unharmed)
+{
+	MonsterType type;
+	type.max_hp = 3;
+	Monster monster(&type);
+	bool ok = monster.heal_by(10);
+	ASSERT(!ok);
+	EQUAL(monster.hp, 3);
+}
+
 TEST(monster_without_equipment_should_have_base_damage)
 {
-	Monster monster;
-	monster.hit_strength = 3;
+	MonsterType type;
+	type.hit_strength = 3;
+	Monster monster(&type);
 	EQUAL(monster.damage(), 3);
 }
 
 TEST(monster_with_equipment_should_have_weapon_damage_instead)
 {
-	Monster monster;
-	monster.hit_strength = 3;
+	MonsterType type;
+	type.hit_strength = 3;
+	Monster monster(&type);
 	Item weapon;
 	weapon.damage = 1;
 	weapon.sprite = 1;

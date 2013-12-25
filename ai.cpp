@@ -87,7 +87,7 @@ Action * angry_and_wander(Monster & monster, Game & game)
 			sign(player.pos.x - monster.pos.x),
 			sign(player.pos.y - monster.pos.y)
 			);
-	if(sees_player && 1 < d && d <= monster.sight) {
+	if(sees_player && 1 < d && d <= monster.type->sight) {
 		return new Move(shift);
 	}
 	if(sees_player && d == 1) {
@@ -109,7 +109,7 @@ Action * angry_and_still(Monster & monster, Game & game)
 		sign(player.pos.x - monster.pos.x),
 		sign(player.pos.y - monster.pos.y)
 		);
-	if(sees_player && 1 < d && d <= monster.sight) {
+	if(sees_player && 1 < d && d <= monster.type->sight) {
 		return new Move(shift);
 	}
 	if(sees_player && d == 1) {

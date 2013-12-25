@@ -2,7 +2,7 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 29, SAVEFILE_MINOR_VERSION = 0 };
+enum { SAVEFILE_MAJOR_VERSION = 30, SAVEFILE_MINOR_VERSION = 1 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -49,14 +49,9 @@ SAVEFILE_STORE_EXT(Inventory, inventory)
 
 SAVEFILE_STORE_EXT(Monster, monster)
 {
-	savefile.store(monster.pos).store(monster.sprite);
-	savefile.store(monster.sight);
-	savefile.store(monster.hp).store(monster.max_hp);
-	savefile.store(monster.hit_strength);
-	savefile.store(monster.poisonous).store(monster.poisoning);
-	savefile.store(monster.ai);
-	savefile.store(monster.name);
-	savefile.store(monster.faction);
+	savefile.store_type(monster);
+	savefile.store(monster.pos).store(monster.hp);
+	savefile.store(monster.poisoning);
 	savefile.newline();
 	savefile.store(monster.inventory);
 }
@@ -86,6 +81,9 @@ SAVEFILE_STORE_EXT(Level, level)
 
 SAVEFILE_STORE_EXT(Game, game)
 {
+	savefile.add_type_registry(game.cell_types);
+	savefile.add_type_registry(game.monster_types);
+
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
 	savefile.newline();
 
@@ -93,9 +91,10 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.store(game.turns);
 	savefile.newline();
 
-	savefile.store(game.cell_types.types, "celltype");
-	savefile.newline();
-	savefile.add_type_registry(game.cell_types);
+	if(savefile.version() < 1) {
+		savefile.store(game.cell_types.types, "celltype");
+		savefile.newline();
+	}
 
 	savefile.store(game.level);
 	savefile.newline();

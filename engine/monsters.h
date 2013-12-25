@@ -3,43 +3,62 @@
 #include <list>
 class Action;
 
-struct Monster {
-	enum Faction { NEUTRAL, PLAYER, MONSTER };
-
+struct MonsterType {
+	std::string id;
 	int faction;
-	Point pos;
 	int sprite;
 	int sight;
 	int ai;
-	int max_hp, hp;
+	int max_hp;
 	int hit_strength;
 	std::string name;
-	Inventory inventory;
 	bool poisonous;
+	MonsterType(const std::string & type_id = std::string());
+
+	struct Builder;
+};
+struct MonsterType::Builder {
+	MonsterType result;
+	Builder(const std::string & type_id) : result(type_id) {}
+	operator MonsterType() { return result; }
+	Builder & faction(int value);
+	Builder & sprite(const int & sprite);
+	Builder & sight(int value);
+	Builder & ai(int value);
+	Builder & max_hp(int value);
+	Builder & name(const std::string & value);
+	Builder & hit_strength(int value);
+	Builder & poisonous(bool value);
+};
+
+
+struct Monster {
+	enum Faction { NEUTRAL, PLAYER, MONSTER };
+	typedef MonsterType Type;
+
+	TypePtr<Type> type;
+	Point pos;
+	int hp;
+	Inventory inventory;
 	int poisoning;
 	std::list<Action*> plan;
-	Monster();
+	Monster(const Type * monster_type = 0);
 	~Monster();
 	bool valid() const;
 	bool is_dead() const { return hp <= 0; }
 	int damage() const;
 	void add_path(const std::list<Point> & path);
+	bool heal_by(int hp_amount);
 
 	struct Builder;
 };
 struct Monster::Builder {
 	Monster result;
+	Builder(const MonsterType * type) : result(type) {}
 	operator Monster() { return result; }
-	Builder & faction(int value);
 	Builder & pos(const Point & value);
-	Builder & sprite(const int & sprite);
-	Builder & sight(int value);
-	Builder & ai(int value);
 	Builder & hp(int value);
-	Builder & name(const std::string & value);
 	Builder & item(const Item & value);
-	Builder & hit_strength(int value);
-	Builder & poisonous(bool value);
 	Builder & wield(int value);
 	Builder & wear(int value);
 };

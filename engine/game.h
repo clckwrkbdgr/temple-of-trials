@@ -1,6 +1,7 @@
 #pragma once
 #include "map.h"
 #include "objects.h"
+#include "monsters.h"
 #include "level.h"
 #include "message.h"
 #include <map>
@@ -22,6 +23,7 @@ struct Game {
 	int turns;
 
 	TypeRegistry<Cell> cell_types;
+	TypeRegistry<Monster> monster_types;
 	const CellType & cell_type_at(const Point & pos) const;
 
 	Game(LevelGenerator * level_generator = 0);

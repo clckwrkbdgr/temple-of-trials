@@ -24,9 +24,9 @@ void Game::run(ControllerFactory controller_factory)
 			if(monster.is_dead()) {
 				continue;
 			}
-			Controller controller = controller_factory(monster.ai);
+			Controller controller = controller_factory(monster.type->ai);
 			if(!controller) {
-				log(format("No controller found for AI #{0}!", monster.ai));
+				log(format("No controller found for AI #{0}!", monster.type->ai));
 				continue;
 			}
 			invalidate_fov(monster);
@@ -112,7 +112,7 @@ void Game::die(Monster & someone)
 		level.items.push_back(item);
 		messages.drops(someone, item);
 	}
-	if(someone.faction == Monster::PLAYER) {
+	if(someone.type->faction == Monster::PLAYER) {
 		messages.player_died();
 		state = PLAYER_DIED;
 	}
@@ -132,7 +132,7 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 {
 	int received_damage = damage - other.inventory.worn_item().defence;
 	other.hp -= received_damage;
-	if(someone.poisonous) {
+	if(someone.type->poisonous) {
 		messages.poisons(someone, other);
 		other.poisoning = std::min(5, std::max(5, other.poisoning));
 	}
@@ -152,7 +152,7 @@ const CellType & Game::cell_type_at(const Point & pos) const
 const Monster & Game::get_player() const
 {
 	foreach(const Monster & monster, level.monsters) {
-		if(monster.faction == Monster::PLAYER) {
+		if(monster.type->faction == Monster::PLAYER) {
 			return monster;
 		}
 	}
@@ -163,7 +163,7 @@ const Monster & Game::get_player() const
 Monster & Game::get_player()
 {
 	foreach( Monster & monster, level.monsters) {
-		if(monster.faction == Monster::PLAYER) {
+		if(monster.type->faction == Monster::PLAYER) {
 			return monster;
 		}
 	}
@@ -208,7 +208,7 @@ int Game::get_sprite_at(const Point & pos) const
 {
 	foreach(const Monster & monster, level.monsters) {
 		if(monster.pos == pos) {
-			return monster.sprite;
+			return monster.type->sprite;
 		}
 	}
 	foreach(const Item & item, level.items) {
@@ -228,7 +228,7 @@ std::string Game::name_at(const Point & pos) const
 {
 	foreach(const Monster & monster, level.monsters) {
 		if(monster.pos == pos) {
-			return monster.name;
+			return monster.type->name;
 		}
 	}
 	foreach(const Item & item, level.items) {
@@ -251,15 +251,15 @@ void Game::invalidate_fov(Monster & monster)
 			level.map.cell(x, y).visible = false;
 		}
 	}
-	for(int x = monster.pos.x - monster.sight; x <= monster.pos.x + monster.sight; ++x) {
-		for(int y = monster.pos.y - monster.sight; y <= monster.pos.y + monster.sight; ++y) {
+	for(int x = monster.pos.x - monster.type->sight; x <= monster.pos.x + monster.type->sight; ++x) {
+		for(int y = monster.pos.y - monster.type->sight; y <= monster.pos.y + monster.type->sight; ++y) {
 			if(!level.map.valid(x, y)) {
 				continue;
 			}
 			int dx = std::abs(x - monster.pos.x);
 			int dy = std::abs(y - monster.pos.y);
 			int distance = int(std::sqrt(dx * dx + dy * dy));
-			bool can_see = distance <= monster.sight;
+			bool can_see = distance <= monster.type->sight;
 			if(can_see) {
 				int deltax = x - monster.pos.x;
 				int deltay = y - monster.pos.y;
@@ -299,7 +299,7 @@ void Game::invalidate_fov(Monster & monster)
 				}
 			}
 			level.map.cell(x, y).visible = can_see;
-			if(can_see && monster.faction == Monster::PLAYER) {
+			if(can_see && monster.type->faction == Monster::PLAYER) {
 				level.map.cell(x, y).seen_sprite = get_sprite_at(x, y);
 			}
 		}

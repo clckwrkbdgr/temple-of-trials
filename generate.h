@@ -8,4 +8,5 @@ public:
 	virtual void create_types(Game & game);
 private:
 	const CellType *wall, *floor, *goo, *torch;
+	const MonsterType *player, *wander_ant, *still_ant, *scorpion;
 };
