@@ -22,7 +22,7 @@ Level::Level(int map_width, int map_height)
 }
 
 
-void LevelGenerator::fill_room(Map & map, const std::pair<Point, Point> & room, const std::string & type)
+void LevelGenerator::fill_room(Map & map, const std::pair<Point, Point> & room, const CellType * type)
 {
 	for(int x = room.first.x; x <= room.second.x; ++x) {
 		for(int y = room.first.y; y <= room.second.y; ++y) {
@@ -53,7 +53,7 @@ std::vector<Point> LevelGenerator::random_positions(const std::pair<Point, Point
 	return result;
 }
 
-std::pair<Point, Point> LevelGenerator::connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const std::string & type)
+std::pair<Point, Point> LevelGenerator::connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const CellType * type)
 {
 	if(a.first.x < b.first.x) {
 		int start_y = std::max(a.first.y, b.first.y);

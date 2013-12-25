@@ -150,6 +150,30 @@ bool equal_containers(IteratorA a_begin, IteratorA a_end, IteratorB b_begin, Ite
 	return a_begin == a_end && b_begin == b_end;
 }
 
+template<class T>
+struct TypePtr {
+	TypePtr(const T * type_pointer = 0)
+		: pointer(type_pointer) {}
+	operator bool() const
+	{
+		return pointer;
+	}
+	const T & operator*() const
+	{
+		if(pointer) {
+			return *pointer;
+		}
+		static T empty;
+		return empty;
+	}
+	const T * operator->() const
+	{
+		return &(operator*());
+	}
+private:
+	const T * pointer;
+};
+
 // TODO rename all types using domains.
 template<class Value>
 struct TypeRegistry {
@@ -160,26 +184,15 @@ struct TypeRegistry {
 	{
 		return (types.count(id) > 0);
 	}
-	const ValueType & get(const std::string & id) const
+	const ValueType * get(const std::string & id) const
 	{
 		if(has(id)) {
-			return types.find(id)->second;
+			return &types.find(id)->second;
 		}
-		static ValueType empty;
-		return empty;
+		return 0;
 	}
-	const ValueType & get(const Value & value) const
+	const ValueType * insert(const ValueType & type)
 	{
-		return get(value.type_id);
-	}
-	void set(const std::string & id, const ValueType & type)
-	{
-		types[id] = type;
-	}
-	void update_types(std::vector<Value> & values)
-	{
-		foreach(Value & value, values) {
-			value.type = has(value.type_id) ? &get(value.type_id) : 0;
-		}
+		return &(types[type.id] = type);
 	}
 };

@@ -155,6 +155,31 @@ TEST(reader_should_read_invalid_point)
 	ASSERT(!point.valid());
 }
 
+TEST(reader_should_read_type_if_valid)
+{
+	std::istringstream in("\"type\" ");
+	Reader reader(in);
+	TypeRegistry<Cell> reg;
+	reader.add_type_registry(reg);
+	reg.insert(CellType("type"));
+	Cell value;
+	reader.store_type(value);
+	ASSERT(value.type);
+	EQUAL(value.type->id, "type");
+}
+
+TEST(reader_should_read_invalid_type_if_type_id_is_unknown)
+{
+	std::istringstream in("\"unknown\" ");
+	Reader reader(in);
+	TypeRegistry<Cell> reg;
+	reader.add_type_registry(reg);
+	reg.insert(CellType("type"));
+	Cell value;
+	reader.store_type(value);
+	ASSERT(!value.type);
+}
+
 TEST(reader_should_read_string_with_quote_in_it_escaped)
 {
 	std::istringstream in("\"hello \\\"world\\\"\" ");
@@ -289,6 +314,25 @@ TEST(writer_should_write_invalid_point)
 	Writer writer(out);
 	writer.store(Point());
 	EQUAL(out.str(), "0 0 0 ");
+}
+
+TEST(writer_should_write_type_if_valid)
+{
+	std::ostringstream out;
+	Writer writer(out);
+	Cell::Type type("type");
+	Cell value(&type);
+	writer.store_type(value);
+	EQUAL(out.str(), "\"type\" ");
+}
+
+TEST(writer_should_write_empty_type_if_invalid)
+{
+	std::ostringstream out;
+	Writer writer(out);
+	Cell value(0);
+	writer.store_type(value);
+	EQUAL(out.str(), "\"\" ");
 }
 
 TEST(writer_should_write_quoted_string_and_a_space)

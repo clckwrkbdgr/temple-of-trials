@@ -127,6 +127,20 @@ Reader & Reader::store(Point & value)
 	return *this;
 }
 
+Reader & Reader::add_type_registry(const TypeRegistry<Cell> & type_registry)
+{
+	cell_types = &type_registry;
+	return *this;
+}
+
+Reader & Reader::store_type(Cell & cell)
+{
+	std::string type_id;
+	store(type_id);
+	cell = Cell(cell_types->get(type_id));
+	return *this;
+}
+
 Reader & Reader::size_of(Map & map)
 {
 	unsigned width = 0, height = 0;
@@ -196,6 +210,11 @@ Writer & Writer::store(const Point & value)
 {
 	store(value.valid()).store(value.x).store(value.y);
 	return *this;
+}
+
+Writer & Writer::store_type(const Cell & cell)
+{
+	return store(cell.type->id);
 }
 
 Writer & Writer::size_of(const Map & map)

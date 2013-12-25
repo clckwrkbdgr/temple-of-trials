@@ -72,8 +72,8 @@ public:
 	const Cell & cell(const Point & pos) const;
 	const Cell & cell(int x, int y) const;
 
-	void fill(const std::string & celltype);
-	void fill(const std::string * map_of_celltypes);
-	void set_cell_type(const Point & pos, const std::string & value);
+	void fill(const CellType * celltype);
+	void fill(const CellType ** map_of_celltypes);
+	void set_cell_type(const Point & pos, const CellType * cell_type);
 };
 

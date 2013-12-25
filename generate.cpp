@@ -6,26 +6,6 @@
 
 namespace World {
 
-CellType floor()
-{
-	return CellType::Builder().sprite(Sprites::FLOOR).name("floor").passable(true).transparent(true);
-}
-
-CellType wall()
-{
-	return CellType::Builder().sprite(Sprites::WALL).name("wall").passable(false);
-}
-
-CellType torch()
-{
-	return CellType::Builder().sprite(Sprites::TORCH).name("torch").passable(false).transparent(true);
-}
-
-CellType goo()
-{
-	return CellType::Builder().sprite(Sprites::GOO).name("goo").passable(true).hurts(true).transparent(true);
-}
-
 Item explosive(const Point & pos = Point())
 {
 	return Item::Builder().pos(pos).sprite(Sprites::EXPLOSIVE).name("explosive").quest();
@@ -131,10 +111,10 @@ Object trap(const Point & pos)
 
 void LinearGenerator::create_types(Game & game)
 {
-	game.cell_types.set("floor", World::floor());
-	game.cell_types.set("wall", World::wall());
-	game.cell_types.set("goo", World::goo());
-	game.cell_types.set("torch", World::torch());
+	floor = game.cell_types.insert(CellType::Builder("floor").sprite(Sprites::FLOOR).name("floor").passable(true).transparent(true));
+	wall = game.cell_types.insert(CellType::Builder("wall").sprite(Sprites::WALL).name("wall").passable(false));
+	goo = game.cell_types.insert(CellType::Builder("goo").sprite(Sprites::GOO).name("goo").passable(true).hurts(true).transparent(true));
+	torch = game.cell_types.insert(CellType::Builder("torch").sprite(Sprites::TORCH).name("torch").passable(false).transparent(true));
 }
 
 void LinearGenerator::generate(Level & level, int level_index)
@@ -144,7 +124,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 	level = Level(60, 23);
 	log("Level cleared.");
 
-	level.map.fill("wall");
+	level.map.fill(wall);
 	log("Map filled.");
 
 	std::vector<std::pair<Point, Point> > rooms;
@@ -200,16 +180,16 @@ void LinearGenerator::generate(Level & level, int level_index)
 				level.monsters[key_holder].inventory.insert(World::key(level_index));
 			}
 		}
-		fill_room(level.map, rooms[i], "floor");
+		fill_room(level.map, rooms[i], floor);
 		std::vector<Point> positions = random_positions(rooms[i], room_content[i].size());
 		foreach(char cell, room_content[i]) {
 			Point pos = positions.back();
 			positions.pop_back();
 			switch(cell) {
-				case '#' : level.map.set_cell_type(pos, "wall"); break;
-				case '~' : level.map.set_cell_type(pos, "goo"); break;
-				case ' ' : level.map.set_cell_type(pos, "floor"); break;
-				case '&' : level.map.set_cell_type(pos, "torch"); break;
+				case '#' : level.map.set_cell_type(pos, wall); break;
+				case '~' : level.map.set_cell_type(pos, goo); break;
+				case ' ' : level.map.set_cell_type(pos, floor); break;
+				case '&' : level.map.set_cell_type(pos, torch); break;
 
 				case '$' : level.items.push_back(World::money(pos)); break;
 				case '%' : level.items.push_back(World::apple(pos)); break;
@@ -245,7 +225,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 			}
 		}
 		if(i > 0) {
-			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], "floor");
+			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], floor);
 			if(doors.first.valid() && doors.second.valid()) {
 				level.objects.push_back(World::door(doors.first));
 				if(is_last_room) {

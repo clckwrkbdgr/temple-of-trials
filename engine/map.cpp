@@ -135,18 +135,18 @@ bool Map::valid(const Point & pos) const
 	return (pos.x >= 0 && pos.x < int(width) && pos.y >= 0 && pos.y < int(height));
 }
 
-void Map::fill(const std::string & celltype)
+void Map::fill(const CellType * celltype)
 {
 	cells = std::vector<Cell>(width * height, Cell(celltype));
 }
 
-void Map::fill(const std::string * map_of_celltypes)
+void Map::fill(const CellType ** map_of_celltypes)
 {
 	cells = std::vector<Cell>(map_of_celltypes, map_of_celltypes + width * height);
 }
 
-void Map::set_cell_type(const Point & pos, const std::string & value)
+void Map::set_cell_type(const Point & pos, const CellType * cell_type)
 {
-	cell(pos).type_id = value;
+	cell(pos).type = cell_type;
 }
 

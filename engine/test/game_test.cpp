@@ -111,8 +111,8 @@ struct GameWithDummy {
 	Game game;
 	GameWithDummy() {
 		game.level.map = Map(2, 2);
-		game.cell_types.set("floor", CellType());
-		game.level.map.fill("floor");
+		game.cell_types.insert(CellType("floor"));
+		game.level.map.fill(game.cell_types.get("floor"));
 		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("item");
 		game.level.monsters.push_back(Monster::Builder().pos(Point(1, 1)).hp(100).name("dummy").item(armor));
 	}
@@ -121,7 +121,7 @@ struct GameWithDummy {
 
 TEST_FIXTURE(GameWithDummy, should_hurt_monster_if_cell_hurts)
 {
-	game.cell_types.set("floor", CellType::Builder().hurts(true));
+	game.cell_types.insert(CellType::Builder("floor").hurts(true));
 	game.process_environment(dummy());
 	EQUAL(dummy().hp, 99);
 	EQUAL(game.messages.messages, MakeVector<std::string>("It hurts!")("Dummy loses 1 hp.").result);
@@ -249,14 +249,14 @@ struct Game2x2 {
 	Game2x2()
 	{
 		game.level = Level(2, 2);
-		game.cell_types.set("floor", CellType::Builder().sprite(1).passable(true).transparent(true));
-		game.level.map.fill("floor");
+		game.cell_types.insert(CellType::Builder("floor").sprite(1).passable(true).transparent(true));
+		game.level.map.fill(game.cell_types.get("floor"));
 	}
 };
 
 TEST_FIXTURE(Game2x2, impassable_cells_should_be_impassable)
 {
-	game.cell_types.set("floor", CellType::Builder().passable(false));
+	game.cell_types.insert(CellType::Builder("floor").passable(false));
 	ASSERT(!game.is_passable(0, 0));
 }
 
@@ -316,7 +316,7 @@ TEST_FIXTURE(Game2x2, passable_cells_should_be_passable)
 
 TEST_FIXTURE(Game2x2, opaque_cells_should_be_opaque)
 {
-	game.cell_types.set("floor", CellType::Builder().transparent(false));
+	game.cell_types.insert(CellType::Builder("floor").transparent(false));
 	ASSERT(!game.is_transparent(1, 1));
 }
 
@@ -419,13 +419,13 @@ struct LevelWithPath {
 	LevelWithPath()
 	{
 		game.level = Level(4, 4);
-		game.cell_types.set("f", CellType::Builder().passable(true));
-		game.cell_types.set("w", CellType::Builder().passable(false));
-		std::string a[] = {
-			"f", "w", "f", "f",
-			"w", "f", "f", "w",
-			"f", "w", "w", "f",
-			"f", "w", "f", "w",
+		const CellType * f = game.cell_types.insert(CellType::Builder("f").passable(true));
+		const CellType * w = game.cell_types.insert(CellType::Builder("w").passable(false));
+		const CellType * a[] = {
+			f, w, f, f,
+			w, f, f, w,
+			f, w, w, f,
+			f, w, f, w,
 		};
 		game.level.map.fill(a);
 	}
@@ -454,11 +454,11 @@ struct LevelForSeeing {
 	LevelForSeeing()
 	{
 		game.level = Level(3, 2);
-		game.cell_types.set("f", CellType::Builder().sprite(1).passable(true).transparent(true));
-		game.cell_types.set("w", CellType::Builder().sprite(2).passable(false).transparent(false));
-		std::string a[] = {
-			"w", "f", "w",
-			"f", "w", "f",
+		const CellType * f = game.cell_types.insert(CellType::Builder("f").sprite(1).passable(true).transparent(true));
+		const CellType * w = game.cell_types.insert(CellType::Builder("w").sprite(2).passable(false).transparent(false));
+		const CellType * a[] = {
+			w, f, w,
+			f, w, f,
 		};
 		game.level.map.fill(a);
 		game.level.monsters.push_back(Monster::Builder().pos(Point(2, 1)).faction(Monster::PLAYER).sight(3).sprite(100));

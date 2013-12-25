@@ -171,43 +171,53 @@ TEST(should_compare_unequal_containers_unequal)
 
 struct Value {
 	struct Type {
-		bool valid;
+		std::string id;
 		int sprite;
-		Type() : valid(false), sprite(0) {}
-		Type(int type_sprite) : valid(true), sprite(type_sprite) {}
+		Type() : sprite(0) {}
+		Type(const std::string & type_id, int type_sprite) : id(type_id), sprite(type_sprite) {}
 	};
 	const Type * type;
-	std::string type_id;
-	Value() : type(0) {}
-	Value(const std::string & value_type) : type(0), type_id(value_type) {}
+	Value(const Type * value_type = 0) : type(value_type) {}
 };
+
+TEST(should_assume_non_null_type_pointer_as_valid)
+{
+	Value::Type type("type", 1);
+	TypePtr<Value::Type> ptr(&type);
+	ASSERT(ptr);
+}
+
+TEST(should_assume_null_type_pointer_as_invalid)
+{
+	TypePtr<Value::Type> ptr;
+	ASSERT(!ptr);
+}
+
+TEST(should_return_type_from_pointer_if_valid)
+{
+	Value::Type type("type", 1);
+	TypePtr<Value::Type> ptr(&type);
+	EQUAL(ptr->id, "type");
+}
+
+TEST(should_return_default_type_from_pointer_if_invalid)
+{
+	TypePtr<Value::Type> ptr;
+	ASSERT(ptr->id.empty());
+}
 
 TEST(should_get_type_for_value)
 {
 	TypeRegistry<Value> reg;
-	reg.set("test", Value::Type(1));
-	ASSERT(reg.get(Value("test")).valid);
-	EQUAL(reg.get(Value("test")).sprite, 1);
+	reg.insert(Value::Type("test", 1));
+	ASSERT(reg.get("test"));
 }
 
 TEST(should_return_default_empty_type_for_unknown_cell_type)
 {
 	TypeRegistry<Value> reg;
-	reg.set("known", Value::Type(1));
-	ASSERT(!reg.get("unknown").valid);
-	EQUAL(reg.get("unknown").sprite, 0);
-}
-
-TEST(should_update_values_type_pointers)
-{
-	TypeRegistry<Value> reg;
-	reg.set("one", Value::Type(1));
-	reg.set("two", Value::Type(2));
-	std::vector<Value> v = MakeVector<Value>(Value("one"))(Value("two"))(Value("unknown")).result;
-	reg.update_types(v);
-	EQUAL(v[0].type, &reg.get("one"));
-	EQUAL(v[1].type, &reg.get("two"));
-	ASSERT(!v[2].type);
+	reg.insert(Value::Type("known", 1));
+	ASSERT(!reg.get("unknown"));
 }
 
 }

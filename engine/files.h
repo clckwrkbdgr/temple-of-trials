@@ -36,12 +36,14 @@ public:
 		return *this;
 	}
 
+	Reader & add_type_registry(const TypeRegistry<Cell> & type_registry);
 	Reader & store(int & value);
 	Reader & store(unsigned int & value);
 	Reader & store(char & value);
 	Reader & store(bool & value);
 	Reader & store(std::string & value);
 	Reader & store(Point & value);
+	Reader & store_type(Cell & cell);
 	Reader & size_of(Map & map);
 	template<class T>
 	Reader & size_of(std::vector<T> & v)
@@ -72,6 +74,7 @@ public:
 	}
 private:
 	int actual_minor_version;
+	const TypeRegistry<Cell> * cell_types;
 	std::istream & in;
 };
 
@@ -101,6 +104,8 @@ public:
 	Writer & store(bool value);
 	Writer & store(const std::string & value);
 	Writer & store(const Point & value);
+	Writer & add_type_registry(const TypeRegistry<Cell> &) { return * this; }
+	Writer & store_type(const Cell & cell);
 	Writer & size_of(const Map & map);
 	template<class T>
 	Writer & size_of(const std::vector<T> & v)

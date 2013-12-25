@@ -25,9 +25,9 @@ public:
 	virtual void generate(Level & level, int level_index) = 0;
 	virtual void create_types(Game & game) = 0;
 protected:
-	void fill_room(Map & map, const std::pair<Point, Point> & room, const std::string & type);
+	void fill_room(Map & map, const std::pair<Point, Point> & room, const CellType * type);
 	std::vector<Point> random_positions(const std::pair<Point, Point> & room, int count);
-	std::pair<Point, Point> connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const std::string & type);
+	std::pair<Point, Point> connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const CellType * type);
 	std::vector<std::pair<Point, Point> > shuffle_rooms(const std::vector<std::pair<Point, Point> > & rooms);
 	void pop_player_front(std::vector<Monster> & monsters);
 };

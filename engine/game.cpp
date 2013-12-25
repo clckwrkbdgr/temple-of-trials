@@ -16,11 +16,6 @@ Game::Game(LevelGenerator * level_generator)
 	}
 }
 
-void Game::update_types()
-{
-	cell_types.update_types(level.map.cells);
-}
-
 void Game::run(ControllerFactory controller_factory)
 {
 	state = PLAYING;
@@ -71,7 +66,6 @@ void Game::generate(int level_index)
 		saved_levels.erase(level_index);
 	} else if(generator) {
 		generator->generate(level, level_index);
-		update_types();
 	} else {
 		return;
 	}
@@ -151,7 +145,7 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 
 const CellType & Game::cell_type_at(const Point & pos) const
 {
-	return cell_types.get(level.map.cell(pos));
+	return *(level.map.cell(pos).type);
 }
 
 

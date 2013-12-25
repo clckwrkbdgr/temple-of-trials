@@ -1,7 +1,7 @@
 #include "cell.h"
 
-CellType::CellType()
-	: sprite(0), passable(false), transparent(false), hurts(false)
+CellType::CellType(const std::string & type_id)
+	: id(type_id), sprite(0), passable(false), transparent(false), hurts(false)
 {
 }
 
@@ -12,8 +12,8 @@ CellType::Builder & CellType::Builder::transparent(bool value) { result.transpar
 CellType::Builder & CellType::Builder::name(const std::string & value) { result.name = value; return *this; }
 
 
-Cell::Cell(const std::string & cell_type)
-	: type(0), type_id(cell_type), visible(false), seen_sprite(0)
+Cell::Cell(const CellType * cell_type)
+	: type(cell_type), visible(false), seen_sprite(0)
 {
 }
 

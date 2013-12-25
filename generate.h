@@ -6,4 +6,6 @@ public:
 	virtual ~LinearGenerator() {}
 	virtual void generate(Level & level, int level_index);
 	virtual void create_types(Game & game);
+private:
+	const CellType *wall, *floor, *goo, *torch;
 };

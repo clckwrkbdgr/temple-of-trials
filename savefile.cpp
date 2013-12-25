@@ -2,17 +2,17 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 28, SAVEFILE_MINOR_VERSION = 0 };
+enum { SAVEFILE_MAJOR_VERSION = 29, SAVEFILE_MINOR_VERSION = 0 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
-	savefile.store(celltype.sprite).store(celltype.passable);
+	savefile.store(celltype.id).store(celltype.sprite).store(celltype.passable);
 	savefile.store(celltype.hurts).store(celltype.transparent).store(celltype.name);
 }
 
 SAVEFILE_STORE_EXT(Cell, cell)
 {
-	savefile.store(cell.type_id).store(cell.seen_sprite);
+	savefile.store_type(cell).store(cell.seen_sprite);
 }
 
 SAVEFILE_STORE_EXT(Item, item)
@@ -95,6 +95,7 @@ SAVEFILE_STORE_EXT(Game, game)
 
 	savefile.store(game.cell_types.types, "celltype");
 	savefile.newline();
+	savefile.add_type_registry(game.cell_types);
 
 	savefile.store(game.level);
 	savefile.newline();
@@ -106,7 +107,6 @@ SAVEFILE_STORE_EXT(Game, game)
 void load(Reader & savefile, Game & game)
 {
 	savefile.store(game);
-	game.update_types();
 }
 
 void save(Writer & savefile, const Game & game)
