@@ -9,4 +9,5 @@ public:
 private:
 	const CellType *wall, *floor, *goo, *torch;
 	const MonsterType *player, *wander_ant, *still_ant, *scorpion;
+	const ObjectType *door, *locked_door, *pot, *well, *gate, *stairs_up, *stairs_down, *trap;
 };

@@ -44,14 +44,14 @@ Action * player_control(Monster & player, Game & game)
 				}
 				Object & object = find_at(game.level.objects, new_pos);
 				if(object.valid()) {
-					if(object.openable && !object.opened) {
+					if(object.type->openable && !object.opened) {
 						player.plan.push_front(new Move(shift));
 						return new Open(shift);
 					}
-					if(object.containable) {
+					if(object.type->containable) {
 						return new Open(shift);
 					}
-					if(object.drinkable) {
+					if(object.type->drinkable) {
 						return new Drink(shift);
 					}
 				}

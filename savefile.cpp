@@ -2,7 +2,7 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 30, SAVEFILE_MINOR_VERSION = 1 };
+enum { SAVEFILE_MAJOR_VERSION = 31, SAVEFILE_MINOR_VERSION = 0 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -27,12 +27,8 @@ SAVEFILE_STORE_EXT(Item, item)
 
 SAVEFILE_STORE_EXT(Object, object)
 {
-	savefile.store(object.pos);
-	savefile.store(object.sprite).store(object.opened_sprite).store(object.name);
-	savefile.store(object.passable).store(object.transparent);
-	savefile.store(object.containable).store(object.drinkable);
-	savefile.store(object.transporting).store(object.triggerable);
-	savefile.store(object.openable).store(object.opened);
+	savefile.store_type(object);
+	savefile.store(object.pos).store(object.opened);
 	savefile.store(object.up_destination).store(object.down_destination);
 	savefile.store(object.locked).store(object.lock_type);
 	savefile.newline();
@@ -83,6 +79,7 @@ SAVEFILE_STORE_EXT(Game, game)
 {
 	savefile.add_type_registry(game.cell_types);
 	savefile.add_type_registry(game.monster_types);
+	savefile.add_type_registry(game.object_types);
 
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
 	savefile.newline();
@@ -90,11 +87,6 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.store(game.current_level);
 	savefile.store(game.turns);
 	savefile.newline();
-
-	if(savefile.version() < 1) {
-		savefile.store(game.cell_types.types, "celltype");
-		savefile.newline();
-	}
 
 	savefile.store(game.level);
 	savefile.newline();

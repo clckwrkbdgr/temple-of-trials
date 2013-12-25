@@ -51,46 +51,6 @@ Item key(int key_type, const Point & pos = Point())
 	return Item::Builder().pos(pos).sprite(Sprites::KEY).name("key").key_type(key_type);
 }
 
-Object door(const Point & pos)
-{
-	return Object::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).name("door").openable().opened(false).passable().transparent();
-}
-
-Object locked_door(const Point & pos, int lock_type)
-{
-	return Object::Builder().pos(pos).opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).name("door").openable().opened(false).passable().transparent().locked(true).lock_type(lock_type);
-}
-
-Object pot(const Point & pos)
-{
-	return Object::Builder().pos(pos).sprite(Sprites::POT).name("pot").containable().item(money()).item(antidote()).transparent();
-}
-
-Object well(const Point & pos)
-{
-	return Object::Builder().pos(pos).sprite(Sprites::WELL).name("well").drinkable().transparent();
-}
-
-Object gate(const Point & pos)
-{
-	return Object::Builder().pos(pos).sprite(Sprites::GATE).name("gate").transporting().up_destination(-1).passable().transparent();
-}
-
-Object stairs_up(const Point & pos, int destination)
-{
-	return Object::Builder().pos(pos).sprite(Sprites::STAIRS_UP).name("stairs").transporting().up_destination(destination).passable().transparent();
-}
-
-Object stairs_down(const Point & pos, int destination)
-{
-	return Object::Builder().pos(pos).sprite(Sprites::STAIRS_DOWN).name("stairs").transporting().down_destination(destination).passable().transparent();
-}
-
-Object trap(const Point & pos)
-{
-	return Object::Builder().pos(pos).sprite(Sprites::TRAP).name("trap").triggerable().item(sharpened_pole()).passable().transparent();
-}
-
 }
 
 void LinearGenerator::create_types(Game & game)
@@ -100,10 +60,25 @@ void LinearGenerator::create_types(Game & game)
 	goo = game.cell_types.insert(CellType::Builder("goo").sprite(Sprites::GOO).name("goo").passable(true).hurts(true).transparent(true));
 	torch = game.cell_types.insert(CellType::Builder("torch").sprite(Sprites::TORCH).name("torch").passable(false).transparent(true));
 
-	player = game.monster_types.insert(MonsterType::Builder("player").faction(Monster::PLAYER).sprite(Sprites::PLAYER).sight(10).max_hp(20).ai(AI::PLAYER).name("you").hit_strength(3));
-	wander_ant = game.monster_types.insert(MonsterType::Builder("wander_ant").faction(Monster::MONSTER).sprite(Sprites::ANT).sight(6).max_hp(3).ai(AI::ANGRY_AND_WANDER).name("ant").hit_strength(1));
-	still_ant = game.monster_types.insert(MonsterType::Builder("still_ant").faction(Monster::MONSTER).sprite(Sprites::ANT).sight(6).max_hp(3).ai(AI::ANGRY_AND_STILL).name("ant").hit_strength(1));
-	scorpion = game.monster_types.insert(MonsterType::Builder("scorpion").faction(Monster::MONSTER).sprite(Sprites::SCORPION).sight(8).max_hp(5).ai(AI::ANGRY_AND_STILL).name("scorpion").hit_strength(2).poisonous(true));
+	player = game.monster_types.insert(MonsterType::Builder("player").faction(Monster::PLAYER).
+			sprite(Sprites::PLAYER).sight(10).max_hp(20).ai(AI::PLAYER).name("you").hit_strength(3));
+	wander_ant = game.monster_types.insert(MonsterType::Builder("wander_ant").faction(Monster::MONSTER).
+			sprite(Sprites::ANT).sight(6).max_hp(3).ai(AI::ANGRY_AND_WANDER).name("ant").hit_strength(1));
+	still_ant = game.monster_types.insert(MonsterType::Builder("still_ant").faction(Monster::MONSTER).
+			sprite(Sprites::ANT).sight(6).max_hp(3).ai(AI::ANGRY_AND_STILL).name("ant").hit_strength(1));
+	scorpion = game.monster_types.insert(MonsterType::Builder("scorpion").faction(Monster::MONSTER).
+			sprite(Sprites::SCORPION).sight(8).max_hp(5).ai(AI::ANGRY_AND_STILL).name("scorpion").hit_strength(2).poisonous(true));
+
+	door = game.object_types.insert(ObjectType::Builder("door").opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).
+			name("door").openable().passable().transparent());
+	locked_door = game.object_types.insert(ObjectType::Builder("locked_door").opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).
+			name("door").openable().passable().transparent());
+	pot = game.object_types.insert(ObjectType::Builder("pot").sprite(Sprites::POT).name("pot").containable().transparent());
+	well = game.object_types.insert(ObjectType::Builder("well").sprite(Sprites::WELL).name("well").drinkable().transparent());
+	gate = game.object_types.insert(ObjectType::Builder("gate").sprite(Sprites::GATE).name("gate").transporting().passable().transparent());
+	stairs_up = game.object_types.insert(ObjectType::Builder("stairs_up").sprite(Sprites::STAIRS_UP).name("stairs").transporting().passable().transparent());
+	stairs_down = game.object_types.insert(ObjectType::Builder("stairs_down").sprite(Sprites::STAIRS_DOWN).name("stairs").transporting().passable().transparent());
+	trap = game.object_types.insert(ObjectType::Builder("trap").sprite(Sprites::TRAP).name("trap").triggerable().passable().transparent());
 }
 
 void LinearGenerator::generate(Level & level, int level_index)
@@ -186,22 +161,22 @@ void LinearGenerator::generate(Level & level, int level_index)
 				case '*' : level.items.push_back(World::explosive(pos)); break;
 				case '[' : level.items.push_back(World::jacket(pos)); break;
 
-				case '{' : level.objects.push_back(World::well(pos)); break;
-				case '+' : level.objects.push_back(World::door(pos)); break;
-				case 'V' : level.objects.push_back(World::pot(pos)); break;
-				case '^' : level.objects.push_back(World::trap(pos)); break;
+				case '{' : level.objects.push_back(Object::Builder(well).pos(pos)); break;
+				case '+' : level.objects.push_back(Object::Builder(door).pos(pos).opened(false)); break;
+				case 'V' : level.objects.push_back(Object::Builder(pot).pos(pos).item(World::antidote()).item(World::money())); break;
+				case '^' : level.objects.push_back(Object::Builder(trap).pos(pos).item(World::sharpened_pole())); break;
 				case '>' :
 					if(level_index == 3) {
 						level.items.push_back(World::explosive(pos));
 					} else {
-						level.objects.push_back(World::stairs_down(pos, level_index + 1));
+						level.objects.push_back(Object::Builder(stairs_down).pos(pos).down_destination(level_index + 1));
 					}
 					break;
 				case '<' :
 					if(level_index == 1) {
-						level.objects.push_back(World::gate(pos)); break;
+						level.objects.push_back(Object::Builder(gate).pos(pos).up_destination(-1)); break;
 					} else {
-						level.objects.push_back(World::stairs_up(pos, level_index - 1)); break;
+						level.objects.push_back(Object::Builder(stairs_up).pos(pos).up_destination(level_index - 1)); break;
 					}
 					break;
 				case '@' :
@@ -209,18 +184,18 @@ void LinearGenerator::generate(Level & level, int level_index)
 					break;
 				case 'a' : level.monsters.push_back(Monster::Builder(still_ant).pos(pos)); break;
 				case 'A' : level.monsters.push_back(Monster::Builder(wander_ant).pos(pos)); break;
-				case 'S' : level.monsters.push_back(Monster::Builder(scorpion).pos(pos)); break;
+				case 'S' : level.monsters.push_back(Monster::Builder(scorpion).pos(pos).item(World::scorpion_tail())); break;
 				default: log("Unknown cell: '{0}' in room {1}.", cell, i);
 			}
 		}
 		if(i > 0) {
 			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], floor);
 			if(doors.first.valid() && doors.second.valid()) {
-				level.objects.push_back(World::door(doors.first));
+				level.objects.push_back(Object::Builder(door).pos(doors.first));
 				if(is_last_room) {
-					level.objects.push_back(World::locked_door(doors.second, level_index));
+					level.objects.push_back(Object::Builder(locked_door).pos(doors.second).locked(true).lock_type(level_index));
 				} else {
-					level.objects.push_back(World::door(doors.second));
+					level.objects.push_back(Object::Builder(door).pos(doors.second));
 				}
 			}
 		}

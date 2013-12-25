@@ -1,5 +1,6 @@
 #pragma once
 #include "monsters.h"
+#include "objects.h"
 #include "util.h"
 #include <fstream>
 #include <vector>
@@ -38,6 +39,7 @@ public:
 
 	Reader & add_type_registry(const TypeRegistry<Cell> & type_registry);
 	Reader & add_type_registry(const TypeRegistry<Monster> & type_registry);
+	Reader & add_type_registry(const TypeRegistry<Object> & type_registry);
 	Reader & store(int & value);
 	Reader & store(unsigned int & value);
 	Reader & store(char & value);
@@ -50,6 +52,7 @@ public:
 		std::string type_id;
 		store(type_id);
 		value = T(get_registry(value)->get(type_id));
+		check(type_id + " type");
 		return *this;
 	}
 
@@ -87,8 +90,10 @@ private:
 
 	const TypeRegistry<Cell> * cell_types;
 	const TypeRegistry<Monster> * monster_types;
+	const TypeRegistry<Object> * object_types;
 	const TypeRegistry<Cell> * get_registry(const Cell &) { return cell_types; }
 	const TypeRegistry<Monster> * get_registry(const Monster &) { return monster_types; }
+	const TypeRegistry<Object> * get_registry(const Object &) { return object_types; }
 };
 
 class Writer {
@@ -119,10 +124,13 @@ public:
 	Writer & store(const Point & value);
 	Writer & add_type_registry(const TypeRegistry<Cell> &) { return * this; }
 	Writer & add_type_registry(const TypeRegistry<Monster> &) { return * this; }
+	Writer & add_type_registry(const TypeRegistry<Object> &) { return * this; }
 	template<class T>
 	Writer & store_type(const T & value)
 	{
-		return store(value.type->id);
+		store(value.type->id);
+		check(value.type->id + " type");
+		return *this;
 	}
 
 	Writer & size_of(const Map & map);

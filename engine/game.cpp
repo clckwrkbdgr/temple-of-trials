@@ -84,7 +84,7 @@ void Game::process_environment(Monster & someone)
 		hurt(someone, 1);
 	}
 	Object & object = find_at(level.objects, someone.pos);
-	if(object.valid() && object.triggerable) {
+	if(object.valid() && object.type->triggerable) {
 		if(object.items.empty()) {
 			messages.trap_is_dead(object);
 		} else {
@@ -238,7 +238,7 @@ std::string Game::name_at(const Point & pos) const
 	}
 	foreach(const Object & object, level.objects) {
 		if(object.pos == pos) {
-			return object.name;
+			return object.type->name;
 		}
 	}
 	return cell_type_at(pos).name;

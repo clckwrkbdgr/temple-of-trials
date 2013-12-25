@@ -24,6 +24,7 @@ struct Game {
 
 	TypeRegistry<Cell> cell_types;
 	TypeRegistry<Monster> monster_types;
+	TypeRegistry<Object> object_types;
 	const CellType & cell_type_at(const Point & pos) const;
 
 	Game(LevelGenerator * level_generator = 0);

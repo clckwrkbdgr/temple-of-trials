@@ -34,11 +34,11 @@ void Messages::return_to_gates_with_item()
 
 void Messages::nothing_to_drink(const Object & object)
 {
-	if(object.containable) {
+	if(object.type->containable) {
 		if(object.items.empty()) {
-			message(format("Unfortunately, {0} is totally empty.", object.name));
+			message(format("Unfortunately, {0} is totally empty.", object.type->name));
 		} else {
-			message(format("Unfortunately, {0} has no water left. But there is something else inside.", object.name));
+			message(format("Unfortunately, {0} has no water left. But there is something else inside.", object.type->name));
 		}
 	} else {
 		message("There is nothing to drink.");
@@ -52,7 +52,7 @@ void Messages::player_died()
 
 void Messages::closed(const Monster & someone, const Object & object)
 {
-	message(format("{0} closed the {1}.", someone.type->name, object.name));
+	message(format("{0} closed the {1}.", someone.type->name, object.type->name));
 }
 
 void Messages::cures_poisoning_a_little(const Item & item)
@@ -82,12 +82,12 @@ void Messages::eats(const Monster & someone, const Item & item)
 
 void Messages::falls_and_lost(const Item & item, const Object & object)
 {
-	message(format("{0} falls into {1}. Forever lost.", item.name, object.name));
+	message(format("{0} falls into {1}. Forever lost.", item.name, object.type->name));
 }
 
 void Messages::falls(const Item & item, const Object & object)
 {
-	message(format("{0} falls into {1}.", item.name, object.name));
+	message(format("{0} falls into {1}.", item.name, object.type->name));
 }
 
 void Messages::goes_down(const Monster & someone)
@@ -131,12 +131,12 @@ void Messages::hits(const Monster & someone, const CellType & cell)
 
 void Messages::hits(const Monster & someone, const Object & object)
 {
-	message(format("{0} hit {1}.", someone.type->name, object.name));
+	message(format("{0} hit {1}.", someone.type->name, object.type->name));
 }
 
 void Messages::hits(const Item & item, const Object & object)
 {
-	message(format("{0} hit {1}.", item.name, object.name));
+	message(format("{0} hit {1}.", item.name, object.type->name));
 }
 
 void Messages::hits(const Monster & someone, const Monster & other)
@@ -151,7 +151,7 @@ void Messages::hits(const Item & item, const Monster & other)
 
 void Messages::trap_is_dead(const Object & object)
 {
-	message(format("{0} is already triggered.", object.name));
+	message(format("{0} is already triggered.", object.type->name));
 }
 
 void Messages::poisoned(const Monster & someone)
@@ -175,7 +175,7 @@ void Messages::sending_to_quest(const Monster & someone)
 
 void Messages::opened(const Monster & someone, const Object & object)
 {
-	message(format("{0} opened the {1}.", someone.type->name, object.name));
+	message(format("{0} opened the {1}.", someone.type->name, object.type->name));
 }
 
 void Messages::picks_up(const Monster & someone, const Item & item, const CellType & cell)
@@ -195,7 +195,7 @@ void Messages::swings_at_nothing(const Monster & someone)
 
 void Messages::swings_at_object(const Monster & someone, const Object & object)
 {
-	message(format("{0} swing at {1}.", someone.type->name, object.name));
+	message(format("{0} swing at {1}.", someone.type->name, object.type->name));
 }
 
 void Messages::takes_off(const Monster & someone, const Item & item)
@@ -210,17 +210,17 @@ void Messages::throws(const Monster & someone, const Item & item)
 
 void Messages::tooks_up_from(const Monster & someone, const Item & item, const Object & object)
 {
-	message(format("{0} took up a {1} from {2}.", someone.type->name, item.name, object.name));
+	message(format("{0} took up a {1} from {2}.", someone.type->name, item.name, object.type->name));
 }
 
 void Messages::triggers_trap(const Monster & someone, const Object & object)
 {
-	message(format("{0} trigger the {1}.", someone.type->name, object.name));
+	message(format("{0} trigger the {1}.", someone.type->name, object.type->name));
 }
 
 void Messages::unlocks(const Monster & someone, const Object & object)
 {
-	message(format("{0} unlocked the {1}.", someone.type->name, object.name));
+	message(format("{0} unlocked the {1}.", someone.type->name, object.type->name));
 }
 
 void Messages::unwields(const Monster & someone, const Item & item)
@@ -275,16 +275,16 @@ void Messages::bumps_into(const Monster & someone, const Monster & monster)
 
 void Messages::bumps_into(const Monster & someone, const Object & object)
 {
-	if(object.openable) {
+	if(object.type->openable) {
 		if(object.locked) {
-			message(format("{0} is locked.", object.name));
+			message(format("{0} is locked.", object.type->name));
 			return;
 		} else {
-			message(format("{0} is closed.", object.name));
+			message(format("{0} is closed.", object.type->name));
 			return;
 		}
 	}
-	message(format("{0} bump into {1}.", someone.type->name, object.name));
+	message(format("{0} bump into {1}.", someone.type->name, object.type->name));
 }
 
 void Messages::cannot_be_worn(const Item & item)
@@ -310,9 +310,9 @@ void Messages::carries_too_much_items(const Monster & someone)
 void Messages::drinks(const Monster & someone, const Object & object)
 {
 	if(someone.hp < someone.type->max_hp) {
-		message(format("{0} drink from {1}. It helps a bit.", someone.type->name, object.name));
+		message(format("{0} drink from {1}. It helps a bit.", someone.type->name, object.type->name));
 	} else {
-		message(format("{0} drink from {1}.", someone.type->name, object.name));
+		message(format("{0} drink from {1}.", someone.type->name, object.type->name));
 	}
 }
 
@@ -343,27 +343,27 @@ void Messages::nothing_to_wield(const Monster & someone)
 
 void Messages::already_closed(const Object & object)
 {
-	message(format("{0} is already closed.", object.name));
+	message(format("{0} is already closed.", object.type->name));
 }
 
 void Messages::already_opened(const Object & object)
 {
-	message(format("{0} is already opened.", object.name));
+	message(format("{0} is already opened.", object.type->name));
 }
 
 void Messages::is_closed(const Object & object)
 {
-	message(format("{0} is closed.", object.name));
+	message(format("{0} is closed.", object.type->name));
 }
 
 void Messages::is_empty(const Object & object)
 {
-	message(format("{0} is empty.", object.name));
+	message(format("{0} is empty.", object.type->name));
 }
 
 void Messages::is_locked(const Object & object)
 {
-	message(format("{0} is locked.", object.name));
+	message(format("{0} is locked.", object.type->name));
 }
 
 void Messages::wears_nothing(const Monster & someone)
