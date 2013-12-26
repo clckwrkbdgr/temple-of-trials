@@ -1,6 +1,7 @@
 #include "files.h"
 #include "util.h"
 #include "map.h"
+#include "format.h"
 #include <sys/stat.h>
 
 bool file_exists(const std::string & filename)

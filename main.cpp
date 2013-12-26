@@ -7,6 +7,7 @@
 #include "engine/objects.h"
 #include "engine/files.h"
 #include "engine/util.h"
+#include "engine/format.h"
 #include <algorithm>
 #include <map>
 #include <cstdlib>

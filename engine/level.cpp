@@ -3,9 +3,8 @@
 #include "objects.h"
 #include "monsters.h"
 #include "items.h"
-#include <cmath>
+#include "format.h"
 #include <algorithm>
-#include <cstdlib>
 
 Level::Level()
 	: map(1, 1)

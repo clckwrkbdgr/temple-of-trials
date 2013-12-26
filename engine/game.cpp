@@ -1,6 +1,7 @@
 #include "game.h"
 #include "actions.h"
 #include "monsters.h"
+#include "format.h"
 #include <map>
 #include <memory>
 #include <algorithm>

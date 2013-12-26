@@ -2,6 +2,7 @@
 #include "objects.h"
 #include "monsters.h"
 #include "map.h"
+#include "format.h"
 #include "util.h"
 
 Messages::Messages()

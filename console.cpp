@@ -1,7 +1,8 @@
 #include "console.h"
+#include "sprites.h"
 #include "engine/game.h"
 #include "engine/monsters.h"
-#include "sprites.h"
+#include "engine/format.h"
 #include <ncurses.h>
 
 std::map<int, Point> Console::directions;

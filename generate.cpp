@@ -2,6 +2,7 @@
 #include "ai.h"
 #include "sprites.h"
 #include "engine/monsters.h"
+#include "engine/format.h"
 #include <cstdlib>
 
 void LinearGenerator::create_types(Game & game)

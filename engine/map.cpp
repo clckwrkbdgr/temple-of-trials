@@ -1,5 +1,6 @@
 #include "map.h"
 #include "util.h"
+#include "format.h"
 #include <cmath>
 
 Point::Point(int _x, int _y)

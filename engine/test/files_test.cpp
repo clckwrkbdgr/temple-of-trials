@@ -1,5 +1,6 @@
 #include "../files.h"
 #include "../map.h"
+#include "../format.h"
 #include "../test.h"
 #include <sstream>
 
