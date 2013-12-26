@@ -25,7 +25,7 @@ Monster::Monster(const Type * monster_type)
 
 bool Monster::valid() const
 {
-	return type;
+	return type.valid();
 }
 
 Monster::~Monster()

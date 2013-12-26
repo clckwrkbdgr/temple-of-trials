@@ -4,73 +4,42 @@
 
 SUITE(objects) {
 
-TEST(should_get_opened_sprite_when_object_is_opened)
+TEST(should_not_open_not_openable_object)
 {
-	ObjectType type = ObjectType::Builder("test").opened_sprite(1).closed_sprite(2).openable();
-	Object object = Object::Builder(&type).opened(true);
-	EQUAL(object.get_sprite(), 1);
-}
-
-TEST(should_get_closed_sprite_when_object_is_closed)
-{
-	ObjectType type = ObjectType::Builder("test").opened_sprite(1).closed_sprite(2).openable();
-	Object object = Object::Builder(&type).opened(false);
-	EQUAL(object.get_sprite(), 2);
-}
-
-TEST(opened_object_should_be_passable)
-{
-	ObjectType type = ObjectType::Builder("test").openable().passable();
-	Object object = Object::Builder(&type).opened(true);
-	ASSERT(object.is_passable());
-}
-
-TEST(closed_object_should_be_impassable)
-{
-	ObjectType type = ObjectType::Builder("test").openable().passable();
-	Object object = Object::Builder(&type).opened(false);
-	ASSERT(!object.is_passable());
-}
-
-TEST(object_should_be_impassable_by_default)
-{
-	Object object;
-	ASSERT(!object.is_passable());
-}
-
-TEST(passable_object_should_be_passable)
-{
-	ObjectType type = ObjectType::Builder("test").passable();
+	ObjectType type = ObjectType::Builder("test");
 	Object object = Object::Builder(&type);
-	ASSERT(object.is_passable());
+	bool ok = object.open();
+	ASSERT(!ok);
 }
 
-TEST(opened_object_should_be_transparent)
+TEST(should_not_close_not_openable_object)
 {
-	ObjectType type = ObjectType::Builder("test").openable().transparent();
-	Object object = Object::Builder(&type).opened(true);
-	ASSERT(object.is_transparent());
-}
-
-TEST(closed_object_should_be_opaque)
-{
-	ObjectType type = ObjectType::Builder("test").openable().transparent();
-	Object object = Object::Builder(&type).opened(false);
-	ASSERT(!object.is_transparent());
-}
-
-TEST(transparent_object_should_be_transparent)
-{
-	ObjectType type = ObjectType::Builder("test").transparent();
+	ObjectType type = ObjectType::Builder("test");
 	Object object = Object::Builder(&type);
-	ASSERT(object.is_transparent());
+	bool ok = object.close();
+	ASSERT(!ok);
 }
 
-TEST(object_should_be_opaque_by_default)
+TEST(object_should_be_of_opened_type_after_opening)
 {
-	Object object;
-	ASSERT(!object.is_transparent());
+	ObjectType opened_door = ObjectType::Builder("opened").openable().sprite(1);
+	ObjectType closed_door = ObjectType::Builder("closed").openable().sprite(2);
+	Object object = Object::Builder(&closed_door, &opened_door).opened(false);
+	bool ok = object.open();
+	ASSERT(ok);
+	EQUAL(object.type, &opened_door);
 }
+
+TEST(object_should_be_of_closed_type_after_closing)
+{
+	ObjectType opened_door = ObjectType::Builder("opened").openable().sprite(1);
+	ObjectType closed_door = ObjectType::Builder("closed").openable().sprite(2);
+	Object object = Object::Builder(&closed_door, &opened_door).opened(true);
+	bool ok = object.close();
+	ASSERT(ok);
+	EQUAL(object.type, &closed_door);
+}
+
 
 TEST(negative_up_destination_should_be_exit_from_dungeon)
 {

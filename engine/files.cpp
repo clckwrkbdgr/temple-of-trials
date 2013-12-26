@@ -145,6 +145,12 @@ Reader & Reader::add_type_registry(const TypeRegistry<Object> & type_registry)
 	return *this;
 }
 
+Reader & Reader::add_type_registry(const TypeRegistry<Item> & type_registry)
+{
+	item_types = &type_registry;
+	return *this;
+}
+
 Reader & Reader::size_of(Map & map)
 {
 	unsigned width = 0, height = 0;

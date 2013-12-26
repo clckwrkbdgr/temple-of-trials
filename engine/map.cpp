@@ -147,6 +147,6 @@ void Map::fill(const CellType ** map_of_celltypes)
 
 void Map::set_cell_type(const Point & pos, const CellType * cell_type)
 {
-	cell(pos).type = cell_type;
+	cell(pos) = Cell(cell_type);
 }
 

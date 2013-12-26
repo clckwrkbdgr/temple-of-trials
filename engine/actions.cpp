@@ -14,7 +14,7 @@ void Move::commit(Monster & someone, Game & game)
     Monster & monster = find_at(game.level.monsters, new_pos);
 	ACTION_ASSERT(!monster.valid(), game.messages.bumps_into(someone, monster));
     Object & object = find_at(game.level.objects, new_pos);
-	ACTION_ASSERT(!object.valid() || object.is_passable(), game.messages.bumps_into(someone, object));
+	ACTION_ASSERT(!object.valid() || object.type->passable, game.messages.bumps_into(someone, object));
 	ACTION_ASSERT(game.cell_type_at(new_pos).passable, game.messages.bumps_into(someone, game.cell_type_at(new_pos)));
     someone.pos = new_pos;
 }
@@ -36,13 +36,13 @@ void Open::commit(Monster & someone, Game & game)
     Object & object = find_at(game.level.objects, new_pos);
 	ACTION_ASSERT(object.valid() && (object.type->openable || object.type->containable), game.messages.nothing_to_open());
     if(object.type->openable) {
-		ACTION_ASSERT(!object.opened, game.messages.already_opened(object));
+		ACTION_ASSERT(!object.opened(), game.messages.already_opened(object));
 		if(object.locked) {
 			ACTION_ASSERT(someone.inventory.has_key(object.lock_type), game.messages.is_locked(object));
 			game.messages.unlocks(someone, object);
 			object.locked = false;
 		}
-		object.opened = true;
+		object.open();
 		game.messages.opened(someone, object);
     } else if(object.type->containable) {
 		ACTION_ASSERT(!object.items.empty(), game.messages.is_empty(object));
@@ -60,8 +60,8 @@ void Close::commit(Monster & someone, Game & game)
     Point new_pos = someone.pos + shift;
     Object & object = find_at(game.level.objects, new_pos);
     ACTION_ASSERT(object.valid() && object.type->openable, game.messages.nothing_to_close());
-    ACTION_ASSERT(object.opened, game.messages.already_closed(object));
-    object.opened = false;
+    ACTION_ASSERT(object.opened(), game.messages.already_closed(object));
+    object.close();
     game.messages.closed(someone, object);
 }
 
@@ -75,14 +75,14 @@ void Swing::commit(Monster & someone, Game & game)
 	}
     Object & object = find_at(game.level.objects, new_pos);
 	if(object.valid()) {
-		if(object.type->openable && !object.opened) {
+		if(object.type->openable && !object.opened()) {
 			game.messages.swings_at_object(someone, object);
 			if(object.locked) {
 				ACTION_ASSERT(someone.inventory.has_key(object.lock_type), game.messages.is_locked(object));
 				game.messages.unlocks(someone, object);
 				object.locked = false;
 			}
-			object.opened = true;
+			object.open();
 			game.messages.opened(someone, object);
 		} else {
 			game.messages.swings_at_object(someone, object);
@@ -120,7 +120,7 @@ void Fire::commit(Monster & someone, Game & game)
 			} else if(object.type->drinkable) {
 				game.messages.falls_and_lost(item, object);
 				break;
-			} else if(!object.is_transparent()) {
+			} else if(!object.type->transparent) {
 				game.messages.hits(item, object);
 				game.level.items.push_back(item);
 				break;

@@ -24,7 +24,7 @@ Item::Item(const Type * item_type)
 
 bool Item::valid() const
 {
-	return type;
+	return type.valid();
 }
 
 Item::Builder & Item::Builder::pos(const Point & value) { result.pos = value; return *this; }

@@ -4,7 +4,7 @@
 
 struct ObjectType {
 	std::string id;
-	int sprite, opened_sprite;
+	int sprite;
 	std::string name;
 	bool passable, transparent;
 	bool containable;
@@ -29,25 +29,24 @@ struct ObjectType::Builder {
 	Builder & transporting();
 	Builder & triggerable();
 	Builder & openable();
-	Builder & opened_sprite(const int & value);
-	Builder & closed_sprite(const int & value);
 };
 
 struct Object {
 	typedef ObjectType Type;
 	TypePtr<Type> type;
+	TypePtr<Type> closed_type, opened_type;
 
 	Point pos;
 	std::vector<Item> items;
-	bool opened;
 	int up_destination, down_destination;
 	bool locked;
 	int lock_type;
 	Object(const Type * object_type = 0);
+	Object(const Type * closed_object_type, const Type * opened_object_type);
 	bool valid() const;
-	bool is_passable() const;
-	bool is_transparent() const;
-	int get_sprite() const;
+	bool open();
+	bool close();
+	bool opened() const;
 	bool is_exit_up() const;
 	bool is_exit_down() const;
 
@@ -56,6 +55,7 @@ struct Object {
 struct Object::Builder {
 	Object result;
 	Builder(const Type * type) : result(type) {}
+	Builder(const Type * closed_type, const Type * opened_type) : result(closed_type, opened_type) {}
 	operator Object() { return result; }
 	Builder & pos(const Point & value);
 	Builder & item(const Item & value);

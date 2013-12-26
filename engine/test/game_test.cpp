@@ -270,7 +270,7 @@ struct Game2x2 {
 		game.level = Level(2, 2);
 		game.cell_types.insert(CellType::Builder("floor").sprite(1).passable(true).transparent(true));
 		monster_type = game.monster_types.insert(MonsterType::Builder("monster").sprite(3).faction(Monster::PLAYER));
-		game.object_types.insert(ObjectType::Builder("door").name("door").passable().openable().transparent());
+		game.object_types.insert(ObjectType::Builder("stone").name("stone"));
 		game.object_types.insert(ObjectType::Builder("passable").passable().sprite(2));
 		game.object_types.insert(ObjectType::Builder("transparent").transparent());
 		game.item_types.insert(ItemType::Builder("item").sprite(4));
@@ -298,7 +298,7 @@ TEST_FIXTURE(Game2x2, items_should_be_passable)
 
 TEST_FIXTURE(Game2x2, impassable_objects_should_be_impassable)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 1)).opened(false));
+	game.level.objects.push_back(Object::Builder(game.object_types.get("stone")).pos(Point(1, 1)).opened(false));
 	ASSERT(!game.is_passable(1, 1));
 }
 
@@ -322,7 +322,7 @@ TEST_FIXTURE(Game2x2, opaque_cells_should_be_opaque)
 
 TEST_FIXTURE(Game2x2, opaque_objects_should_be_opaque)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 1)).opened(false));
+	game.level.objects.push_back(Object::Builder(game.object_types.get("stone")).pos(Point(1, 1)).opened(false));
 	ASSERT(!game.is_transparent(1, 1));
 }
 

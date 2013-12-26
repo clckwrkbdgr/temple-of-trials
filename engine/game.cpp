@@ -179,7 +179,7 @@ bool Game::is_passable(int x, int y) const
 		return false;
 	}
     const Object & object = find_at(level.objects, new_pos);
-	if(object.valid() && !object.is_passable()) {
+	if(object.valid() && !object.type->passable) {
 		return false;
 	}
     const Monster & monster = find_at(level.monsters, new_pos);
@@ -193,7 +193,7 @@ bool Game::is_transparent(int x, int y) const
 {
 	Point new_pos(x, y);
     const Object & object = find_at(level.objects, new_pos);
-	if(object.valid() && !object.is_transparent()) {
+	if(object.valid() && !object.type->transparent) {
 		return false;
 	}
 	return cell_type_at(new_pos).transparent;
@@ -218,7 +218,7 @@ int Game::get_sprite_at(const Point & pos) const
 	}
 	foreach(const Object & object, level.objects) {
 		if(object.pos == pos) {
-			return object.get_sprite();
+			return object.type->sprite;
 		}
 	}
 	return cell_type_at(pos).sprite;

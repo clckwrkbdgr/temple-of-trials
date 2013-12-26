@@ -20,10 +20,8 @@ void LinearGenerator::create_types(Game & game)
 	scorpion = game.monster_types.insert(MonsterType::Builder("scorpion").faction(Monster::MONSTER).
 			sprite(Sprites::SCORPION).sight(8).max_hp(5).ai(AI::ANGRY_AND_STILL).name("scorpion").hit_strength(2).poisonous(true));
 
-	door = game.object_types.insert(ObjectType::Builder("door").opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).
-			name("door").openable().passable().transparent());
-	locked_door = game.object_types.insert(ObjectType::Builder("locked_door").opened_sprite(Sprites::DOOR_OPENED).closed_sprite(Sprites::DOOR_CLOSED).
-			name("door").openable().passable().transparent());
+	opened_door = game.object_types.insert(ObjectType::Builder("door").sprite(Sprites::DOOR_OPENED).name("door").openable().passable().transparent());
+	closed_door = game.object_types.insert(ObjectType::Builder("door").sprite(Sprites::DOOR_CLOSED).name("door").openable());
 	pot = game.object_types.insert(ObjectType::Builder("pot").sprite(Sprites::POT).name("pot").containable().transparent());
 	well = game.object_types.insert(ObjectType::Builder("well").sprite(Sprites::WELL).name("well").drinkable().transparent());
 	gate = game.object_types.insert(ObjectType::Builder("gate").sprite(Sprites::GATE).name("gate").transporting().passable().transparent());
@@ -123,7 +121,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 				case '[' : level.items.push_back(Item::Builder(jacket).pos(pos)); break;
 
 				case '{' : level.objects.push_back(Object::Builder(well).pos(pos)); break;
-				case '+' : level.objects.push_back(Object::Builder(door).pos(pos).opened(false)); break;
+				case '+' : level.objects.push_back(Object::Builder(closed_door, opened_door).pos(pos).opened(false)); break;
 				case 'V' : level.objects.push_back(Object::Builder(pot).pos(pos).item(antidote).item(money)); break;
 				case '^' : level.objects.push_back(Object::Builder(trap).pos(pos).item(sharpened_pole)); break;
 				case '>' :
@@ -152,11 +150,11 @@ void LinearGenerator::generate(Level & level, int level_index)
 		if(i > 0) {
 			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], floor);
 			if(doors.first.valid() && doors.second.valid()) {
-				level.objects.push_back(Object::Builder(door).pos(doors.first));
+				level.objects.push_back(Object::Builder(closed_door, opened_door).pos(doors.first));
 				if(is_last_room) {
-					level.objects.push_back(Object::Builder(locked_door).pos(doors.second).locked(true).lock_type(level_index));
+					level.objects.push_back(Object::Builder(closed_door, opened_door).pos(doors.second).locked(true).lock_type(level_index));
 				} else {
-					level.objects.push_back(Object::Builder(door).pos(doors.second));
+					level.objects.push_back(Object::Builder(closed_door, opened_door).pos(doors.second));
 				}
 			}
 		}

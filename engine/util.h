@@ -153,11 +153,19 @@ bool equal_containers(IteratorA a_begin, IteratorA a_end, IteratorB b_begin, Ite
 
 template<class T>
 struct TypePtr {
-	TypePtr(const T * type_pointer = 0)
+	explicit TypePtr(const T * type_pointer = 0)
 		: pointer(type_pointer) {}
-	operator bool() const
+	bool valid() const
 	{
 		return pointer;
+	}
+	bool equal(const TypePtr<T> & other) const
+	{
+		return other == pointer;
+	}
+	bool equal(const T * other) const
+	{
+		return other == pointer;
 	}
 	const T & operator*() const
 	{
@@ -174,6 +182,25 @@ struct TypePtr {
 private:
 	const T * pointer;
 };
+template<class T>
+std::string to_string(const TypePtr<T> & ptr)
+{
+	return ptr->id;
+}
+template<class T>
+bool operator==(const TypePtr<T> & typeptr, const T * ptr)
+{
+	return typeptr.equal(ptr);
+}
+template<class T>
+bool operator==(const TypePtr<T> & typeptr, const TypePtr<T> & other)
+{
+	return typeptr.equal(other);
+}
+template<class T> bool operator==(const T * ptr, const TypePtr<T> & typeptr) { return operator==(typeptr, ptr); }
+template<class T> bool operator!=(const TypePtr<T> & typeptr, const TypePtr<T> & other) { return !operator==(typeptr, other); }
+template<class T> bool operator!=(const TypePtr<T> & typeptr, const T * ptr) { return !operator==(typeptr, ptr); }
+template<class T> bool operator!=(const T * ptr, const TypePtr<T> & typeptr) { return !operator==(typeptr, ptr); }
 
 // TODO rename all types using domains.
 template<class Value>

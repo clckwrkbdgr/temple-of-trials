@@ -2,7 +2,7 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 32, SAVEFILE_MINOR_VERSION = 0 };
+enum { SAVEFILE_MAJOR_VERSION = 33, SAVEFILE_MINOR_VERSION = 0 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -12,18 +12,20 @@ SAVEFILE_STORE_EXT(CellType, celltype)
 
 SAVEFILE_STORE_EXT(Cell, cell)
 {
-	savefile.store_type(cell).store(cell.seen_sprite);
+	savefile.store_type(cell.type).store(cell.seen_sprite);
 }
 
 SAVEFILE_STORE_EXT(Item, item)
 {
-	savefile.store_type(item).store(item.pos).store(item.key_type);
+	savefile.store_type(item.type).store(item.pos).store(item.key_type);
 }
 
 SAVEFILE_STORE_EXT(Object, object)
 {
-	savefile.store_type(object);
-	savefile.store(object.pos).store(object.opened);
+	savefile.store_type(object.type);
+	savefile.store_type(object.closed_type);
+	savefile.store_type(object.opened_type);
+	savefile.store(object.pos);
 	savefile.store(object.up_destination).store(object.down_destination);
 	savefile.store(object.locked).store(object.lock_type);
 	savefile.newline();
@@ -40,7 +42,7 @@ SAVEFILE_STORE_EXT(Inventory, inventory)
 
 SAVEFILE_STORE_EXT(Monster, monster)
 {
-	savefile.store_type(monster);
+	savefile.store_type(monster.type);
 	savefile.store(monster.pos).store(monster.hp);
 	savefile.store(monster.poisoning);
 	savefile.newline();
@@ -75,6 +77,7 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.add_type_registry(game.cell_types);
 	savefile.add_type_registry(game.monster_types);
 	savefile.add_type_registry(game.object_types);
+	savefile.add_type_registry(game.item_types);
 
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
 	savefile.newline();

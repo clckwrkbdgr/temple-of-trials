@@ -163,8 +163,8 @@ TEST(reader_should_read_type_if_valid)
 	reader.add_type_registry(reg);
 	reg.insert(CellType("type"));
 	Cell value;
-	reader.store_type(value);
-	ASSERT(value.type);
+	reader.store_type(value.type);
+	ASSERT(value.type.valid());
 	EQUAL(value.type->id, "type");
 }
 
@@ -176,8 +176,8 @@ TEST(reader_should_read_invalid_type_if_type_id_is_unknown)
 	reader.add_type_registry(reg);
 	reg.insert(CellType("type"));
 	Cell value;
-	reader.store_type(value);
-	ASSERT(!value.type);
+	reader.store_type(value.type);
+	ASSERT(!value.type.valid());
 }
 
 TEST(reader_should_read_string_with_quote_in_it_escaped)
@@ -322,7 +322,7 @@ TEST(writer_should_write_type_if_valid)
 	Writer writer(out);
 	Cell::Type type("type");
 	Cell value(&type);
-	writer.store_type(value);
+	writer.store_type(value.type);
 	EQUAL(out.str(), "\"type\" ");
 }
 
@@ -331,7 +331,7 @@ TEST(writer_should_write_empty_type_if_invalid)
 	std::ostringstream out;
 	Writer writer(out);
 	Cell value(0);
-	writer.store_type(value);
+	writer.store_type(value.type);
 	EQUAL(out.str(), "\"\" ");
 }
 

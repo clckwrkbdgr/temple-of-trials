@@ -11,13 +11,16 @@ struct GameWithDummy {
 	const CellType * floor_type;
 	const MonsterType * dummy_type;
 	const MonsterType * stub_type;
+	const ObjectType * opened_door;
+	const ObjectType * closed_door;
 	GameWithDummy() {
 		game.level.map = Map(2, 2);
 		floor_type = game.cell_types.insert(CellType::Builder("floor").name("floor").passable(true));
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
 		stub_type = game.monster_types.insert(MonsterType::Builder("stub").name("stub"));
 		game.object_types.insert(ObjectType::Builder("stub").name("stub"));
-		game.object_types.insert(ObjectType::Builder("door").name("door").passable().openable());
+		opened_door = game.object_types.insert(ObjectType::Builder("opened_door").name("door").transparent().passable().openable().sprite(1));
+		closed_door = game.object_types.insert(ObjectType::Builder("closed_door").name("door").openable().sprite(2));
 		game.object_types.insert(ObjectType::Builder("pot").name("pot").containable());
 		game.object_types.insert(ObjectType::Builder("well").name("well").drinkable());
 		game.item_types.insert(ItemType::Builder("key").name("item").sprite(1));
@@ -63,7 +66,7 @@ TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_object)
 
 TEST_FIXTURE(GameWithDummy, should_move_into_opened_object)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(true));
+	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
 	Move action(Point(0, -1));
 	action.commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 0));
@@ -71,7 +74,7 @@ TEST_FIXTURE(GameWithDummy, should_move_into_opened_object)
 
 TEST_FIXTURE(GameWithDummy, should_not_move_into_closed_object)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(false));
+	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
 	Move action(Point(0, -1));
 	action.commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
@@ -123,40 +126,40 @@ TEST_FIXTURE(GameWithDummy, should_heal_from_fountains)
 
 TEST_FIXTURE(GameWithDummy, should_not_open_already_opened_doors)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(true));
+	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
 	Open action(Point(0, -1));
 	action.commit(dummy(), game);
-	ASSERT(game.level.objects[0].opened);
+	ASSERT(game.level.objects[0].opened());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Door is already opened.").result);
 }
 
 TEST_FIXTURE(GameWithDummy, should_open_closed_doors)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(false));
+	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
 	Open action(Point(0, -1));
 	action.commit(dummy(), game);
-	ASSERT(game.level.objects[0].opened);
+	ASSERT(game.level.objects[0].opened());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy opened the door.").result);
 }
 
-TEST_FIXTURE(GameWithDummy, should_open_locked_doors_without_a_key)
+TEST_FIXTURE(GameWithDummy, should_not_open_locked_doors_without_a_key)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(false).locked(true).lock_type(1));
+	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false).locked(true).lock_type(1));
 	Open action(Point(0, -1));
 	action.commit(dummy(), game);
 	ASSERT(game.level.objects[0].locked);
-	ASSERT(!game.level.objects[0].opened);
+	ASSERT(!game.level.objects[0].opened());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Door is locked.").result);
 }
 
 TEST_FIXTURE(GameWithDummy, should_open_locked_doors_with_a_key)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(false).locked(true).lock_type(1));
+	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false).locked(true).lock_type(1));
 	dummy().inventory.set_item(1, Item::Builder(game.item_types.get("key")).key_type(1));
 	Open action(Point(0, -1));
 	action.commit(dummy(), game);
 	ASSERT(!game.level.objects[0].locked);
-	ASSERT(game.level.objects[0].opened);
+	ASSERT(game.level.objects[0].opened());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unlocked the door.")("Dummy opened the door.").result);
 }
 
@@ -191,19 +194,19 @@ TEST_FIXTURE(GameWithDummy, should_not_open_empty_containers)
 
 TEST_FIXTURE(GameWithDummy, should_close_opened_doors)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(true));
+	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
 	Close action(Point(0, -1));
 	action.commit(dummy(), game);
-	ASSERT(!game.level.objects[0].opened);
+	ASSERT(!game.level.objects[0].opened());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy closed the door.").result);
 }
 
 TEST_FIXTURE(GameWithDummy, should_not_close_already_closed_doors)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(false));
+	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
 	Close action(Point(0, -1));
 	action.commit(dummy(), game);
-	ASSERT(!game.level.objects[0].opened);
+	ASSERT(!game.level.objects[0].opened());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Door is already closed.").result);
 }
 
@@ -226,10 +229,10 @@ TEST_FIXTURE(GameWithDummy, should_hit_impassable_cells_on_swing)
 
 TEST_FIXTURE(GameWithDummy, should_open_closed_doors_on_swing)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(false));
+	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
 	Swing action(Point(0, -1));
 	action.commit(dummy(), game);
-	ASSERT(game.level.objects[0].opened);
+	ASSERT(game.level.objects[0].opened());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy swing at door.")("Dummy opened the door.").result);
 }
 
@@ -307,9 +310,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_it
 	EQUAL(game.level.items[0].pos, Point(1, 1));
 }
 
-TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_closed_door_and_drop_item_before_it)
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_impassable_object_and_drop_item_before_it)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)).opened(false));
+	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)));
 	Fire action(Point(0, -1));
 	action.commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hit door.").result);

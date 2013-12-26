@@ -184,13 +184,13 @@ TEST(should_assume_non_null_type_pointer_as_valid)
 {
 	Value::Type type("type", 1);
 	TypePtr<Value::Type> ptr(&type);
-	ASSERT(ptr);
+	ASSERT(ptr.valid());
 }
 
 TEST(should_assume_null_type_pointer_as_invalid)
 {
 	TypePtr<Value::Type> ptr;
-	ASSERT(!ptr);
+	ASSERT(!ptr.valid());
 }
 
 TEST(should_return_type_from_pointer_if_valid)

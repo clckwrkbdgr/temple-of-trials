@@ -48,11 +48,11 @@ public:
 	Reader & store(std::string & value);
 	Reader & store(Point & value);
 	template<class T>
-	Reader & store_type(T & value)
+	Reader & store_type(TypePtr<T> & type)
 	{
 		std::string type_id;
 		store(type_id);
-		value = T(get_registry(value)->get(type_id));
+		type = TypePtr<T>(get_registry(T())->get(type_id));
 		check(type_id + " type");
 		return *this;
 	}
@@ -93,10 +93,10 @@ private:
 	const TypeRegistry<Monster> * monster_types;
 	const TypeRegistry<Object> * object_types;
 	const TypeRegistry<Item> * item_types;
-	const TypeRegistry<Cell> * get_registry(const Cell &) { return cell_types; }
-	const TypeRegistry<Monster> * get_registry(const Monster &) { return monster_types; }
-	const TypeRegistry<Object> * get_registry(const Object &) { return object_types; }
-	const TypeRegistry<Item> * get_registry(const Item &) { return item_types; }
+	const TypeRegistry<Cell> * get_registry(const Cell::Type &) { return cell_types; }
+	const TypeRegistry<Monster> * get_registry(const Monster::Type &) { return monster_types; }
+	const TypeRegistry<Object> * get_registry(const Object::Type &) { return object_types; }
+	const TypeRegistry<Item> * get_registry(const Item::Type &) { return item_types; }
 };
 
 class Writer {
@@ -130,10 +130,10 @@ public:
 	Writer & add_type_registry(const TypeRegistry<Object> &) { return * this; }
 	Writer & add_type_registry(const TypeRegistry<Item> &) { return * this; }
 	template<class T>
-	Writer & store_type(const T & value)
+	Writer & store_type(const TypePtr<T> & type)
 	{
-		store(value.type->id);
-		check(value.type->id + " type");
+		store(type->id);
+		check(type->id + " type");
 		return *this;
 	}
 
