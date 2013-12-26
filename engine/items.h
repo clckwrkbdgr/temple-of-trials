@@ -2,8 +2,8 @@
 #include "map.h"
 #include <string>
 
-struct Item {
-	Point pos;
+struct ItemType {
+	std::string id;
 	int sprite;
 	std::string name;
 	int damage;
@@ -13,16 +13,14 @@ struct Item {
 	int antidote;
 	int healing;
 	bool quest;
-	int key_type;
-	Item();
-	bool valid() const;
+	ItemType(const std::string & type_id = std::string());
 
 	struct Builder;
 };
-struct Item::Builder {
-	Item result;
-	operator Item() { return result; }
-	Builder & pos(const Point & value);
+struct ItemType::Builder {
+	ItemType result;
+	Builder(const std::string & type_id) : result(type_id) {}
+	operator ItemType() { return result; }
 	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
 	Builder & damage(int damage);
@@ -32,6 +30,24 @@ struct Item::Builder {
 	Builder & antidote(int value);
 	Builder & healing(int value);
 	Builder & quest();
+};
+
+struct Item {
+	typedef ItemType Type;
+	TypePtr<Type> type;
+
+	Point pos;
+	int key_type;
+	Item(const Type * item_type = 0);
+	bool valid() const;
+
+	struct Builder;
+};
+struct Item::Builder {
+	Item result;
+	Builder(const Type * type) : result(type) {}
+	operator Item() { return result; }
+	Builder & pos(const Point & value);
 	Builder & key_type(int value);
 };
 

@@ -1,26 +1,33 @@
 #include "items.h"
 #include "util.h"
 
-Item::Item()
-	: sprite(0), damage(0), wearable(false), defence(0), edible(false), antidote(0), healing(0), quest(false)
+ItemType::ItemType(const std::string & type_id)
+	: id(type_id), sprite(0), damage(0), wearable(false), defence(0), edible(false), antidote(0), healing(0), quest(false)
+{
+}
+
+ItemType::Builder & ItemType::Builder::sprite(const int & value) { result.sprite = value; return *this; }
+ItemType::Builder & ItemType::Builder::name(const std::string & value) { result.name = value; return *this; }
+ItemType::Builder & ItemType::Builder::damage(int value) { result.damage = value; return *this; }
+ItemType::Builder & ItemType::Builder::wearable() { result.wearable = true; return *this; }
+ItemType::Builder & ItemType::Builder::defence(int value) { result.defence = value; return *this; }
+ItemType::Builder & ItemType::Builder::edible() { result.edible = true; return *this; }
+ItemType::Builder & ItemType::Builder::antidote(int value) { result.antidote = value; return *this; }
+ItemType::Builder & ItemType::Builder::healing(int value) { result.healing = value; return *this; }
+ItemType::Builder & ItemType::Builder::quest() { result.quest = true; return *this; }
+
+
+Item::Item(const Type * item_type)
+	: type(item_type), key_type(0)
 {
 }
 
 bool Item::valid() const
 {
-	return bool(sprite);
+	return type;
 }
 
 Item::Builder & Item::Builder::pos(const Point & value) { result.pos = value; return *this; }
-Item::Builder & Item::Builder::sprite(const int & value) { result.sprite = value; return *this; }
-Item::Builder & Item::Builder::name(const std::string & value) { result.name = value; return *this; }
-Item::Builder & Item::Builder::damage(int value) { result.damage = value; return *this; }
-Item::Builder & Item::Builder::wearable() { result.wearable = true; return *this; }
-Item::Builder & Item::Builder::defence(int value) { result.defence = value; return *this; }
-Item::Builder & Item::Builder::edible() { result.edible = true; return *this; }
-Item::Builder & Item::Builder::antidote(int value) { result.antidote = value; return *this; }
-Item::Builder & Item::Builder::healing(int value) { result.healing = value; return *this; }
-Item::Builder & Item::Builder::quest() { result.quest = true; return *this; }
 Item::Builder & Item::Builder::key_type(int value) { result.key_type = value; return *this; }
 
 
@@ -185,7 +192,7 @@ unsigned Inventory::insert(const Item & item)
 const Item & Inventory::quest_item() const
 {
 	foreach(const Item & item, items) {
-		if(item.quest) {
+		if(item.type->quest) {
 			return item;
 		}
 	}

@@ -82,7 +82,8 @@ struct GameWithDummyOnTrap {
 		game.level.map = Map(2, 2);
 		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
 		const ObjectType * trap_type = game.object_types.insert(ObjectType::Builder("trap").name("trap").triggerable());
-		game.level.objects.push_back(Object::Builder(trap_type).pos(Point(1, 1)).item(Item::Builder().sprite(1)));
+		const ItemType * item = game.item_types.insert(ItemType::Builder("item").name("item").sprite(1));
+		game.level.objects.push_back(Object::Builder(trap_type).pos(Point(1, 1)).item(item));
 	}
 	Monster & dummy() { return game.level.monsters.front(); }
 };
@@ -103,7 +104,7 @@ TEST_FIXTURE(GameWithDummyOnTrap, should_hurt_monster_if_trap_is_set)
 TEST_FIXTURE(GameWithDummyOnTrap, should_leave_bolt_if_trap_is_set)
 {
 	game.process_environment(dummy());
-	EQUAL(game.level.items.front().sprite, 1);
+	EQUAL(game.level.items.front().type->sprite, 1);
 }
 
 TEST_FIXTURE(GameWithDummyOnTrap, should_not_hurt_monster_if_trap_is_triggered_already)
@@ -125,7 +126,7 @@ struct GameWithDummy {
 		player_type = game.monster_types.insert(MonsterType::Builder("player").max_hp(100).name("dummy").faction(Monster::PLAYER));
 
 		game.level.map.fill(game.cell_types.get("floor"));
-		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("item");
+		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("item"));
 		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
 		game.level.monsters.push_back(Monster::Builder(player_type).pos(Point(1, 1)).item(armor));
 	}
@@ -210,7 +211,7 @@ struct GameWithDummyAndKiller {
 		const MonsterType * killer_type = game.monster_types.insert(MonsterType::Builder("killer").max_hp(100).name("killer"));
 		const MonsterType * poisoner_type = game.monster_types.insert(MonsterType::Builder("poisoner").max_hp(100).name("poisoner").poisonous(true));
 		game.level.map = Map(2, 2);
-		Item armor = Item::Builder().sprite(1).wearable().defence(3).name("item");
+		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("item"));
 		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
 		game.level.monsters.push_back(Monster::Builder(killer_type).pos(Point(0, 1)));
 		game.level.monsters.push_back(Monster::Builder(poisoner_type).pos(Point(1, 0)));
@@ -272,6 +273,7 @@ struct Game2x2 {
 		game.object_types.insert(ObjectType::Builder("door").name("door").passable().openable().transparent());
 		game.object_types.insert(ObjectType::Builder("passable").passable().sprite(2));
 		game.object_types.insert(ObjectType::Builder("transparent").transparent());
+		game.item_types.insert(ItemType::Builder("item").sprite(4));
 		game.level.map.fill(game.cell_types.get("floor"));
 	}
 };
@@ -290,7 +292,7 @@ TEST_FIXTURE(Game2x2, monsters_should_be_impassable)
 
 TEST_FIXTURE(Game2x2, items_should_be_passable)
 {
-	game.level.items.push_back(Item::Builder().pos(Point(1, 1)));
+	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
 	ASSERT(game.is_passable(1, 1));
 }
 
@@ -338,7 +340,7 @@ TEST_FIXTURE(Game2x2, monsters_should_be_transparent)
 
 TEST_FIXTURE(Game2x2, items_should_be_transparent)
 {
-	game.level.items.push_back(Item::Builder().pos(Point(1, 1)));
+	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
 	ASSERT(game.is_transparent(1, 1));
 }
 
@@ -352,7 +354,7 @@ TEST_FIXTURE(Game2x2, monster_should_be_on_top_of_all)
 {
 	game.level.objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
 	game.level.monsters.push_back(Monster::Builder(monster_type).pos(Point(1, 1)));
-	game.level.items.push_back(Item::Builder().pos(Point(1, 1)).sprite(4));
+	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
 	int sprite = game.get_sprite_at(Point(1, 1));
 	EQUAL(sprite, 3);
 }
@@ -360,7 +362,7 @@ TEST_FIXTURE(Game2x2, monster_should_be_on_top_of_all)
 TEST_FIXTURE(Game2x2, items_should_be_on_top_of_objects)
 {
 	game.level.objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
-	game.level.items.push_back(Item::Builder().pos(Point(1, 1)).sprite(4));
+	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
 	int sprite = game.get_sprite_at(Point(1, 1));
 	EQUAL(sprite, 4);
 }

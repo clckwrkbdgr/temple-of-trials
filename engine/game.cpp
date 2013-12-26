@@ -120,7 +120,7 @@ void Game::die(Monster & someone)
 
 void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 {
-	int received_damage = damage - (pierce_armour ? 0 : someone.inventory.worn_item().defence);
+	int received_damage = damage - (pierce_armour ? 0 : someone.inventory.worn_item().type->defence);
 	someone.hp -= received_damage;
 	messages.hurts(someone, received_damage);
 	if(someone.is_dead()) {
@@ -130,7 +130,7 @@ void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 
 void Game::hit(Monster & someone, Monster & other, int damage)
 {
-	int received_damage = damage - other.inventory.worn_item().defence;
+	int received_damage = damage - other.inventory.worn_item().type->defence;
 	other.hp -= received_damage;
 	if(someone.type->poisonous) {
 		messages.poisons(someone, other);
@@ -213,7 +213,7 @@ int Game::get_sprite_at(const Point & pos) const
 	}
 	foreach(const Item & item, level.items) {
 		if(item.pos == pos) {
-			return item.sprite;
+			return item.type->sprite;
 		}
 	}
 	foreach(const Object & object, level.objects) {
@@ -233,7 +233,7 @@ std::string Game::name_at(const Point & pos) const
 	}
 	foreach(const Item & item, level.items) {
 		if(item.pos == pos) {
-			return item.name;
+			return item.type->name;
 		}
 	}
 	foreach(const Object & object, level.objects) {

@@ -182,8 +182,8 @@ void Console::draw_game(const Game & game)
 	print_stat(row++, format("Turns: {0}", game.turns));
 	print_stat(row++, format("HP   : {0}/{1}", player.hp, player.type->max_hp));
 	print_stat(row++, format("Items: {0}", player.inventory.size()));
-	print_stat(row++, format("Wield: {0}", player.inventory.wielded_item().valid() ? player.inventory.wielded_item().name : "none"));
-	print_stat(row++, format("Wear : {0}", player.inventory.worn_item().valid() ? player.inventory.worn_item().name : "none"));
+	print_stat(row++, format("Wield: {0}", player.inventory.wielded_item().valid() ? player.inventory.wielded_item().type->name : "none"));
+	print_stat(row++, format("Wear : {0}", player.inventory.worn_item().valid() ? player.inventory.worn_item().type->name : "none"));
 	print_stat(row++, format("Dmg  : {0}", player.damage()));
 	row++;
 	if(player.poisoning > 0) {
@@ -282,7 +282,7 @@ void Console::draw_inventory(const Game & game, const Monster & monster)
 		if(item.valid()) {
 			int x = (pos < 13) ? 0 : width / 2;
 			int y = 1 + ((pos < 13) ? pos : pos - 13);
-			std::string text = format("{0} - {1}", char(index + 'a'), item.name);
+			std::string text = format("{0} - {1}", char(index + 'a'), item.type->name);
 			if(monster.inventory.wields(index)) {
 				text += " (wielded)";
 			}

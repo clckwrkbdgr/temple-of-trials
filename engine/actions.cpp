@@ -131,7 +131,7 @@ void Fire::commit(Monster & someone, Game & game)
 			game.messages.hits(item, monster);
 			item.pos += shift;
 			game.level.items.push_back(item);
-			game.hit(someone, monster, item.damage);
+			game.hit(someone, monster, item.type->damage);
 			break;
 		}
 		item.pos += shift;
@@ -165,7 +165,7 @@ void Grab::commit(Monster & someone, Game & game)
 	ACTION_ASSERT(slot != Inventory::NOTHING, game.messages.carries_too_much_items(someone));
 	game.level.items.erase(item_index);
 	game.messages.picks_up(someone, item, game.cell_type_at(someone.pos));
-	if(item.quest) {
+	if(item.type->quest) {
 		game.messages.return_to_gates_with_item();
 	}
 }
@@ -199,7 +199,7 @@ void Wear::commit(Monster & someone, Game & game)
 	ACTION_ASSERT(!someone.inventory.empty(), game.messages.nothing_to_wear(someone));
 	const Item & item = someone.inventory.get_item(slot);
 	ACTION_ASSERT(item.valid(), game.messages.no_such_object_in_inventory());
-	ACTION_ASSERT(item.wearable, game.messages.cannot_be_worn(item));
+	ACTION_ASSERT(item.type->wearable, game.messages.cannot_be_worn(item));
 	if(someone.inventory.wields(slot)) {
 		game.messages.unwields(someone, someone.inventory.wielded_item());
 		someone.inventory.unwield();
@@ -225,7 +225,7 @@ void Eat::commit(Monster & someone, Game & game)
 	ACTION_ASSERT(!someone.inventory.empty(), game.messages.nothing_to_eat(someone));
 	Item item = someone.inventory.get_item(slot);
 	ACTION_ASSERT(item.valid(), game.messages.no_such_object_in_inventory());
-	ACTION_ASSERT(item.edible, game.messages.cannot_be_eaten(item));
+	ACTION_ASSERT(item.type->edible, game.messages.cannot_be_eaten(item));
 	if(someone.inventory.wears(slot)) {
 		game.messages.takes_off(someone, someone.inventory.worn_item());
 		someone.inventory.take_off();
@@ -235,8 +235,8 @@ void Eat::commit(Monster & someone, Game & game)
 		someone.inventory.unwield();
 	}
 	game.messages.eats(someone, item);
-	if(item.antidote > 0 && someone.poisoning > 0) {
-		someone.poisoning -= item.antidote;
+	if(item.type->antidote > 0 && someone.poisoning > 0) {
+		someone.poisoning -= item.type->antidote;
 		someone.poisoning = std::max(0, someone.poisoning);
 		if(someone.poisoning > 0) {
 			game.messages.cures_poisoning_a_little(item);
@@ -244,8 +244,8 @@ void Eat::commit(Monster & someone, Game & game)
 			game.messages.cures_poisoning_fully(item);
 		}
 	}
-	if(item.healing > 0) {
-		if(someone.heal_by(item.healing)) {
+	if(item.type->healing > 0) {
+		if(someone.heal_by(item.type->healing)) {
 			game.messages.heals(item, someone);
 		}
 	}

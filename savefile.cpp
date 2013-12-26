@@ -2,7 +2,7 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 31, SAVEFILE_MINOR_VERSION = 0 };
+enum { SAVEFILE_MAJOR_VERSION = 32, SAVEFILE_MINOR_VERSION = 0 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -17,12 +17,7 @@ SAVEFILE_STORE_EXT(Cell, cell)
 
 SAVEFILE_STORE_EXT(Item, item)
 {
-	savefile.store(item.pos).store(item.pos);
-	savefile.store(item.sprite).store(item.name);
-	savefile.store(item.damage).store(item.wearable).store(item.defence);
-	savefile.store(item.edible).store(item.antidote).store(item.healing);
-	savefile.store(item.quest);
-	savefile.store(item.key_type);
+	savefile.store_type(item).store(item.pos).store(item.key_type);
 }
 
 SAVEFILE_STORE_EXT(Object, object)

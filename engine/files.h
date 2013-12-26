@@ -40,6 +40,7 @@ public:
 	Reader & add_type_registry(const TypeRegistry<Cell> & type_registry);
 	Reader & add_type_registry(const TypeRegistry<Monster> & type_registry);
 	Reader & add_type_registry(const TypeRegistry<Object> & type_registry);
+	Reader & add_type_registry(const TypeRegistry<Item> & type_registry);
 	Reader & store(int & value);
 	Reader & store(unsigned int & value);
 	Reader & store(char & value);
@@ -91,9 +92,11 @@ private:
 	const TypeRegistry<Cell> * cell_types;
 	const TypeRegistry<Monster> * monster_types;
 	const TypeRegistry<Object> * object_types;
+	const TypeRegistry<Item> * item_types;
 	const TypeRegistry<Cell> * get_registry(const Cell &) { return cell_types; }
 	const TypeRegistry<Monster> * get_registry(const Monster &) { return monster_types; }
 	const TypeRegistry<Object> * get_registry(const Object &) { return object_types; }
+	const TypeRegistry<Item> * get_registry(const Item &) { return item_types; }
 };
 
 class Writer {
@@ -125,6 +128,7 @@ public:
 	Writer & add_type_registry(const TypeRegistry<Cell> &) { return * this; }
 	Writer & add_type_registry(const TypeRegistry<Monster> &) { return * this; }
 	Writer & add_type_registry(const TypeRegistry<Object> &) { return * this; }
+	Writer & add_type_registry(const TypeRegistry<Item> &) { return * this; }
 	template<class T>
 	Writer & store_type(const T & value)
 	{

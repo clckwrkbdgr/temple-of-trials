@@ -62,10 +62,8 @@ TEST(monster_with_equipment_should_have_weapon_damage_instead)
 	MonsterType type;
 	type.hit_strength = 3;
 	Monster monster(&type);
-	Item weapon;
-	weapon.damage = 1;
-	weapon.sprite = 1;
-	monster.inventory.insert(weapon);
+	ItemType weapon = ItemType::Builder("weapon").damage(1).sprite(1);
+	monster.inventory.insert(&weapon);
 	monster.inventory.wield(0);
 	EQUAL(monster.damage(), 1);
 }

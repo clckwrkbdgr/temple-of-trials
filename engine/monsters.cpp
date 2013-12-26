@@ -38,7 +38,7 @@ Monster::~Monster()
 int Monster::damage() const
 {
 	if(inventory.wielded_item().valid()) {
-		return inventory.wielded_item().damage;
+		return inventory.wielded_item().type->damage;
 	}
 	return type->hit_strength;
 }

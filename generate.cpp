@@ -4,55 +4,6 @@
 #include "engine/monsters.h"
 #include <cstdlib>
 
-namespace World {
-
-Item explosive(const Point & pos = Point())
-{
-	return Item::Builder().pos(pos).sprite(Sprites::EXPLOSIVE).name("explosive").quest();
-}
-
-Item money(const Point & pos = Point())
-{
-	return Item::Builder().pos(pos).sprite(Sprites::MONEY).name("money");
-}
-
-Item scorpion_tail(const Point & pos = Point())
-{
-	return Item::Builder().pos(pos).sprite(Sprites::SCORPION_TAIL).name("scorpion tail");
-}
-
-Item spear(const Point & pos = Point())
-{
-	return Item::Builder().pos(pos).sprite(Sprites::SPEAR).name("spear").damage(5);
-}
-
-Item sharpened_pole(const Point & pos = Point())
-{
-	return Item::Builder().pos(pos).sprite(Sprites::SHARPENED_POLE).name("sharpened pole").damage(1);
-}
-
-Item jacket(const Point & pos = Point())
-{
-	return Item::Builder().pos(pos).sprite(Sprites::JACKET).name("jacket").wearable().defence(1);
-}
-
-Item antidote(const Point & pos = Point())
-{
-	return Item::Builder().pos(pos).sprite(Sprites::ANTIDOTE).name("antidote").edible().antidote(5);
-}
-
-Item apple(const Point & pos = Point())
-{
-	return Item::Builder().pos(pos).sprite(Sprites::APPLE).name("apple").edible().healing(10);
-}
-
-Item key(int key_type, const Point & pos = Point())
-{
-	return Item::Builder().pos(pos).sprite(Sprites::KEY).name("key").key_type(key_type);
-}
-
-}
-
 void LinearGenerator::create_types(Game & game)
 {
 	floor = game.cell_types.insert(CellType::Builder("floor").sprite(Sprites::FLOOR).name("floor").passable(true).transparent(true));
@@ -79,6 +30,16 @@ void LinearGenerator::create_types(Game & game)
 	stairs_up = game.object_types.insert(ObjectType::Builder("stairs_up").sprite(Sprites::STAIRS_UP).name("stairs").transporting().passable().transparent());
 	stairs_down = game.object_types.insert(ObjectType::Builder("stairs_down").sprite(Sprites::STAIRS_DOWN).name("stairs").transporting().passable().transparent());
 	trap = game.object_types.insert(ObjectType::Builder("trap").sprite(Sprites::TRAP).name("trap").triggerable().passable().transparent());
+
+	explosive = game.item_types.insert(ItemType::Builder("explosive").sprite(Sprites::EXPLOSIVE).name("explosive").quest());
+	money = game.item_types.insert(ItemType::Builder("money").sprite(Sprites::MONEY).name("money"));
+	scorpion_tail = game.item_types.insert(ItemType::Builder("scorpion_tail").sprite(Sprites::SCORPION_TAIL).name("scorpion tail"));
+	spear = game.item_types.insert(ItemType::Builder("spear").sprite(Sprites::SPEAR).name("spear").damage(5));
+	sharpened_pole = game.item_types.insert(ItemType::Builder("sharpened_pole").sprite(Sprites::SHARPENED_POLE).name("sharpened pole").damage(1));
+	jacket = game.item_types.insert(ItemType::Builder("jacket").sprite(Sprites::JACKET).name("jacket").wearable().defence(1));
+	antidote = game.item_types.insert(ItemType::Builder("antidote").sprite(Sprites::ANTIDOTE).name("antidote").edible().antidote(5));
+	apple = game.item_types.insert(ItemType::Builder("apple").sprite(Sprites::APPLE).name("apple").edible().healing(10));
+	key = game.item_types.insert(ItemType::Builder("key").sprite(Sprites::KEY).name("key"));
 }
 
 void LinearGenerator::generate(Level & level, int level_index)
@@ -141,7 +102,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 		if(is_last_room) {
 			if(!level.monsters.empty()) {
 				int key_holder = rand() % level.monsters.size();
-				level.monsters[key_holder].inventory.insert(World::key(level_index));
+				level.monsters[key_holder].inventory.insert(Item::Builder(key).key_type(level_index));
 			}
 		}
 		fill_room(level.map, rooms[i], floor);
@@ -155,19 +116,19 @@ void LinearGenerator::generate(Level & level, int level_index)
 				case ' ' : level.map.set_cell_type(pos, floor); break;
 				case '&' : level.map.set_cell_type(pos, torch); break;
 
-				case '$' : level.items.push_back(World::money(pos)); break;
-				case '%' : level.items.push_back(World::apple(pos)); break;
-				case '(' : level.items.push_back(World::spear(pos)); break;
-				case '*' : level.items.push_back(World::explosive(pos)); break;
-				case '[' : level.items.push_back(World::jacket(pos)); break;
+				case '$' : level.items.push_back(Item::Builder(money).pos(pos)); break;
+				case '%' : level.items.push_back(Item::Builder(apple).pos(pos)); break;
+				case '(' : level.items.push_back(Item::Builder(spear).pos(pos)); break;
+				case '*' : level.items.push_back(Item::Builder(explosive).pos(pos)); break;
+				case '[' : level.items.push_back(Item::Builder(jacket).pos(pos)); break;
 
 				case '{' : level.objects.push_back(Object::Builder(well).pos(pos)); break;
 				case '+' : level.objects.push_back(Object::Builder(door).pos(pos).opened(false)); break;
-				case 'V' : level.objects.push_back(Object::Builder(pot).pos(pos).item(World::antidote()).item(World::money())); break;
-				case '^' : level.objects.push_back(Object::Builder(trap).pos(pos).item(World::sharpened_pole())); break;
+				case 'V' : level.objects.push_back(Object::Builder(pot).pos(pos).item(antidote).item(money)); break;
+				case '^' : level.objects.push_back(Object::Builder(trap).pos(pos).item(sharpened_pole)); break;
 				case '>' :
 					if(level_index == 3) {
-						level.items.push_back(World::explosive(pos));
+						level.items.push_back(Item::Builder(explosive).pos(pos));
 					} else {
 						level.objects.push_back(Object::Builder(stairs_down).pos(pos).down_destination(level_index + 1));
 					}
@@ -184,7 +145,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 					break;
 				case 'a' : level.monsters.push_back(Monster::Builder(still_ant).pos(pos)); break;
 				case 'A' : level.monsters.push_back(Monster::Builder(wander_ant).pos(pos)); break;
-				case 'S' : level.monsters.push_back(Monster::Builder(scorpion).pos(pos).item(World::scorpion_tail())); break;
+				case 'S' : level.monsters.push_back(Monster::Builder(scorpion).pos(pos).item(scorpion_tail)); break;
 				default: log("Unknown cell: '{0}' in room {1}.", cell, i);
 			}
 		}
