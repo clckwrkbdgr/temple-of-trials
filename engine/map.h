@@ -6,7 +6,6 @@ struct Point {
 	int x, y;
 	Point(int _x, int _y);
 	Point();
-	bool valid() const;
 	bool null() const;
 	bool operator==(const Point & other) const;
 	bool operator!=(const Point & other) const { return !(*this == other); }
@@ -14,13 +13,12 @@ struct Point {
 	Point & operator-=(const Point & other);
 	Point & operator*=(int factor);
 	Point & operator/=(int factor);
-private:
-	bool is_valid;
 };
 Point operator+(const Point & a, const Point & b);
 Point operator-(const Point & a, const Point & b);
 Point operator*(const Point & a, int factor);
 Point operator/(const Point & a, int factor);
+std::string to_string(const Point & value);
 
 template<class T>
 const T & find_at(const std::vector<T> & container, const Point & pos, typename std::vector<T>::const_iterator * index = 0)

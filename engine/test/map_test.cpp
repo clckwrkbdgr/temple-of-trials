@@ -10,18 +10,6 @@ TEST(should_make_point_from_two_coords)
 	EQUAL(p.y, 2);
 }
 
-TEST(should_consider_default_constructed_point_invalid)
-{
-	Point p;
-	ASSERT(!p.valid());
-}
-
-TEST(should_consider_valid_constructed_point_valid)
-{
-	Point p(1, 2);
-	ASSERT(p.valid());
-}
-
 TEST(should_consider_non_zero_point_non_null)
 {
 	Point p(1, 2);
@@ -74,6 +62,12 @@ TEST(should_multiply_point_by_factor)
 	EQUAL(c.y, 24);
 }
 
+TEST(should_convert_point_to_string)
+{
+	std::string result = to_string(Point(10, 0));
+	EQUAL(result, "(10, 0)");
+}
+
 struct PosInt {
 	int value;
 	Point pos;
@@ -98,10 +92,10 @@ TEST(should_change_found_item_in_vector)
 
 TEST(should_return_empty_item_if_not_found_in_vector)
 {
-	std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
-	PosInt & i = find_at(v, Point(1, 1));
+	std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(1, 1)));
+	PosInt & i = find_at(v, Point(2, 2));
 	EQUAL(i.value, 0);
-	ASSERT(!i.pos.valid());
+	ASSERT(i.pos.null());
 }
 
 TEST(should_find_item_in_const_vector)
@@ -113,10 +107,10 @@ TEST(should_find_item_in_const_vector)
 
 TEST(should_return_empty_item_if_not_found_in_const_vector)
 {
-	const std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
-	PosInt i = find_at(v, Point(1, 1));
+	const std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(1, 1)));
+	PosInt i = find_at(v, Point(2, 2));
 	EQUAL(i.value, 0);
-	ASSERT(!i.pos.valid());
+	ASSERT(i.pos.null());
 }
 
 

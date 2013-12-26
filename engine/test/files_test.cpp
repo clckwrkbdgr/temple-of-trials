@@ -136,23 +136,13 @@ TEST(reader_should_read_string_as_quoted_string)
 	EQUAL(s, "hello world");
 }
 
-TEST(reader_should_read_valid_point)
+TEST(reader_should_read_point)
 {
-	std::istringstream in("1 2 3 ");
+	std::istringstream in("2 3 ");
 	Reader reader(in);
 	Point point;
 	reader.store(point);
-	ASSERT(point.valid());
 	EQUAL(point, Point(2, 3));
-}
-
-TEST(reader_should_read_invalid_point)
-{
-	std::istringstream in("0 2 3 ");
-	Reader reader(in);
-	Point point;
-	reader.store(point);
-	ASSERT(!point.valid());
 }
 
 TEST(reader_should_read_type_if_valid)
@@ -300,20 +290,12 @@ TEST(writer_should_write_bool_as_int_and_a_space)
 	EQUAL(out.str(), "1 ");
 }
 
-TEST(writer_should_write_valid_point)
+TEST(writer_should_write_point)
 {
 	std::ostringstream out;
 	Writer writer(out);
 	writer.store(Point(2, 3));
-	EQUAL(out.str(), "1 2 3 ");
-}
-
-TEST(writer_should_write_invalid_point)
-{
-	std::ostringstream out;
-	Writer writer(out);
-	writer.store(Point());
-	EQUAL(out.str(), "0 0 0 ");
+	EQUAL(out.str(), "2 3 ");
 }
 
 TEST(writer_should_write_type_if_valid)

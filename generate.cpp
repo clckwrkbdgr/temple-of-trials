@@ -149,7 +149,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 		}
 		if(i > 0) {
 			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], floor);
-			if(doors.first.valid() && doors.second.valid()) {
+			if(!doors.first.null() && !doors.second.null()) {
 				level.objects.push_back(Object::Builder(closed_door, opened_door).pos(doors.first));
 				if(is_last_room) {
 					level.objects.push_back(Object::Builder(closed_door, opened_door).pos(doors.second).locked(true).lock_type(level_index));

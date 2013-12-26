@@ -309,7 +309,7 @@ void Game::invalidate_fov(Monster & monster)
 std::list<Point> Game::find_path(const Point & player_pos, const Point & target)
 {
 	std::list<Point> best_path;
-	if(!target.valid() || !is_passable(target.x, target.y) || player_pos == target) {
+	if(!is_passable(target.x, target.y) || player_pos == target) {
 		return best_path;
 	}
 

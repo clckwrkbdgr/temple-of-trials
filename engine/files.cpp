@@ -116,14 +116,9 @@ Reader & Reader::store(std::string & value)
 
 Reader & Reader::store(Point & value)
 {
-	bool valid;
 	int x, y;
-	store(valid).store(x).store(y);
-	if(valid) {
-		value = Point(x, y);
-	} else {
-		value = Point();
-	}
+	store(x).store(y);
+	value = Point(x, y);
 	return *this;
 }
 
@@ -218,7 +213,7 @@ Writer & Writer::store(const std::string & value)
 
 Writer & Writer::store(const Point & value)
 {
-	store(value.valid()).store(value.x).store(value.y);
+	store(value.x).store(value.y);
 	return *this;
 }
 

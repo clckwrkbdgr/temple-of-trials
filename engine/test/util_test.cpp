@@ -97,12 +97,6 @@ TEST(should_convert_string_to_string)
 	EQUAL(result, "hello");
 }
 
-TEST(should_convert_point_to_string)
-{
-	std::string result = to_string(Point(10, 0));
-	EQUAL(result, "(10, 0)");
-}
-
 TEST(should_convert_vector_to_string)
 {
 	std::vector<int> v = MakeVector<int>(1)(2)(3)(4);

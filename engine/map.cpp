@@ -3,18 +3,13 @@
 #include <cmath>
 
 Point::Point(int _x, int _y)
-	: x(_x), y(_y), is_valid(true)
+	: x(_x), y(_y)
 {
 }
 
 Point::Point()
-	: x(0), y(0), is_valid(false)
+	: x(0), y(0)
 {
-}
-
-bool Point::valid() const
-{
-	return is_valid;
 }
 
 bool Point::null() const
@@ -77,6 +72,11 @@ Point operator/(const Point & a, int factor)
 {
 	Point result = a;
 	return result /= factor;
+}
+
+std::string to_string(const Point & value)
+{
+    return format("({0}, {1})", value.x, value.y);
 }
 
 int distance(const Point & a, const Point & b)

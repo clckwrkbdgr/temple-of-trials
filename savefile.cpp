@@ -2,7 +2,7 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 33, SAVEFILE_MINOR_VERSION = 0 };
+enum { SAVEFILE_MAJOR_VERSION = 34, SAVEFILE_MINOR_VERSION = 0 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {

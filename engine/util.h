@@ -4,7 +4,6 @@
 #include <map>
 #include <list>
 #include <cstdarg>
-class Point;
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #if GCC_VERSION < 403000
@@ -34,7 +33,6 @@ std::string to_string(unsigned value);
 std::string to_string(long unsigned value);
 std::string to_string(char value);
 std::string to_string(const std::string & value);
-std::string to_string(const Point & value);
 std::string to_string(const char * value);
 template<class T>
 std::string to_string(const T * value)

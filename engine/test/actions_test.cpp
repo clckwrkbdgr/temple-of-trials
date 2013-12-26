@@ -261,7 +261,7 @@ struct GameWithDummyWieldingAndWearing {
 		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
 		stub_type = game.monster_types.insert(MonsterType::Builder("stub").name("stub").max_hp(100));
-		game.object_types.insert(ObjectType::Builder("door").name("door").passable().openable());
+		game.object_types.insert(ObjectType::Builder("door").name("door"));
 		game.object_types.insert(ObjectType::Builder("pot").name("pot").containable());
 		game.object_types.insert(ObjectType::Builder("well").name("well").drinkable());
 		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
