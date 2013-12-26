@@ -20,8 +20,8 @@ void LinearGenerator::create_types(Game & game)
 	scorpion = game.monster_types.insert(MonsterType::Builder("scorpion").faction(Monster::MONSTER).
 			sprite(Sprites::SCORPION).sight(8).max_hp(5).ai(AI::ANGRY_AND_STILL).name("scorpion").hit_strength(2).poisonous(true));
 
-	opened_door = game.object_types.insert(ObjectType::Builder("door").sprite(Sprites::DOOR_OPENED).name("door").openable().passable().transparent());
-	closed_door = game.object_types.insert(ObjectType::Builder("door").sprite(Sprites::DOOR_CLOSED).name("door").openable());
+	opened_door = game.object_types.insert(ObjectType::Builder("opened_door").sprite(Sprites::DOOR_OPENED).name("door").openable().passable().transparent());
+	closed_door = game.object_types.insert(ObjectType::Builder("closed_door").sprite(Sprites::DOOR_CLOSED).name("door").openable());
 	pot = game.object_types.insert(ObjectType::Builder("pot").sprite(Sprites::POT).name("pot").containable().transparent());
 	well = game.object_types.insert(ObjectType::Builder("well").sprite(Sprites::WELL).name("well").drinkable().transparent());
 	gate = game.object_types.insert(ObjectType::Builder("gate").sprite(Sprites::GATE).name("gate").transporting().passable().transparent());
