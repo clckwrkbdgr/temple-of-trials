@@ -41,11 +41,6 @@ struct Game {
 
 	CompiledInfo get_info(int x, int y) const;
 	CompiledInfo get_info(const Point & pos) const;
-	bool is_passable(int x, int y) const;
-	bool is_transparent(int x, int y) const;
-	int get_sprite_at(int x, int y) const;
-	int get_sprite_at(const Point & pos) const;
-	std::string name_at(const Point & pos) const;
 
 	const Monster & get_player() const;
 	Monster & get_player();

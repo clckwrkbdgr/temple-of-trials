@@ -39,6 +39,5 @@ struct CompiledInfo {
 		return *this;
 	}
 	CompiledInfo & in(const Map & map);
-	bool passable() const;
-	bool transparent() const;
+	Info compiled() const;
 };

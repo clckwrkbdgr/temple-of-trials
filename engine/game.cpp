@@ -184,78 +184,6 @@ CompiledInfo Game::get_info(const Point & pos) const
 	return get_info(pos.x, pos.y);
 }
 
-bool Game::is_passable(int x, int y) const
-{
-	Point new_pos(x, y);
-	if(!cell_type_at(new_pos).passable) {
-		return false;
-	}
-    const Object & object = find_at(level.objects, new_pos);
-	if(object.valid() && !object.type->passable) {
-		return false;
-	}
-    const Monster & monster = find_at(level.monsters, new_pos);
-	if(monster.valid()) {
-		return false;
-	}
-	return true;
-}
-
-bool Game::is_transparent(int x, int y) const
-{
-	Point new_pos(x, y);
-    const Object & object = find_at(level.objects, new_pos);
-	if(object.valid() && !object.type->transparent) {
-		return false;
-	}
-	return cell_type_at(new_pos).transparent;
-}
-
-int Game::get_sprite_at(int x, int y) const
-{
-	return get_sprite_at(Point(x, y));
-}
-
-int Game::get_sprite_at(const Point & pos) const
-{
-	foreach(const Monster & monster, level.monsters) {
-		if(monster.pos == pos) {
-			return monster.type->sprite;
-		}
-	}
-	foreach(const Item & item, level.items) {
-		if(item.pos == pos) {
-			return item.type->sprite;
-		}
-	}
-	foreach(const Object & object, level.objects) {
-		if(object.pos == pos) {
-			return object.type->sprite;
-		}
-	}
-	return cell_type_at(pos).sprite;
-}
-
-std::string Game::name_at(const Point & pos) const
-{
-	foreach(const Monster & monster, level.monsters) {
-		if(monster.pos == pos) {
-			return monster.type->name;
-		}
-	}
-	foreach(const Item & item, level.items) {
-		if(item.pos == pos) {
-			return item.type->name;
-		}
-	}
-	foreach(const Object & object, level.objects) {
-		if(object.pos == pos) {
-			return object.type->name;
-		}
-	}
-	return cell_type_at(pos).name;
-}
-
 void Game::invalidate_fov(Monster & monster)
 {
 	for(unsigned x = 0; x < level.map.width; ++x) {
@@ -282,7 +210,7 @@ void Game::invalidate_fov(Monster & monster)
 					double delta_error = std::abs(double(deltay) / double(deltax));
 					int cy = monster.pos.y;
 					for(int cx = monster.pos.x; cx != x; cx += ix) {
-						if(!is_transparent(cx, cy)) {
+						if(!get_info(cx, cy).compiled().transparent) {
 							can_see = false;
 							break;
 						}
@@ -297,7 +225,7 @@ void Game::invalidate_fov(Monster & monster)
 					double delta_error = std::abs(double(deltax) / double(deltay));
 					int cx = monster.pos.x;
 					for(int cy = monster.pos.y; cy != y; cy += iy) {
-						if(!is_transparent(cx, cy)) {
+						if(!get_info(cx, cy).compiled().transparent) {
 							can_see = false;
 							break;
 						}
@@ -312,7 +240,7 @@ void Game::invalidate_fov(Monster & monster)
 			}
 			level.map.cell(x, y).visible = can_see;
 			if(can_see && monster.type->faction == Monster::PLAYER) {
-				level.map.cell(x, y).seen_sprite = get_sprite_at(x, y);
+				level.map.cell(x, y).seen_sprite = get_info(x, y).compiled().sprite;
 			}
 		}
 	}
@@ -321,7 +249,7 @@ void Game::invalidate_fov(Monster & monster)
 std::list<Point> Game::find_path(const Point & player_pos, const Point & target)
 {
 	std::list<Point> best_path;
-	if(!is_passable(target.x, target.y) || player_pos == target) {
+	if(!get_info(target.x, target.y).compiled().passable || player_pos == target) {
 		return best_path;
 	}
 
@@ -347,7 +275,7 @@ std::list<Point> Game::find_path(const Point & player_pos, const Point & target)
 					found = true;
 					break;
 				}
-				if(!is_passable(n.x, n.y)) {
+				if(!get_info(n.x, n.y).compiled().passable) {
 					continue;
 				}
 				bool already_present = false;

@@ -52,21 +52,24 @@ CompiledInfo & CompiledInfo::in(const Map & map)
 	return *this;
 }
 
-bool CompiledInfo::passable() const
+Info CompiledInfo::compiled() const
 {
-	bool result = true;
+	Info result;
+	result.passable = true;
+	result.transparent = true;
 	foreach(const Info & info, all_info) {
-		result = result && info.passable;
+		if(result.id.empty()) {
+			result.id = info.id;
+		}
+		if(result.sprite == 0) {
+			result.sprite = info.sprite;
+		}
+		if(result.name.empty()) {
+			result.name = info.name;
+		}
+		result.passable = result.passable && info.passable;
+		result.transparent = result.transparent && info.transparent;
 	}
-	return result;
-}
-
-bool CompiledInfo::transparent() const
-{
-	bool result = true;
-	foreach(const Info & info, all_info) {
-		result = result && info.transparent;
-	}
-	return result;
+	return result.valid() ? result : Info();
 }
 
