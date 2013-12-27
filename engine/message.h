@@ -82,4 +82,6 @@ struct Messages {
 	void wields(const Monster & someone, const Item & item);
 	void wields_nothing(const Monster & someone);
 	void win_the_game(const Monster & someone, const Item & quest_item);
+	void item_is_full_already(const Item & item);
+	void fill(const Monster & someone, const Item & item);
 };

@@ -5,11 +5,14 @@
 #include "../format.h"
 #include "../test.h"
 
+namespace ActionsFixture {
+
 struct GameWithDummyWieldingAndWearing {
 	Game game;
 	const MonsterType * dummy_type;
 	const MonsterType * stub_type;
 	GameWithDummyWieldingAndWearing() {
+		TRACE(1);
 		game.level.map = Map(2, 3);
 		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
@@ -23,9 +26,14 @@ struct GameWithDummyWieldingAndWearing {
 		game.item_types.insert(ItemType::Builder("quest_item").sprite(1).name("item").quest());
 		game.item_types.insert(ItemType::Builder("stub").sprite(2).name("stub"));
 		const ItemType * jacket = game.item_types.insert(ItemType::Builder("jacket").sprite(1).name("jacket").wearable());
+		const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(1).name("water flask"));
+		const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(2).name("empty flask"));
 
 		game.level.map.fill(game.cell_types.get("floor"));
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(Item(spear)).item(Item(armor)).wield(0).wear(1).item(jacket));
+		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).
+				item(Item(spear)).item(Item(armor)).wield(0).wear(1).
+				item(jacket).item(Item::Builder(full_flask, empty_flask).make_empty()));
+		TRACE(dummy().inventory.size());
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
 };
@@ -119,8 +127,11 @@ struct GameWithDummyAndStairs {
 	Object & stairs() { return game.level.objects[0]; }
 };
 
+};
 
 SUITE(drop) {
+
+using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_drop_if_nothing_to_drop)
 {
@@ -172,6 +183,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_place_item_on_the_floor_whe
 
 SUITE(grab) {
 
+using namespace ActionsFixture;
+
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_if_floor_is_empty)
 {
 	Grab action;
@@ -184,7 +197,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_grabbed_item_to_the_fir
 	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
 	Grab action;
 	action.commit(dummy(), game);
-	EQUAL(dummy().inventory.get_item(3).type->name, "item");
+	EQUAL(dummy().inventory.get_item(4).type->name, "item");
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy picked up item from the floor.").result);
 }
 
@@ -218,6 +231,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_item_if_inventory_
 }
 
 SUITE(wield) {
+
+using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWithItems, should_wield_any_item)
 {
@@ -260,6 +275,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_before_wieldi
 
 SUITE(unwield) {
 
+using namespace ActionsFixture;
+
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_if_wielded)
 {
 	Unwield action;
@@ -277,6 +294,8 @@ TEST_FIXTURE(GameWithDummyWithItems, should_not_unwield_item_if_not_wielded)
 }
 
 SUITE(wear) {
+
+using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWithItems, should_wear_any_item)
 {
@@ -325,6 +344,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_wearing
 
 SUITE(take_off) {
 
+using namespace ActionsFixture;
+
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_if_worn)
 {
 	TakeOff action;
@@ -342,6 +363,8 @@ TEST_FIXTURE(GameWithDummyWithItems, should_not_take_off_item_if_not_worn)
 }
 
 SUITE(eat) {
+
+using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_invalid_slot)
 {
@@ -440,6 +463,8 @@ TEST_FIXTURE(GameWithDummyAndFood, should_make_flask_empty_after_eating_it_and_n
 
 SUITE(go_up) {
 
+using namespace ActionsFixture;
+
 TEST_FIXTURE(GameWithDummyAndStairs, should_go_up_on_upstairs)
 {
 	stairs().up_destination = 1;
@@ -477,6 +502,8 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_go
 }
 
 SUITE(go_down) {
+
+using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_go_down_on_downstairs)
 {

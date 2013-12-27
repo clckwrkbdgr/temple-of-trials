@@ -2,6 +2,8 @@
 #include "../game.h"
 #include "../test.h"
 
+namespace DirectedActionsFixture {
+
 struct GameWithDummy {
 	Game game;
 	const CellType * floor_type;
@@ -31,6 +33,7 @@ struct GameWithDummyWieldingAndWearing {
 	const MonsterType * dummy_type;
 	const MonsterType * stub_type;
 	GameWithDummyWieldingAndWearing() {
+		TRACE(1);
 		game.level.map = Map(2, 3);
 		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
@@ -44,15 +47,42 @@ struct GameWithDummyWieldingAndWearing {
 		game.item_types.insert(ItemType::Builder("quest_item").sprite(1).name("item").quest());
 		game.item_types.insert(ItemType::Builder("stub").sprite(2).name("stub"));
 		const ItemType * jacket = game.item_types.insert(ItemType::Builder("jacket").sprite(1).name("jacket").wearable());
+		const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(1).name("water flask"));
+		const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(2).name("empty flask"));
 
 		game.level.map.fill(game.cell_types.get("floor"));
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(Item(spear)).item(Item(armor)).wield(0).wear(1).item(jacket));
+		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).
+				item(Item(spear)).item(Item(armor)).wield(0).wear(1).
+				item(jacket).item(Item::Builder(full_flask, empty_flask).make_empty()));
+		TRACE(dummy().inventory.size());
+	}
+	Monster & dummy() { return game.level.monsters[0]; }
+};
+
+struct GameWithDummyWithItems {
+	Game game;
+	const MonsterType * dummy_type;
+	GameWithDummyWithItems() {
+		game.level.map = Map(2, 3);
+		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
+		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
+		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
+		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear"));
+		const ItemType * pot = game.item_types.insert(ItemType::Builder("pot").sprite(1).name("pot"));
+
+		game.level.map.fill(game.cell_types.get("floor"));
+		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(spear).item(armor).item(pot).item(pot));
+		dummy().inventory.take_item(2);
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
 };
 
 
+}
+
 SUITE(move) {
+
+using namespace DirectedActionsFixture;
 
 TEST_FIXTURE(GameWithDummy, should_move_when_cell_is_empty)
 {
@@ -109,6 +139,8 @@ TEST_FIXTURE(GameWithDummy, should_not_move_into_closed_object)
 
 SUITE(drink) {
 
+using namespace DirectedActionsFixture;
+
 TEST_FIXTURE(GameWithDummy, should_not_drink_monsters)
 {
 	game.level.monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
@@ -153,6 +185,8 @@ TEST_FIXTURE(GameWithDummy, should_heal_from_fountains)
 }
 
 SUITE(open) {
+
+using namespace DirectedActionsFixture;
 
 TEST_FIXTURE(GameWithDummy, should_not_open_already_opened_doors)
 {
@@ -225,6 +259,8 @@ TEST_FIXTURE(GameWithDummy, should_not_open_empty_containers)
 
 SUITE(close) {
 
+using namespace DirectedActionsFixture;
+
 TEST_FIXTURE(GameWithDummy, should_close_opened_doors)
 {
 	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
@@ -253,6 +289,8 @@ TEST_FIXTURE(GameWithDummy, should_not_close_empty_cell)
 }
 
 SUITE(swing) {
+
+using namespace DirectedActionsFixture;
 
 TEST_FIXTURE(GameWithDummy, should_hit_impassable_cells_on_swing)
 {
@@ -290,6 +328,8 @@ TEST_FIXTURE(GameWithDummy, should_swing_at_nothing_at_empty_cell)
 }
 
 SUITE(fire) {
+
+using namespace DirectedActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_throw_if_wields_nothing)
 {
@@ -368,6 +408,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_monster_and_drop_item_u
 
 SUITE(put) {
 
+using namespace DirectedActionsFixture;
+
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_put_if_wields_nothing)
 {
 	dummy().inventory.unwield();
@@ -397,6 +439,31 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_on_the_floor_if_pa
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy dropped spear on the floor.").result);
 	ASSERT(!game.level.items.empty());
 	EQUAL(game.level.items[0].pos, Point(1, 1));
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_refill_item_if_emptyable_and_object_is_drinkable)
+{
+	game.level.objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 1)));
+	dummy().inventory.wield(3);
+	Put action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy refill empty flask.").result);
+	ASSERT(dummy().inventory.has_item(3));
+	ASSERT(dummy().inventory.get_item(3).is_full());
+	ASSERT(game.level.items.empty());
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_refill_already_full_item)
+{
+	game.level.objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 1)));
+	dummy().inventory.get_item(3).make_full();
+	dummy().inventory.wield(3);
+	Put action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Water flask is already full.").result);
+	ASSERT(dummy().inventory.has_item(3));
+	ASSERT(dummy().inventory.get_item(3).is_full());
+	ASSERT(game.level.items.empty());
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_under_monster_if_target_is_impassable)

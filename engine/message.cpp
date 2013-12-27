@@ -392,3 +392,13 @@ void Messages::cannot_be_eaten(const Item & item)
 	message(format("{0} isn't edible.", item.type->name));
 }
 
+void Messages::item_is_full_already(const Item & item)
+{
+	message(format("{0} is already full.", item.type->name));
+}
+
+void Messages::fill(const Monster & someone, const Item & item)
+{
+	message(format("{0} refill {1}.", someone.type->name, item.type->name));
+}
+

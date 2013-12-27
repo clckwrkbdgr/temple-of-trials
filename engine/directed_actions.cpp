@@ -134,14 +134,24 @@ void Fire::commit(Monster & someone, Game & game)
 
 void Put::commit(Monster & someone, Game & game)
 {
-	Item item = someone.inventory.take_wielded_item();
+	Item & item = someone.inventory.wielded_item();
 	ACTION_ASSERT(item.valid(), game.messages.nothing_to_put(someone));
 
 	item.pos = someone.pos;
+
+	Object & object = find_at(game.level.objects, item.pos + shift);
+	if(object.valid() && object.type->drinkable && item.is_emptyable()) {
+		ACTION_ASSERT(item.is_empty(), game.messages.item_is_full_already(item));
+		game.messages.fill(someone, item);
+		item.make_full();
+		return;
+	}
+	
 	if(game.cell_type_at(item.pos + shift).passable) {
 		item.pos += shift;
 	}
 	game.messages.drops(someone, item, game.cell_type_at(item.pos));
 	game.level.items.push_back(item);
+	someone.inventory.take_wielded_item();
 }
 
