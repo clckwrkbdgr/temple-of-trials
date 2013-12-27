@@ -3,6 +3,9 @@
 class Game;
 class Monster;
 
+#define ACTION_ASSERT(condition, expression) \
+	do { if(!(condition)) { (expression); return; } } while(0)
+
 class Action {
 public:
 	virtual ~Action() {}

@@ -5,254 +5,6 @@
 #include "../format.h"
 #include "../test.h"
 
-SUITE(actions) {
-
-struct GameWithDummy {
-	Game game;
-	const CellType * floor_type;
-	const MonsterType * dummy_type;
-	const MonsterType * stub_type;
-	const ObjectType * opened_door;
-	const ObjectType * closed_door;
-	GameWithDummy() {
-		game.level.map = Map(2, 2);
-		floor_type = game.cell_types.insert(CellType::Builder("floor").name("floor").passable(true));
-		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-		stub_type = game.monster_types.insert(MonsterType::Builder("stub").name("stub"));
-		game.object_types.insert(ObjectType::Builder("stub").name("stub"));
-		opened_door = game.object_types.insert(ObjectType::Builder("opened_door").name("door").transparent().passable().openable().sprite(1));
-		closed_door = game.object_types.insert(ObjectType::Builder("closed_door").name("door").openable().sprite(2));
-		game.object_types.insert(ObjectType::Builder("pot").name("pot").containable());
-		game.object_types.insert(ObjectType::Builder("well").name("well").drinkable());
-		game.item_types.insert(ItemType::Builder("key").name("item").sprite(1));
-		game.level.map.fill(floor_type);
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
-	}
-	Monster & dummy() { return game.level.monsters[0]; }
-};
-
-TEST_FIXTURE(GameWithDummy, should_move_when_cell_is_empty)
-{
-	Move action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().pos, Point(1, 0));
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_cell)
-{
-	game.cell_types.insert(CellType::Builder("floor").name("wall").passable(false));
-	Move action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into the wall.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_move_into_monster)
-{
-	game.level.monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
-	Move action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into stub.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_object)
-{
-	game.level.objects.push_back(Object::Builder(game.object_types.get("stub")).pos(Point(1, 0)));
-	Move action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into stub.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_move_into_opened_object)
-{
-	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
-	Move action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().pos, Point(1, 0));
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_move_into_closed_object)
-{
-	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
-	Move action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages.messages, MakeVector<std::string>("Door is closed.").result);
-}
-
-
-TEST_FIXTURE(GameWithDummy, should_not_drink_monsters)
-{
-	game.level.monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
-	Drink action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("It is stub. dummy is not a vampire to drink that.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_drink_containers)
-{
-	game.level.objects.push_back(Object::Builder(game.object_types.get("pot")).pos(Point(1, 0)));
-	Drink action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Unfortunately, pot is totally empty.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_drink_at_empty_cell)
-{
-	Drink action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("There is nothing to drink.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_drink_fountains)
-{
-	game.level.objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 0)));
-	Drink action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy drink from well.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_heal_from_fountains)
-{
-	game.level.objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 0)));
-	dummy().hp -= 5;
-	Drink action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(dummy().hp, 96);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy drink from well. It helps a bit.").result);
-}
-
-
-TEST_FIXTURE(GameWithDummy, should_not_open_already_opened_doors)
-{
-	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
-	Open action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Door is already opened.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_open_closed_doors)
-{
-	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
-	Open action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy opened the door.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_open_locked_doors_without_a_key)
-{
-	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false).locked(true).lock_type(1));
-	Open action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(game.level.objects[0].locked);
-	ASSERT(!game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Door is locked.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_open_locked_doors_with_a_key)
-{
-	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false).locked(true).lock_type(1));
-	dummy().inventory.set_item(1, Item::Builder(game.item_types.get("key")).key_type(1));
-	Open action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(!game.level.objects[0].locked);
-	ASSERT(game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unlocked the door.")("Dummy opened the door.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_open_empty_cell)
-{
-	Open action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("There is nothing to open there.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_open_containers_and_drop_items)
-{
-	Item item(game.item_types.get("key"));
-	game.level.objects.push_back(Object::Builder(game.object_types.get("pot")).pos(Point(1, 0)).item(item));
-	Open action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.level.items[0].type, item.type);
-	ASSERT(game.level.objects[0].items.empty());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy took up a item from pot.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_open_empty_containers)
-{
-	game.level.objects.push_back(Object::Builder(game.object_types.get("pot")).pos(Point(1, 0)));
-	Open action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(game.level.items.empty());
-	ASSERT(game.level.objects[0].items.empty());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Pot is empty.").result);
-}
-
-
-TEST_FIXTURE(GameWithDummy, should_close_opened_doors)
-{
-	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
-	Close action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(!game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy closed the door.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_close_already_closed_doors)
-{
-	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
-	Close action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(!game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Door is already closed.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_not_close_empty_cell)
-{
-	Close action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("There is nothing to close there.").result);
-}
-
-
-TEST_FIXTURE(GameWithDummy, should_hit_impassable_cells_on_swing)
-{
-	game.cell_types.insert(CellType::Builder("wall").name("wall").passable(false));
-	game.level.map.set_cell_type(Point(1, 0), game.cell_types.get("wall"));
-	Swing action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy hit wall.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_open_closed_doors_on_swing)
-{
-	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
-	Swing action(Point(0, -1));
-	action.commit(dummy(), game);
-	ASSERT(game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy swing at door.")("Dummy opened the door.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_hit_monsters_on_swing)
-{
-	game.level.monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
-	Swing action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy hit stub for 0 hp.").result);
-}
-
-TEST_FIXTURE(GameWithDummy, should_swing_at_nothing_at_empty_cell)
-{
-	Swing action(Point(0, -1));
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy swing at nothing.").result);
-}
-
-
 struct GameWithDummyWieldingAndWearing {
 	Game game;
 	const MonsterType * dummy_type;
@@ -277,6 +29,98 @@ struct GameWithDummyWieldingAndWearing {
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
 };
+
+struct GameWithDummyWithItems {
+	Game game;
+	const MonsterType * dummy_type;
+	GameWithDummyWithItems() {
+		game.level.map = Map(2, 3);
+		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
+		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
+		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
+		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear"));
+		const ItemType * pot = game.item_types.insert(ItemType::Builder("pot").sprite(1).name("pot"));
+
+		game.level.map.fill(game.cell_types.get("floor"));
+		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(spear).item(armor).item(pot).item(pot));
+		dummy().inventory.take_item(2);
+	}
+	Monster & dummy() { return game.level.monsters[0]; }
+};
+
+struct GameWithDummyAndFood {
+	Game game;
+	const MonsterType * dummy_type;
+	enum { ARMOR, SPEAR, JUNK, FOOD, MEDKIT, MEGASPHERE, ANTIDOTE, FULL_FLASK, EMPTY_FLASK, EMPTY, NONE };
+	GameWithDummyAndFood() {
+		game.level.map = Map(2, 2);
+		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
+
+		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor").edible());
+		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear").edible());
+		const ItemType * junk = game.item_types.insert(ItemType::Builder("junk").sprite(3).name("junk"));
+		const ItemType * food = game.item_types.insert(ItemType::Builder("food").sprite(4).name("food").edible());
+		const ItemType * medkit = game.item_types.insert(ItemType::Builder("medkit").sprite(4).name("medkit").edible().healing(5));
+		const ItemType * megasphere = game.item_types.insert(ItemType::Builder("megasphere").sprite(4).name("megasphere").edible().healing(100));
+		const ItemType * antidote = game.item_types.insert(ItemType::Builder("antidote").sprite(4).name("antidote").edible().antidote(5));
+		const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(7).name("water flask").edible());
+		const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(8).name("empty flask"));
+		game.level.monsters.push_back(
+				Monster::Builder(dummy_type).hp(90)
+				.item(armor).item(spear).wear(0).wield(1)
+				.item(junk).item(food).item(medkit).item(megasphere).item(antidote)
+				.item(Item()).item(Item(full_flask, empty_flask)).item(Item::Builder(full_flask, empty_flask).make_empty())
+				);
+	}
+	Monster & dummy() { return game.level.monsters[0]; }
+};
+
+class TestLevelGenerator : public LevelGenerator {
+public:
+	TestLevelGenerator(const Point & player_pos1, const Point & player_pos2)
+		: generated(false), pos1(player_pos1), pos2(player_pos2) { }
+	virtual void create_types(Game & game)
+	{
+		player_one = game.monster_types.insert(MonsterType::Builder("player_one").sprite(1).faction(Monster::PLAYER));
+		player_two = game.monster_types.insert(MonsterType::Builder("player_two").sprite(2).faction(Monster::PLAYER));
+	}
+	virtual void generate(Level & level, int level_index)
+	{
+		generated = true;
+		level = Level(4, 4);
+		if(level_index == 1) {
+			level.monsters.push_back(Monster::Builder(player_one).pos(pos1));
+		} else {
+			level.monsters.push_back(Monster::Builder(player_two).pos(pos2));
+		}
+	}
+	bool was_generated() const { return generated; }
+private:
+	bool generated;
+	Point pos1, pos2;
+	const MonsterType * player_one;
+	const MonsterType * player_two;
+};
+
+struct GameWithDummyAndStairs {
+	TestLevelGenerator generator;
+	Game game;
+	GameWithDummyAndStairs()
+		: generator(Point(1, 1), Point(2, 2)), game(&generator)
+	{
+		const MonsterType * dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").name("dummy"));
+		const ObjectType * stairs_type = game.object_types.insert(ObjectType::Builder("stairs").name("stairs").transporting());
+		game.item_types.insert(ItemType::Builder("yendor").name("Yendor").quest().sprite(1));
+		game.level.map = Map(2, 2);
+		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
+		game.level.objects.push_back(Object::Builder(stairs_type).pos(Point(1, 1)));
+	}
+	Monster & dummy() { return game.level.monsters[0]; }
+	Object & stairs() { return game.level.objects[0]; }
+};
+
+
+SUITE(fire) {
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_throw_if_wields_nothing)
 {
@@ -351,6 +195,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_monster_and_drop_item_u
 	EQUAL(game.level.items[0].pos, Point(1, 0));
 }
 
+}
+
+SUITE(drop) {
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_drop_if_nothing_to_drop)
 {
@@ -398,6 +245,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_place_item_on_the_floor_whe
 	EQUAL(game.level.items[0].type->name, "spear");
 }
 
+}
+
+SUITE(grab) {
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_if_floor_is_empty)
 {
@@ -442,24 +292,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_item_if_inventory_
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy carry too much items.").result);
 }
 
+}
 
-struct GameWithDummyWithItems {
-	Game game;
-	const MonsterType * dummy_type;
-	GameWithDummyWithItems() {
-		game.level.map = Map(2, 3);
-		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
-		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
-		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear"));
-		const ItemType * pot = game.item_types.insert(ItemType::Builder("pot").sprite(1).name("pot"));
-
-		game.level.map.fill(game.cell_types.get("floor"));
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(spear).item(armor).item(pot).item(pot));
-		dummy().inventory.take_item(2);
-	}
-	Monster & dummy() { return game.level.monsters[0]; }
-};
+SUITE(wield) {
 
 TEST_FIXTURE(GameWithDummyWithItems, should_wield_any_item)
 {
@@ -498,6 +333,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_before_wieldi
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy takes off armor.")("Dummy wields armor.").result);
 }
 
+}
+
+SUITE(unwield) {
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_if_wielded)
 {
@@ -513,6 +351,9 @@ TEST_FIXTURE(GameWithDummyWithItems, should_not_unwield_item_if_not_wielded)
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy is wielding nothing.").result);
 }
 
+}
+
+SUITE(wear) {
 
 TEST_FIXTURE(GameWithDummyWithItems, should_wear_any_item)
 {
@@ -557,6 +398,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_wearing
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields jacket.")("Dummy takes off armor.")("Dummy wear jacket.").result);
 }
 
+}
+
+SUITE(take_off) {
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_if_worn)
 {
@@ -572,33 +416,9 @@ TEST_FIXTURE(GameWithDummyWithItems, should_not_take_off_item_if_not_worn)
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy is wearing nothing.").result);
 }
 
+}
 
-struct GameWithDummyAndFood {
-	Game game;
-	const MonsterType * dummy_type;
-	enum { ARMOR, SPEAR, JUNK, FOOD, MEDKIT, MEGASPHERE, ANTIDOTE, FULL_FLASK, EMPTY_FLASK, EMPTY, NONE };
-	GameWithDummyAndFood() {
-		game.level.map = Map(2, 2);
-		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-
-		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor").edible());
-		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear").edible());
-		const ItemType * junk = game.item_types.insert(ItemType::Builder("junk").sprite(3).name("junk"));
-		const ItemType * food = game.item_types.insert(ItemType::Builder("food").sprite(4).name("food").edible());
-		const ItemType * medkit = game.item_types.insert(ItemType::Builder("medkit").sprite(4).name("medkit").edible().healing(5));
-		const ItemType * megasphere = game.item_types.insert(ItemType::Builder("megasphere").sprite(4).name("megasphere").edible().healing(100));
-		const ItemType * antidote = game.item_types.insert(ItemType::Builder("antidote").sprite(4).name("antidote").edible().antidote(5));
-		const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(7).name("water flask").edible());
-		const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(8).name("empty flask"));
-		game.level.monsters.push_back(
-				Monster::Builder(dummy_type).hp(90)
-				.item(armor).item(spear).wear(0).wield(1)
-				.item(junk).item(food).item(medkit).item(megasphere).item(antidote)
-				.item(Item()).item(Item(full_flask, empty_flask)).item(Item::Builder(full_flask, empty_flask).make_empty())
-				);
-	}
-	Monster & dummy() { return game.level.monsters[0]; }
-};
+SUITE(eat) {
 
 TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_invalid_slot)
 {
@@ -693,50 +513,9 @@ TEST_FIXTURE(GameWithDummyAndFood, should_make_flask_empty_after_eating_it_and_n
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats water flask.")("Water flask is empty now.").result);
 }
 
+}
 
-class TestLevelGenerator : public LevelGenerator {
-public:
-	TestLevelGenerator(const Point & player_pos1, const Point & player_pos2)
-		: generated(false), pos1(player_pos1), pos2(player_pos2) { }
-	virtual void create_types(Game & game)
-	{
-		player_one = game.monster_types.insert(MonsterType::Builder("player_one").sprite(1).faction(Monster::PLAYER));
-		player_two = game.monster_types.insert(MonsterType::Builder("player_two").sprite(2).faction(Monster::PLAYER));
-	}
-	virtual void generate(Level & level, int level_index)
-	{
-		generated = true;
-		level = Level(4, 4);
-		if(level_index == 1) {
-			level.monsters.push_back(Monster::Builder(player_one).pos(pos1));
-		} else {
-			level.monsters.push_back(Monster::Builder(player_two).pos(pos2));
-		}
-	}
-	bool was_generated() const { return generated; }
-private:
-	bool generated;
-	Point pos1, pos2;
-	const MonsterType * player_one;
-	const MonsterType * player_two;
-};
-
-struct GameWithDummyAndStairs {
-	TestLevelGenerator generator;
-	Game game;
-	GameWithDummyAndStairs()
-		: generator(Point(1, 1), Point(2, 2)), game(&generator)
-	{
-		const MonsterType * dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").name("dummy"));
-		const ObjectType * stairs_type = game.object_types.insert(ObjectType::Builder("stairs").name("stairs").transporting());
-		game.item_types.insert(ItemType::Builder("yendor").name("Yendor").quest().sprite(1));
-		game.level.map = Map(2, 2);
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
-		game.level.objects.push_back(Object::Builder(stairs_type).pos(Point(1, 1)));
-	}
-	Monster & dummy() { return game.level.monsters[0]; }
-	Object & stairs() { return game.level.objects[0]; }
-};
+SUITE(go_up) {
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_go_up_on_upstairs)
 {
@@ -772,6 +551,9 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_go
 	ASSERT(generator.was_generated());
 }
 
+}
+
+SUITE(go_down) {
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_go_down_on_downstairs)
 {
