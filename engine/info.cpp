@@ -43,3 +43,30 @@ bool Info::valid() const
 	return !id.empty();
 }
 
+
+CompiledInfo & CompiledInfo::in(const Map & map)
+{
+	if(map.valid(pos)) {
+		all_info.push_back(Info(map.cell(pos)));
+	}
+	return *this;
+}
+
+bool CompiledInfo::passable() const
+{
+	bool result = true;
+	foreach(const Info & info, all_info) {
+		result = result && info.passable;
+	}
+	return result;
+}
+
+bool CompiledInfo::transparent() const
+{
+	bool result = true;
+	foreach(const Info & info, all_info) {
+		result = result && info.transparent;
+	}
+	return result;
+}
+

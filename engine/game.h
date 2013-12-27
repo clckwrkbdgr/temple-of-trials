@@ -4,6 +4,7 @@
 #include "monsters.h"
 #include "level.h"
 #include "message.h"
+#include "info.h"
 #include <map>
 #include <list>
 class Game;
@@ -38,6 +39,8 @@ struct Game {
 	void hurt(Monster & someone, int damage, bool pierce_armour = false);
 	void hit(Monster & someone, Monster & other, int damage);
 
+	CompiledInfo get_info(int x, int y) const;
+	CompiledInfo get_info(const Point & pos) const;
 	bool is_passable(int x, int y) const;
 	bool is_transparent(int x, int y) const;
 	int get_sprite_at(int x, int y) const;

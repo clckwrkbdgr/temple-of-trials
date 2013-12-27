@@ -173,6 +173,17 @@ Monster & Game::get_player()
 	return empty;
 }
 
+CompiledInfo Game::get_info(int x, int y) const
+{
+	CompiledInfo result(Point(x, y));
+	return result.in(level.monsters).in(level.items).in(level.objects).in(level.map);
+}
+
+CompiledInfo Game::get_info(const Point & pos) const
+{
+	return get_info(pos.x, pos.y);
+}
+
 bool Game::is_passable(int x, int y) const
 {
 	Point new_pos(x, y);
