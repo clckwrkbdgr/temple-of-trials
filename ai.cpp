@@ -70,6 +70,7 @@ Action * player_control(Monster & player, Game & game)
 			case '.': return new Wait();
 			case 'D': return new Drink(console.draw_and_get_direction(game));
 			case 'f': return new Fire(console.draw_and_get_direction(game));
+			case 'p': return new Put(console.draw_and_get_direction(game));
 			case 's': return new Swing(console.draw_and_get_direction(game));
 			case 'o': return new Open(console.draw_and_get_direction(game));
 			case 'c': return new Close(console.draw_and_get_direction(game));
