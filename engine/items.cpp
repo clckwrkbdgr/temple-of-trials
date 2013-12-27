@@ -42,6 +42,11 @@ bool Item::is_full() const
 	return type == full_type;
 }
 
+bool Item::is_empty() const
+{
+	return type == empty_type;
+}
+
 bool Item::make_full()
 {
 	if(is_emptyable()) {
@@ -177,6 +182,14 @@ bool Inventory::wear(unsigned slot)
 void Inventory::take_off()
 {
 	worn = NOTHING;
+}
+
+bool Inventory::has_item(unsigned slot) const
+{
+	if(slot < 0 || items.size() <= slot) {
+		return false;
+	}
+	return items[slot].valid();
 }
 
 const Item & Inventory::get_item(unsigned slot) const

@@ -576,7 +576,7 @@ TEST_FIXTURE(GameWithDummyWithItems, should_not_take_off_item_if_not_worn)
 struct GameWithDummyAndFood {
 	Game game;
 	const MonsterType * dummy_type;
-	enum { ARMOR, SPEAR, JUNK, FOOD, MEDKIT, MEGASPHERE, ANTIDOTE, EMPTY, NONE };
+	enum { ARMOR, SPEAR, JUNK, FOOD, MEDKIT, MEGASPHERE, ANTIDOTE, FULL_FLASK, EMPTY_FLASK, EMPTY, NONE };
 	GameWithDummyAndFood() {
 		game.level.map = Map(2, 2);
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
@@ -588,11 +588,13 @@ struct GameWithDummyAndFood {
 		const ItemType * medkit = game.item_types.insert(ItemType::Builder("medkit").sprite(4).name("medkit").edible().healing(5));
 		const ItemType * megasphere = game.item_types.insert(ItemType::Builder("megasphere").sprite(4).name("megasphere").edible().healing(100));
 		const ItemType * antidote = game.item_types.insert(ItemType::Builder("antidote").sprite(4).name("antidote").edible().antidote(5));
+		const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(7).name("water flask").edible());
+		const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(8).name("empty flask"));
 		game.level.monsters.push_back(
 				Monster::Builder(dummy_type).hp(90)
 				.item(armor).item(spear).wear(0).wield(1)
 				.item(junk).item(food).item(medkit).item(megasphere).item(antidote)
-				.item(Item())
+				.item(Item()).item(Item(full_flask, empty_flask)).item(Item::Builder(full_flask, empty_flask).make_empty())
 				);
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
@@ -631,6 +633,14 @@ TEST_FIXTURE(GameWithDummyAndFood, should_unwield_item_before_eating)
 	Eat action(SPEAR);
 	action.commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy eats spear.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_not_unwield_emptyable_item_when_eating)
+{
+	dummy().inventory.wield(FULL_FLASK);
+	Eat action(FULL_FLASK);
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats water flask.")("Water flask is empty now.").result);
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_eat_items)
@@ -672,6 +682,15 @@ TEST_FIXTURE(GameWithDummyAndFood, should_cure_poisoning_to_the_end_when_eating_
 	action.commit(dummy(), game);
 	EQUAL(dummy().poisoning, 0);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats antidote.")("Antidote cures poisoning.").result);
+}
+
+TEST_FIXTURE(GameWithDummyAndFood, should_make_flask_empty_after_eating_it_and_not_remove_it)
+{
+	Eat action(FULL_FLASK);
+	action.commit(dummy(), game);
+	ASSERT(dummy().inventory.has_item(FULL_FLASK));
+	ASSERT(dummy().inventory.get_item(FULL_FLASK).is_empty());
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats water flask.")("Water flask is empty now.").result);
 }
 
 

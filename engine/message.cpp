@@ -362,6 +362,11 @@ void Messages::is_empty(const Object & object)
 	message(format("{0} is empty.", object.type->name));
 }
 
+void Messages::is_empty_now(const Item & item)
+{
+	message(format("{0} is empty now.", item.type->name));
+}
+
 void Messages::is_locked(const Object & object)
 {
 	message(format("{0} is locked.", object.type->name));

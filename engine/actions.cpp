@@ -4,6 +4,7 @@
 #include "monsters.h"
 #include "cell.h"
 #include "util.h"
+#include "format.h"
 
 #define ACTION_ASSERT(condition, expression) \
 	do { if(!(condition)) { (expression); return; } } while(0)
@@ -223,18 +224,22 @@ void TakeOff::commit(Monster & someone, Game & game)
 void Eat::commit(Monster & someone, Game & game)
 {
 	ACTION_ASSERT(!someone.inventory.empty(), game.messages.nothing_to_eat(someone));
-	Item item = someone.inventory.get_item(slot);
+	Item & item = someone.inventory.get_item(slot);
 	ACTION_ASSERT(item.valid(), game.messages.no_such_object_in_inventory());
 	ACTION_ASSERT(item.type->edible, game.messages.cannot_be_eaten(item));
 	if(someone.inventory.wears(slot)) {
 		game.messages.takes_off(someone, someone.inventory.worn_item());
 		someone.inventory.take_off();
 	}
-	if(someone.inventory.wields(slot)) {
+	if(!item.is_emptyable() && someone.inventory.wields(slot)) {
 		game.messages.unwields(someone, someone.inventory.wielded_item());
 		someone.inventory.unwield();
 	}
 	game.messages.eats(someone, item);
+	if(item.is_emptyable()) {
+		game.messages.is_empty_now(item);
+		item.make_empty();
+	}
 	if(item.type->antidote > 0 && someone.poisoning > 0) {
 		someone.poisoning -= item.type->antidote;
 		someone.poisoning = std::max(0, someone.poisoning);
@@ -249,7 +254,9 @@ void Eat::commit(Monster & someone, Game & game)
 			game.messages.heals(item, someone);
 		}
 	}
-	someone.inventory.take_item(slot);
+	if(!item.is_emptyable()) {
+		someone.inventory.take_item(slot);
+	}
 }
 
 void GoUp::commit(Monster & someone, Game & game)

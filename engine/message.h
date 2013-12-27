@@ -48,6 +48,7 @@ struct Messages {
 	void hurts(const Monster & someone, int received_damage);
 	void is_closed(const Object & object);
 	void is_empty(const Object & object);
+	void is_empty_now(const Item & item);
 	void is_locked(const Object & object);
 	void no_such_object_in_inventory();
 	void nothing_to_close();

@@ -45,6 +45,7 @@ struct Item {
 
 	bool is_emptyable() const;
 	bool is_full() const;
+	bool is_empty() const;
 	bool make_full();
 	bool make_empty();
 
@@ -73,6 +74,7 @@ struct Inventory {
 	void clear();
 	unsigned size() const;
 	bool set_item(unsigned slot, const Item & item);
+	bool has_item(unsigned slot) const;
 	const Item & get_item(unsigned slot) const;
 	Item & get_item(unsigned slot);
 
