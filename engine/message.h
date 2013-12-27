@@ -60,6 +60,7 @@ struct Messages {
 	void nothing_to_throw(const Monster & someone);
 	void nothing_to_wear(const Monster & someone);
 	void nothing_to_wield(const Monster & someone);
+	void nothing_to_put(const Monster & someone);
 	void opened(const Monster & someone, const Object & object);
 	void picks_up(const Monster & someone, const Item & item, const CellType & cell);
 	void player_died();

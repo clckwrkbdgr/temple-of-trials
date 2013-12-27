@@ -317,6 +317,11 @@ void Messages::drinks(const Monster & someone, const Object & object)
 	}
 }
 
+void Messages::nothing_to_put(const Monster & someone)
+{
+	message(format("{0} have nothing to put.", someone.type->name));
+}
+
 void Messages::nothing_to_drop(const Monster & someone)
 {
 	message(format("{0} have nothing to drop.", someone.type->name));

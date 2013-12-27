@@ -26,6 +26,32 @@ struct GameWithDummy {
 	Monster & dummy() { return game.level.monsters[0]; }
 };
 
+struct GameWithDummyWieldingAndWearing {
+	Game game;
+	const MonsterType * dummy_type;
+	const MonsterType * stub_type;
+	GameWithDummyWieldingAndWearing() {
+		game.level.map = Map(2, 3);
+		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
+		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
+		stub_type = game.monster_types.insert(MonsterType::Builder("stub").name("stub").max_hp(100));
+		game.object_types.insert(ObjectType::Builder("door").name("door"));
+		game.object_types.insert(ObjectType::Builder("pot").name("pot").containable());
+		game.object_types.insert(ObjectType::Builder("well").name("well").drinkable());
+		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
+		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear"));
+		game.item_types.insert(ItemType::Builder("item").sprite(1).name("item"));
+		game.item_types.insert(ItemType::Builder("quest_item").sprite(1).name("item").quest());
+		game.item_types.insert(ItemType::Builder("stub").sprite(2).name("stub"));
+		const ItemType * jacket = game.item_types.insert(ItemType::Builder("jacket").sprite(1).name("jacket").wearable());
+
+		game.level.map.fill(game.cell_types.get("floor"));
+		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(Item(spear)).item(Item(armor)).wield(0).wear(1).item(jacket));
+	}
+	Monster & dummy() { return game.level.monsters[0]; }
+};
+
+
 SUITE(move) {
 
 TEST_FIXTURE(GameWithDummy, should_move_when_cell_is_empty)
@@ -259,6 +285,129 @@ TEST_FIXTURE(GameWithDummy, should_swing_at_nothing_at_empty_cell)
 	Swing action(Point(0, -1));
 	action.commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy swing at nothing.").result);
+}
+
+}
+
+SUITE(fire) {
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_throw_if_wields_nothing)
+{
+	dummy().inventory.unwield();
+	Fire action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy have nothing to throw.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_item_from_monster_when_thrown)
+{
+	Fire action(Point(0, -1));
+	action.commit(dummy(), game);
+	ASSERT(!dummy().inventory.get_item(0).valid());
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_from_monster_when_thrown)
+{
+	Fire action(Point(0, -1));
+	action.commit(dummy(), game);
+	ASSERT(!dummy().inventory.wielded_item().valid());
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_item_before_it)
+{
+	game.cell_types.insert(CellType::Builder("wall").name("wall").transparent(false));
+	game.level.map.set_cell_type(Point(1, 0), game.cell_types.get("wall"));
+	Fire action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hit wall.").result);
+	ASSERT(!game.level.items.empty());
+	EQUAL(game.level.items[0].pos, Point(1, 1));
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_impassable_object_and_drop_item_before_it)
+{
+	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)));
+	Fire action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hit door.").result);
+	ASSERT(!game.level.items.empty());
+	EQUAL(game.level.items[0].pos, Point(1, 1));
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_container_and_drop_item_in_it)
+{
+	game.level.objects.push_back(Object::Builder(game.object_types.get("pot")).pos(Point(1, 0)));
+	Fire action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear falls into pot.").result);
+	ASSERT(game.level.items.empty());
+	ASSERT(!game.level.objects[0].items.empty());
+	EQUAL(game.level.objects[0].items[0].type->name, "spear");
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_fountain_and_erase_item_forever)
+{
+	game.level.objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 0)));
+	Fire action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear falls into well. Forever lost.").result);
+	ASSERT(game.level.items.empty());
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_monster_and_drop_item_under_it)
+{
+	game.level.monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
+	Fire action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hits stub.")("Dummy hit stub for 3 hp.").result);
+	ASSERT(!game.level.items.empty());
+	EQUAL(game.level.items[0].pos, Point(1, 0));
+}
+
+}
+
+SUITE(put) {
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_put_if_wields_nothing)
+{
+	dummy().inventory.unwield();
+	Put action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy have nothing to put.").result);
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_item_from_monster_when_put)
+{
+	Put action(Point(0, -1));
+	action.commit(dummy(), game);
+	ASSERT(!dummy().inventory.get_item(0).valid());
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_from_monster_when_put)
+{
+	Put action(Point(0, -1));
+	action.commit(dummy(), game);
+	ASSERT(!dummy().inventory.wielded_item().valid());
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_on_the_floor_if_passable)
+{
+	Put action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy dropped spear on the floor.").result);
+	ASSERT(!game.level.items.empty());
+	EQUAL(game.level.items[0].pos, Point(1, 1));
+}
+
+TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_under_monster_if_target_is_impassable)
+{
+	game.cell_types.insert(CellType::Builder("wall").name("wall").transparent(false));
+	game.level.map.set_cell_type(Point(1, 1), game.cell_types.get("wall"));
+	Put action(Point(0, -1));
+	action.commit(dummy(), game);
+	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy dropped spear on the floor.").result);
+	ASSERT(!game.level.items.empty());
+	EQUAL(game.level.items[0].pos, Point(1, 2));
 }
 
 }

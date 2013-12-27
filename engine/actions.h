@@ -119,3 +119,8 @@ public:
 	virtual void commit(Monster & someone, Game & game);
 };
 
+class Put : public DirectedAction {
+public:
+	Put(const Point & shift) : DirectedAction(shift) {}
+	virtual void commit(Monster & someone, Game & game);
+};
