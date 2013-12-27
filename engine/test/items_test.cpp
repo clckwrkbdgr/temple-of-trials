@@ -3,6 +3,43 @@
 
 SUITE(inventory) {
 
+TEST(should_not_empty_not_emptyable_item)
+{
+	ItemType type = ItemType::Builder("test");
+	Item item = Item::Builder(&type);
+	bool ok = item.make_empty();
+	ASSERT(!ok);
+}
+
+TEST(should_not_fill_not_emptyable_item)
+{
+	ItemType type = ItemType::Builder("test");
+	Item item = Item::Builder(&type);
+	bool ok = item.make_full();
+	ASSERT(!ok);
+}
+
+TEST(item_should_be_of_empty_type_after_emptying)
+{
+	ItemType full_item = ItemType::Builder("full").sprite(1);
+	ItemType empty_item = ItemType::Builder("empty").sprite(2);
+	Item item = Item::Builder(&full_item, &empty_item).make_full();
+	bool ok = item.make_empty();
+	ASSERT(ok);
+	EQUAL(item.type, &empty_item);
+}
+
+TEST(item_should_be_of_full_type_after_filling)
+{
+	ItemType full_item = ItemType::Builder("full").sprite(1);
+	ItemType empty_item = ItemType::Builder("empty").sprite(2);
+	Item item = Item::Builder(&full_item, &empty_item).make_empty();
+	bool ok = item.make_full();
+	ASSERT(ok);
+	EQUAL(item.type, &full_item);
+}
+
+
 TEST(should_get_item)
 {
 	Inventory inventory;

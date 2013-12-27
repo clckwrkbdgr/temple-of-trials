@@ -2,7 +2,7 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 34, SAVEFILE_MINOR_VERSION = 0 };
+enum { SAVEFILE_MAJOR_VERSION = 34, SAVEFILE_MINOR_VERSION = 1 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -17,7 +17,11 @@ SAVEFILE_STORE_EXT(Cell, cell)
 
 SAVEFILE_STORE_EXT(Item, item)
 {
-	savefile.store_type(item.type).store(item.pos).store(item.key_type);
+	savefile.store_type(item.type);
+	if(savefile.version() >= 1) {
+		savefile.store_type(item.full_type).store_type(item.empty_type);
+	}
+	savefile.store(item.pos).store(item.key_type);
 }
 
 SAVEFILE_STORE_EXT(Object, object)

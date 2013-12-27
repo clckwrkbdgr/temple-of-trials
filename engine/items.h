@@ -35,20 +35,30 @@ struct ItemType::Builder {
 struct Item {
 	typedef ItemType Type;
 	TypePtr<Type> type;
+	TypePtr<Type> full_type, empty_type;
 
 	Point pos;
 	int key_type;
 	Item(const Type * item_type = 0);
+	Item(const Type * full_item_type, const Type * empty_item_type);
 	bool valid() const;
+
+	bool is_emptyable() const;
+	bool is_full() const;
+	bool make_full();
+	bool make_empty();
 
 	struct Builder;
 };
 struct Item::Builder {
 	Item result;
 	Builder(const Type * type) : result(type) {}
+	Builder(const Type * full_type, const Type * empty_type) : result(full_type, empty_type) {}
 	operator Item() { return result; }
 	Builder & pos(const Point & value);
 	Builder & key_type(int value);
+	Builder & make_full() { result.make_full(); return *this; }
+	Builder & make_empty() { result.make_empty(); return *this; }
 };
 
 struct Inventory {

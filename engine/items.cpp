@@ -22,10 +22,44 @@ Item::Item(const Type * item_type)
 {
 }
 
+Item::Item(const Type * full_item_type, const Type * empty_item_type)
+	: type(full_item_type), full_type(full_item_type), empty_type(empty_item_type), key_type(0)
+{
+}
+
 bool Item::valid() const
 {
 	return type.valid();
 }
+
+bool Item::is_emptyable() const
+{
+	return full_type.valid() && empty_type.valid();
+}
+
+bool Item::is_full() const
+{
+	return type == full_type;
+}
+
+bool Item::make_full()
+{
+	if(is_emptyable()) {
+		type = full_type;
+		return true;
+	}
+	return false;
+}
+
+bool Item::make_empty()
+{
+	if(is_emptyable()) {
+		type = empty_type;
+		return true;
+	}
+	return false;
+}
+
 
 Item::Builder & Item::Builder::pos(const Point & value) { result.pos = value; return *this; }
 Item::Builder & Item::Builder::key_type(int value) { result.key_type = value; return *this; }
