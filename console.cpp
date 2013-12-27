@@ -77,6 +77,7 @@ void Console::init_sprites()
 	sprites[Sprites::TRAP]          = std::make_pair('^', COLOR_PAIR(COLOR_YELLOW));
 	sprites[Sprites::SHARPENED_POLE] = std::make_pair('(', COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
 	sprites[Sprites::KEY]           = std::make_pair('*', COLOR_PAIR(COLOR_WHITE));
+	sprites[Sprites::FLASK]         = std::make_pair('}', COLOR_PAIR(COLOR_WHITE));
 }
 
 void Console::print_tile(int x, int y, int sprite)

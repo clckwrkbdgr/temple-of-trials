@@ -236,10 +236,6 @@ void Eat::commit(Monster & someone, Game & game)
 		someone.inventory.unwield();
 	}
 	game.messages.eats(someone, item);
-	if(item.is_emptyable()) {
-		game.messages.is_empty_now(item);
-		item.make_empty();
-	}
 	if(item.type->antidote > 0 && someone.poisoning > 0) {
 		someone.poisoning -= item.type->antidote;
 		someone.poisoning = std::max(0, someone.poisoning);
@@ -254,7 +250,10 @@ void Eat::commit(Monster & someone, Game & game)
 			game.messages.heals(item, someone);
 		}
 	}
-	if(!item.is_emptyable()) {
+	if(item.is_emptyable()) {
+		game.messages.is_empty_now(item);
+		item.make_empty();
+	} else {
 		someone.inventory.take_item(slot);
 	}
 }

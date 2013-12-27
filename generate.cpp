@@ -39,6 +39,8 @@ void LinearGenerator::create_types(Game & game)
 	antidote = game.item_types.insert(ItemType::Builder("antidote").sprite(Sprites::ANTIDOTE).name("antidote").edible().antidote(5));
 	apple = game.item_types.insert(ItemType::Builder("apple").sprite(Sprites::APPLE).name("apple").edible().healing(10));
 	key = game.item_types.insert(ItemType::Builder("key").sprite(Sprites::KEY).name("key"));
+	empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(Sprites::FLASK).name("empty flask"));
+	full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(Sprites::FLASK).name("water flask").edible().healing(5));
 }
 
 void LinearGenerator::generate(Level & level, int level_index)
@@ -68,15 +70,15 @@ void LinearGenerator::generate(Level & level, int level_index)
 	switch(level_index) {
 		case 1:
 			room_content
-				<< "^@<" << "a" << "%a"
-				<< "####^Aa" << "%Aa" << "&%AAa"
+				<< "^@}<" << "a" << "%a"
+				<< "####^Aa" << "%Aa" << "&%AAa}"
 				<< "&&(AAA" << "&&&&^%A%A" << "####AAAA>"
 				;
 			break;
 		case 2:
 			room_content
-				<< "&@<%" << "AAAV" << "########^^S%%"
-				<< "(SaAAA" << "V%%%" << "AAASS"
+				<< "&@<%}" << "AAAV" << "########^^S%%"
+				<< "(SaAAA" << "V%%%}" << "AAASS"
 				<< "&&&&~~~~~~~~~~~~{%" << "V[SSSAA%" << "####SSSSAAAA>"
 				;
 			break;
@@ -91,7 +93,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 			room_content
 				<< "@<" << std::string(32, '~') << std::string(32, '~')
 				<< std::string(32, '~') << std::string(32, '~') << std::string(32, '~')
-				<< std::string(32, '~') << std::string(32, '~') << std::string(32, '~')
+				<< std::string(32, '~') << std::string(32, '~') << "*";
 				;
 			break;
 	}
@@ -120,6 +122,7 @@ void LinearGenerator::generate(Level & level, int level_index)
 				case '(' : level.items.push_back(Item::Builder(spear).pos(pos)); break;
 				case '*' : level.items.push_back(Item::Builder(explosive).pos(pos)); break;
 				case '[' : level.items.push_back(Item::Builder(jacket).pos(pos)); break;
+				case '}' : level.items.push_back(Item::Builder(full_flask, empty_flask).pos(pos)); break;
 
 				case '{' : level.objects.push_back(Object::Builder(well).pos(pos)); break;
 				case '+' : level.objects.push_back(Object::Builder(closed_door, opened_door).pos(pos).opened(false)); break;

@@ -28,6 +28,7 @@ enum {
 	TRAP,
 	SHARPENED_POLE,
 	KEY,
+	FLASK,
 
 	COUNT
 };
