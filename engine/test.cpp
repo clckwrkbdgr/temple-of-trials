@@ -27,7 +27,7 @@ bool Test::specified(int argc, char ** argv) const
 	return false;
 }
 
-TestException::TestException(const char * ex_filename, int ex_linenumber, const std::string & message)
+AssertException::AssertException(const char * ex_filename, int ex_linenumber, const std::string & message)
 	: filename(ex_filename), line(ex_linenumber), what(message)
 {
 }
@@ -68,12 +68,12 @@ int run_all_tests(int argc, char ** argv)
 		test_name += std::string(test_name.empty() ? "" : " :: ") + test->name;
 		try {
 			test->run();
-		} catch(const TestException & e) {
+		} catch(const AssertException & e) {
 			ok = false;
 			exception_text = format("{0}:{1}: {2}", e.filename, e.line, e.what);
 		} catch(const std::exception & e) {
 			ok = false;
-			exception_text = format("{0}:{1}: {2}", test->filename, test->line, e.what());
+			exception_text = format("{0}:{1}: exception caught: {2}", test->filename, test->line, e.what());
 		} catch(...) {
 			ok = false;
 			exception_text = format("{0}:{1}: unknown exception", test->filename, test->line);

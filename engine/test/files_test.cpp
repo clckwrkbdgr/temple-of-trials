@@ -46,32 +46,24 @@ TEST(reader_should_throw_exception_when_major_version_is_wrong)
 {
 	std::istringstream in("1 2 ");
 	Reader reader(in);
-	try {
-		reader.version(2, 2);
-	} catch(Reader::Exception & e) {
+	EXPECT_EXCEPTION(reader.version(2, 2), Reader::Exception, e) {
 		EQUAL(
 				e.message,
 				"Savefile has major version 1, which is incompatible with current program savefile major version 2."
 			 );
-		return;
 	}
-	FAIL("no exception");
 }
 
 TEST(reader_should_throw_exception_when_minor_version_is_less)
 {
 	std::istringstream in("1 2 ");
 	Reader reader(in);
-	try {
-		reader.version(1, 1);
-	} catch(Reader::Exception & e) {
+	EXPECT_EXCEPTION(reader.version(1, 1), Reader::Exception, e) {
 		EQUAL(
 				e.message,
 				"Savefile has minor version 2, which is incompatible with current program savefile minor version 1."
 			 );
-		return;
 	}
-	FAIL("no exception");
 }
 
 TEST(reader_should_throw_exception_when_stream_is_bad)
@@ -80,16 +72,12 @@ TEST(reader_should_throw_exception_when_stream_is_bad)
 	Reader reader(in);
 	int i;
 	reader.store(i);
-	try {
-		reader.check("test");
-	} catch(Reader::Exception & e) {
+	EXPECT_EXCEPTION(reader.check("test"), Reader::Exception, e) {
 		EQUAL(
 				e.message,
 				"Error: savefile is corrupted (reading test) ."
 			 );
-		return;
 	}
-	FAIL("no exception");
 }
 
 TEST(reader_should_read_int)
