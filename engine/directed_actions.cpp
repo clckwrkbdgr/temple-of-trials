@@ -15,7 +15,7 @@ void Move::commit(Monster & someone, Game & game)
 		game.messages.bumps_into(someone, object);
 		return;
 	}
-	if(game.cell_type_at(new_pos).passable) {
+	if(!game.cell_type_at(new_pos).passable) {
 		game.messages.bumps_into(someone, game.cell_type_at(new_pos));
 		return;
 	}

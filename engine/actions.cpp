@@ -22,7 +22,7 @@ void Action::assert(bool expression, unsigned exception_type, const Info & subje
 void Drop::commit(Monster & someone, Game & game)
 {
 	assert(!someone.inventory.empty(), NOTHING_TO_DROP, someone);
-	assert(someone.inventory.get_item(slot).valid(), NO_SUCH_ITEM_IN_INVENTORY, someone);
+	assert(someone.inventory.get_item(slot).valid(), NO_SUCH_ITEM, someone);
 	if(someone.inventory.wields(slot)) {
 		game.messages.unwields(someone, someone.inventory.wielded_item());
 		someone.inventory.unwield();
@@ -43,7 +43,7 @@ void Grab::commit(Monster & someone, Game & game)
 	Item item = find_at(game.level.items, someone.pos, &item_index);
 	assert(item.valid(), NOTHING_TO_GRAB, someone);
 	unsigned slot = someone.inventory.insert(item);
-	assert(slot != Inventory::NOTHING, NO_SPACE_LEFT_IN_INVENTORY, someone);
+	assert(slot != Inventory::NOTHING, NO_SPACE_LEFT, someone);
 	game.level.items.erase(item_index);
 	game.messages.picks_up(someone, item, game.cell_type_at(someone.pos));
 	if(item.type->quest) {
@@ -54,7 +54,7 @@ void Grab::commit(Monster & someone, Game & game)
 void Wield::commit(Monster & someone, Game & game)
 {
 	assert(!someone.inventory.empty(), NOTHING_TO_WIELD, someone);
-	assert(someone.inventory.get_item(slot).valid(), NO_SUCH_ITEM_IN_INVENTORY, someone);
+	assert(someone.inventory.get_item(slot).valid(), NO_SUCH_ITEM, someone);
 	if(someone.inventory.wielded_item().valid()) {
 		game.messages.unwields(someone, someone.inventory.wielded_item());
 		someone.inventory.unwield();
@@ -79,7 +79,7 @@ void Wear::commit(Monster & someone, Game & game)
 {
 	assert(!someone.inventory.empty(), NOTHING_TO_WEAR, someone);
 	const Item & item = someone.inventory.get_item(slot);
-	assert(item.valid(), NO_SUCH_ITEM_IN_INVENTORY, someone);
+	assert(item.valid(), NO_SUCH_ITEM, someone);
 	assert(item.type->wearable, CANNOT_WEAR, someone, item);
 	if(someone.inventory.wields(slot)) {
 		game.messages.unwields(someone, someone.inventory.wielded_item());
@@ -105,7 +105,7 @@ void Eat::commit(Monster & someone, Game & game)
 {
 	assert(!someone.inventory.empty(), NOTHING_TO_EAT, someone);
 	Item & item = someone.inventory.get_item(slot);
-	assert(item.valid(), NO_SUCH_ITEM_IN_INVENTORY, someone);
+	assert(item.valid(), NO_SUCH_ITEM, someone);
 	assert(item.type->edible, CANNOT_EAT, someone, item);
 	if(someone.inventory.wears(slot)) {
 		game.messages.takes_off(someone, someone.inventory.worn_item());

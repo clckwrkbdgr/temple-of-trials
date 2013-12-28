@@ -77,7 +77,7 @@ void test_equal_containers(const ContainerA & a, const ContainerB & b, const cha
 #define ASSERT(expression) \
 	do { if(!(expression)) { throw AssertException(__FILE__, __LINE__, "failed assertion: " #expression ); } } while(0)
 
-#define EXPECT_EXCEPTION(expression, exception_class, exception_variable) \
+#define CATCH(expression, exception_class, exception_variable) \
 	try { \
 		do { (expression); } while(0); \
 		throw AssertException(__FILE__, __LINE__, "expected exception " #exception_class " was not thrown"); \

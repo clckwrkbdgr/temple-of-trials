@@ -136,45 +136,41 @@ using namespace ActionsFixture;
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_drop_if_nothing_to_drop)
 {
 	dummy().inventory.clear();
-	Drop action(0);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy have nothing to drop.").result);
+	CATCH(Drop(0).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NOTHING_TO_DROP);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_drop_items_only_in_range)
 {
-	Drop action(4);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("No such object.").result);
+	CATCH(Drop(4).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NO_SUCH_ITEM);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_dropping)
 {
-	Drop action(0);
-	action.commit(dummy(), game);
+	Drop(0).commit(dummy(), game);
 	ASSERT(!dummy().inventory.wielded_item().valid());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy dropped spear on the floor.").result);
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_before_dropping)
 {
-	Drop action(1);
-	action.commit(dummy(), game);
+	Drop(1).commit(dummy(), game);
 	ASSERT(!dummy().inventory.worn_item().valid());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy dropped armor on the floor.").result);
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_item_from_inventory_when_dropped)
 {
-	Drop action(0);
-	action.commit(dummy(), game);
+	Drop(0).commit(dummy(), game);
 	ASSERT(!dummy().inventory.get_item(0).valid());
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_place_item_on_the_floor_when_dropped)
 {
-	Drop action(0);
-	action.commit(dummy(), game);
+	Drop(0).commit(dummy(), game);
 	EQUAL(game.level.items.size(), 1);
 	EQUAL(game.level.items[0].type->name, "spear");
 }
@@ -187,16 +183,15 @@ using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_if_floor_is_empty)
 {
-	Grab action;
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Nothing here to pick up.").result);
+	CATCH(Grab().commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NOTHING_TO_GRAB);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_grabbed_item_to_the_first_empty_slot)
 {
 	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
-	Grab action;
-	action.commit(dummy(), game);
+	Grab().commit(dummy(), game);
 	EQUAL(dummy().inventory.get_item(4).type->name, "item");
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy picked up item from the floor.").result);
 }
@@ -204,16 +199,14 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_grabbed_item_to_the_fir
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_grabbed_item_from_map)
 {
 	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
-	Grab action;
-	action.commit(dummy(), game);
+	Grab().commit(dummy(), game);
 	ASSERT(game.level.items.empty());
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_notify_if_quest_item)
 {
 	game.level.items.push_back(Item::Builder(game.item_types.get("quest_item")).pos(Point(1, 2)));
-	Grab action;
-	action.commit(dummy(), game);
+	Grab().commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy picked up item from the floor.")("Now bring it back to the surface!").result);
 }
 
@@ -223,9 +216,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_item_if_inventory_
 		dummy().inventory.insert(Item(game.item_types.get("stub")));
 	}
 	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
-	Grab action;
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy carry too much items.").result);
+	CATCH(Grab().commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NO_SPACE_LEFT);
+	}
 }
 
 }
@@ -236,38 +229,35 @@ using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWithItems, should_wield_any_item)
 {
-	Wield action(0);
-	action.commit(dummy(), game);
+	Wield(0).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy wields spear.").result);
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wield_invalid_slot)
 {
-	Wield action(10);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("No such object.").result);
+	CATCH(Wield(10).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NO_SUCH_ITEM);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wield_empty_slot)
 {
-	Wield action(2);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("No such object.").result);
+	CATCH(Wield(2).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NO_SUCH_ITEM);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_previous_item_before_wielding_new)
 {
 	ItemType sword = ItemType::Builder("sword").sprite(1).name("sword");
 	dummy().inventory.set_item(2, Item(&sword));
-	Wield action(2);
-	action.commit(dummy(), game);
+	Wield(2).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy wields sword.").result);
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_before_wielding_it)
 {
-	Wield action(1);
-	action.commit(dummy(), game);
+	Wield(1).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy takes off armor.")("Dummy wields armor.").result);
 }
 
@@ -279,16 +269,15 @@ using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_if_wielded)
 {
-	Unwield action;
-	action.commit(dummy(), game);
+	Unwield().commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields spear.").result);
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_unwield_item_if_not_wielded)
 {
-	Unwield action;
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy is wielding nothing.").result);
+	CATCH(Unwield().commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NOTHING_TO_UNWIELD);
+	}
 }
 
 }
@@ -299,44 +288,42 @@ using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWithItems, should_wear_any_item)
 {
-	Wear action(1);
-	action.commit(dummy(), game);
+	Wear(1).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy wear armor.").result);
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wear_invalid_slot)
 {
-	Wear action(10);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("No such object.").result);
+	CATCH(Wear(10).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NO_SUCH_ITEM);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wear_empty_slot)
 {
-	Wear action(2);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("No such object.").result);
+	CATCH(Wear(2).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NO_SUCH_ITEM);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wear_unwearable_item)
 {
-	Wear action(3);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Pot cannot be worn.").result);
+	CATCH(Wear(3).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::CANNOT_WEAR);
+		EQUAL(e.object.name, "pot");
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_previous_item_before_wearing_new)
 {
-	Wear action(2);
-	action.commit(dummy(), game);
+	Wear(2).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy wear jacket.").result);
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_wearing_it)
 {
 	dummy().inventory.wield(2);
-	Wear action(2);
-	action.commit(dummy(), game);
+	Wear(2).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields jacket.")("Dummy takes off armor.")("Dummy wear jacket.").result);
 }
 
@@ -348,16 +335,15 @@ using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_if_worn)
 {
-	TakeOff action;
-	action.commit(dummy(), game);
+	TakeOff().commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy takes off armor.").result);
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_take_off_item_if_not_worn)
 {
-	TakeOff action;
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy is wearing nothing.").result);
+	CATCH(TakeOff().commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NOTHING_TO_TAKE_OFF);
+	}
 }
 
 }
@@ -368,66 +354,61 @@ using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_invalid_slot)
 {
-	Eat action(NONE);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("No such object.").result);
+	CATCH(Eat(NONE).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NO_SUCH_ITEM);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_empty_slot)
 {
-	Eat action(EMPTY);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("No such object.").result);
+	CATCH(Eat(EMPTY).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::NO_SUCH_ITEM);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_not_edible_item)
 {
-	Eat action(JUNK);
-	action.commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Junk isn't edible.").result);
+	CATCH(Eat(JUNK).commit(dummy(), game), Action::Exception, e) {
+		EQUAL(e.type, Action::CANNOT_EAT);
+		EQUAL(e.object.name, "junk");
+	}
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_take_off_item_before_eating)
 {
-	Eat action(ARMOR);
-	action.commit(dummy(), game);
+	Eat(ARMOR).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy eats armor.").result);
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_unwield_item_before_eating)
 {
-	Eat action(SPEAR);
-	action.commit(dummy(), game);
+	Eat(SPEAR).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy eats spear.").result);
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_not_unwield_emptyable_item_when_eating)
 {
 	dummy().inventory.wield(FULL_FLASK);
-	Eat action(FULL_FLASK);
-	action.commit(dummy(), game);
+	Eat(FULL_FLASK).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats water flask.")("Water flask is empty now.").result);
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_eat_items)
 {
-	Eat action(FOOD);
-	action.commit(dummy(), game);
+	Eat(FOOD).commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats food.").result);
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_heal_when_eating_healing_item)
 {
-	Eat action(MEDKIT);
-	action.commit(dummy(), game);
+	Eat(MEDKIT).commit(dummy(), game);
 	EQUAL(dummy().hp, 95);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats medkit.")("Medkit heals dummy.").result);
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_heal_up_to_max_hp_when_eating_healing_item)
 {
-	Eat action(MEGASPHERE);
-	action.commit(dummy(), game);
+	Eat(MEGASPHERE).commit(dummy(), game);
 	EQUAL(dummy().hp, 100);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats megasphere.")("Megasphere heals dummy.").result);
 }
@@ -435,8 +416,7 @@ TEST_FIXTURE(GameWithDummyAndFood, should_heal_up_to_max_hp_when_eating_healing_
 TEST_FIXTURE(GameWithDummyAndFood, should_cure_poisoning_when_eating_antidote)
 {
 	dummy().poisoning = 10;
-	Eat action(ANTIDOTE);
-	action.commit(dummy(), game);
+	Eat(ANTIDOTE).commit(dummy(), game);
 	EQUAL(dummy().poisoning, 5);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats antidote.")("Antidote cures poisoning a little.").result);
 }
@@ -444,16 +424,14 @@ TEST_FIXTURE(GameWithDummyAndFood, should_cure_poisoning_when_eating_antidote)
 TEST_FIXTURE(GameWithDummyAndFood, should_cure_poisoning_to_the_end_when_eating_antidote)
 {
 	dummy().poisoning = 5;
-	Eat action(ANTIDOTE);
-	action.commit(dummy(), game);
+	Eat(ANTIDOTE).commit(dummy(), game);
 	EQUAL(dummy().poisoning, 0);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats antidote.")("Antidote cures poisoning.").result);
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_make_flask_empty_after_eating_it_and_not_remove_it)
 {
-	Eat action(FULL_FLASK);
-	action.commit(dummy(), game);
+	Eat(FULL_FLASK).commit(dummy(), game);
 	ASSERT(dummy().inventory.has_item(FULL_FLASK));
 	ASSERT(dummy().inventory.get_item(FULL_FLASK).is_empty());
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy eats water flask.")("Water flask is empty now.").result);
@@ -468,16 +446,14 @@ using namespace ActionsFixture;
 TEST_FIXTURE(GameWithDummyAndStairs, should_go_up_on_upstairs)
 {
 	stairs().up_destination = 1;
-	GoUp action;
-	action.commit(dummy(), game);
+	GoUp().commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy goes up.").result);
 }
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_send_to_quest_on_upstairs_to_the_surface)
 {
 	stairs().up_destination = -1;
-	GoUp action;
-	action.commit(dummy(), game);
+	GoUp().commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy must complete mission in order to go back to the surface.").result);
 }
 
@@ -485,8 +461,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_upstairs_when_have_quest
 {
 	dummy().inventory.insert(Item(game.item_types.get("yendor")));
 	stairs().up_destination = -1;
-	GoUp action;
-	action.commit(dummy(), game);
+	GoUp().commit(dummy(), game);
 	EQUAL(game.state, Game::COMPLETED);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy have brought Yendor to the surface. Yay! Game if finished.").result);
 }
@@ -494,8 +469,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_upstairs_when_have_quest
 TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_going_up)
 {
 	stairs().up_destination = 1;
-	GoUp action;
-	action.commit(dummy(), game);
+	GoUp().commit(dummy(), game);
 	ASSERT(generator.was_generated());
 }
 
@@ -508,16 +482,14 @@ using namespace ActionsFixture;
 TEST_FIXTURE(GameWithDummyAndStairs, should_go_down_on_downstairs)
 {
 	stairs().down_destination = 1;
-	GoDown action;
-	action.commit(dummy(), game);
+	GoDown().commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy goes down.").result);
 }
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_send_to_quest_on_downstairs_to_the_surface)
 {
 	stairs().down_destination = -1;
-	GoDown action;
-	action.commit(dummy(), game);
+	GoDown().commit(dummy(), game);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy must complete mission in order to go back to the surface.").result);
 }
 
@@ -525,8 +497,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_downstairs_when_have_que
 {
 	dummy().inventory.insert(Item(game.item_types.get("yendor")));
 	stairs().down_destination = -1;
-	GoDown action;
-	action.commit(dummy(), game);
+	GoDown().commit(dummy(), game);
 	EQUAL(game.state, Game::COMPLETED);
 	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy have brought Yendor to the surface. Yay! Game if finished.").result);
 }
@@ -534,8 +505,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_downstairs_when_have_que
 TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_going_down)
 {
 	stairs().down_destination = 1;
-	GoDown action;
-	action.commit(dummy(), game);
+	GoDown().commit(dummy(), game);
 	ASSERT(generator.was_generated());
 }
 
