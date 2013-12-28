@@ -23,6 +23,39 @@ void Messages::message(const std::string & text)
 	}
 }
 
+void Messages::message(const Action::Exception & e)
+{
+	switch(e.type) {
+		case Action::ALREADY_CLOSED: message(format("{0} is already closed.", e.subject.name)); break;
+		case Action::ALREADY_FULL: message(format("{0} is already full.", e.subject.name)); break;
+		case Action::ALREADY_OPENED: message(format("{0} is already opened.", e.subject.name)); break;
+		case Action::CANNOT_DRINK: message(format("{0} cannot drink {1}", e.subject.name, e.object.name)); break;
+		case Action::CANNOT_EAT: message(format("{0} is not edible.", e.object.name)); break;
+		case Action::CANNOT_GO_DOWN: message(format("{0} cannot go down there.", e.subject.name)); break;
+		case Action::CANNOT_GO_UP: message(format("{0} cannot go up there.", e.subject.name)); break;
+		case Action::CANNOT_WEAR: message(format("{0} cannot wear {1}.", e.subject.name, e.object.name)); break;
+		case Action::LOCKED: message(format("{0} is locked.", e.subject.name)); break;
+		case Action::NOTHING_TO_CLOSE: message("There is nothing to close there."); break;
+		case Action::NOTHING_TO_DRINK: message("There is nothing to drink there."); break;
+		case Action::NOTHING_TO_DROP: message(format("{0} has nothing to drop.", e.subject.name)); break;
+		case Action::NOTHING_TO_EAT: message(format("{0} has nothing to eat.", e.subject.name)); break;
+		case Action::NOTHING_TO_GRAB: message("There is nothing to grab there."); break;
+		case Action::NOTHING_TO_OPEN: message("There is nothing to open there."); break;
+		case Action::NOTHING_TO_TAKE_OFF: message(format("{0} have nothing to take off.", e.subject.name)); break;
+		case Action::NOTHING_TO_UNWIELD: message(format("{0} have nothing to unwield.", e.subject.name)); break;
+		case Action::NOTHING_TO_WEAR: message(format("{0} has nothing to drop.", e.subject.name)); break;
+		case Action::NOTHING_TO_WIELD: message(format("{0} has nothing to drop.", e.subject.name)); break;
+		case Action::NOTHING_TO_PUT: message(format("{0} have nothing to put down.", e.subject.name)); break;
+		case Action::NOTHING_TO_THROW: message(format("{0} have nothing to throw.", e.subject.name)); break;
+		case Action::NO_SPACE_LEFT: message(format("{0} carries too much items.", e.subject.name)); break;
+		case Action::NO_SUCH_ITEM: message("No such item."); break;
+		case Action::HAS_NO_ITEMS: message(format("{0} is totally empty.", e.subject.name)); break;
+		default:
+			throw e;
+	}
+}
+
+
 void Messages::terrain_hurts()
 {
 	message("It hurts!");

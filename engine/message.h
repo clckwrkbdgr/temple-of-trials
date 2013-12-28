@@ -1,11 +1,11 @@
 #pragma once
+#include "actions.h"
 #include <vector>
 #include <string>
 class Object;
 class Item;
 class Monster;
 class CellType;
-class ActionException;
 
 struct Messages {
 	bool log_messages;
@@ -13,7 +13,7 @@ struct Messages {
 
 	Messages();
 	void message(const std::string & text);
-	void message(const ActionException & e);
+	void message(const Action::Exception & e);
 
 
 	void already_closed(const Object & object);

@@ -33,7 +33,11 @@ void Game::run(ControllerFactory controller_factory)
 			invalidate_fov(monster);
 			Action * action = controller(monster, *this);
 			if(action) {
-				action->commit(monster, *this);
+				try {
+					action->commit(monster, *this);
+				} catch(const Action::Exception & e) {
+					messages.message(e);
+				}
 				delete action;
 				action = 0;
 			}
