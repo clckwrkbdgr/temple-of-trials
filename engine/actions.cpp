@@ -6,10 +6,23 @@
 #include "util.h"
 #include "format.h"
 
+Action::Exception::Exception(unsigned exception_type, const Info & action_subject, const Info & action_object)
+	: type(exception_type), subject(action_subject), object(action_object)
+{
+}
+
+void Action::assert(bool expression, unsigned exception_type, const Info & subject, const Info & object)
+{
+	if(!expression) {
+		throw Exception(exception_type, subject, object);
+	}
+}
+
+
 void Drop::commit(Monster & someone, Game & game)
 {
-	ACTION_ASSERT(!someone.inventory.empty(), game.messages.nothing_to_drop(someone));
-	ACTION_ASSERT(someone.inventory.get_item(slot).valid(), game.messages.no_such_object_in_inventory());
+	assert(!someone.inventory.empty(), NOTHING_TO_DROP, someone);
+	assert(someone.inventory.get_item(slot).valid(), NO_SUCH_ITEM_IN_INVENTORY, someone);
 	if(someone.inventory.wields(slot)) {
 		game.messages.unwields(someone, someone.inventory.wielded_item());
 		someone.inventory.unwield();
@@ -28,9 +41,9 @@ void Grab::commit(Monster & someone, Game & game)
 {
 	std::vector<Item>::iterator item_index;
 	Item item = find_at(game.level.items, someone.pos, &item_index);
-	ACTION_ASSERT(item.valid(), game.messages.nothing_to_pick_up());
+	assert(item.valid(), NOTHING_TO_GRAB, someone);
 	unsigned slot = someone.inventory.insert(item);
-	ACTION_ASSERT(slot != Inventory::NOTHING, game.messages.carries_too_much_items(someone));
+	assert(slot != Inventory::NOTHING, NO_SPACE_LEFT_IN_INVENTORY, someone);
 	game.level.items.erase(item_index);
 	game.messages.picks_up(someone, item, game.cell_type_at(someone.pos));
 	if(item.type->quest) {
@@ -40,8 +53,8 @@ void Grab::commit(Monster & someone, Game & game)
 
 void Wield::commit(Monster & someone, Game & game)
 {
-	ACTION_ASSERT(!someone.inventory.empty(), game.messages.nothing_to_wield(someone));
-	ACTION_ASSERT(someone.inventory.get_item(slot).valid(), game.messages.no_such_object_in_inventory());
+	assert(!someone.inventory.empty(), NOTHING_TO_WIELD, someone);
+	assert(someone.inventory.get_item(slot).valid(), NO_SUCH_ITEM_IN_INVENTORY, someone);
 	if(someone.inventory.wielded_item().valid()) {
 		game.messages.unwields(someone, someone.inventory.wielded_item());
 		someone.inventory.unwield();
@@ -57,17 +70,17 @@ void Wield::commit(Monster & someone, Game & game)
 void Unwield::commit(Monster & someone, Game & game)
 {
 	const Item & item = someone.inventory.wielded_item();
-	ACTION_ASSERT(item.valid(), game.messages.wields_nothing(someone));
+	assert(item.valid(), NOTHING_TO_UNWIELD, someone);
 	game.messages.unwields(someone, item);
 	someone.inventory.unwield();
 }
 
 void Wear::commit(Monster & someone, Game & game)
 {
-	ACTION_ASSERT(!someone.inventory.empty(), game.messages.nothing_to_wear(someone));
+	assert(!someone.inventory.empty(), NOTHING_TO_WEAR, someone);
 	const Item & item = someone.inventory.get_item(slot);
-	ACTION_ASSERT(item.valid(), game.messages.no_such_object_in_inventory());
-	ACTION_ASSERT(item.type->wearable, game.messages.cannot_be_worn(item));
+	assert(item.valid(), NO_SUCH_ITEM_IN_INVENTORY, someone);
+	assert(item.type->wearable, CANNOT_WEAR, someone, item);
 	if(someone.inventory.wields(slot)) {
 		game.messages.unwields(someone, someone.inventory.wielded_item());
 		someone.inventory.unwield();
@@ -83,17 +96,17 @@ void Wear::commit(Monster & someone, Game & game)
 void TakeOff::commit(Monster & someone, Game & game)
 {
 	const Item & item = someone.inventory.worn_item();
-	ACTION_ASSERT(item.valid(), game.messages.wears_nothing(someone));
+	assert(item.valid(), NOTHING_TO_TAKE_OFF, someone);
 	game.messages.takes_off(someone, item);
 	someone.inventory.unwield();
 }
 
 void Eat::commit(Monster & someone, Game & game)
 {
-	ACTION_ASSERT(!someone.inventory.empty(), game.messages.nothing_to_eat(someone));
+	assert(!someone.inventory.empty(), NOTHING_TO_EAT, someone);
 	Item & item = someone.inventory.get_item(slot);
-	ACTION_ASSERT(item.valid(), game.messages.no_such_object_in_inventory());
-	ACTION_ASSERT(item.type->edible, game.messages.cannot_be_eaten(item));
+	assert(item.valid(), NO_SUCH_ITEM_IN_INVENTORY, someone);
+	assert(item.type->edible, CANNOT_EAT, someone, item);
 	if(someone.inventory.wears(slot)) {
 		game.messages.takes_off(someone, someone.inventory.worn_item());
 		someone.inventory.take_off();
@@ -128,7 +141,7 @@ void Eat::commit(Monster & someone, Game & game)
 void GoUp::commit(Monster & someone, Game & game)
 {
     Object & object = find_at(game.level.objects, someone.pos);
-	ACTION_ASSERT(object.valid() && object.type->transporting && object.up_destination, game.messages.cannot_go_up(someone));
+	assert(object.valid() && object.type->transporting && object.up_destination, CANNOT_GO_UP, someone);
 	if(object.is_exit_up()) {
 		const Item & quest_item = someone.inventory.quest_item();
 		if(quest_item.valid()) {
@@ -146,7 +159,7 @@ void GoUp::commit(Monster & someone, Game & game)
 void GoDown::commit(Monster & someone, Game & game)
 {
     Object & object = find_at(game.level.objects, someone.pos);
-	ACTION_ASSERT(object.valid() && object.type->transporting && object.down_destination, game.messages.cannot_go_down(someone));
+	assert(object.valid() && object.type->transporting && object.down_destination, CANNOT_GO_DOWN, someone);
 	if(object.is_exit_down()) {
 		const Item & quest_item = someone.inventory.quest_item();
 		if(quest_item.valid()) {
