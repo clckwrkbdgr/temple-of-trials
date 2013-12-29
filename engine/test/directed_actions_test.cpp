@@ -95,7 +95,10 @@ TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_cell)
 	game.cell_types.insert(CellType::Builder("floor").name("wall").passable(false));
 	Move(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into the wall.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::BUMPS_INTO);
+		EQUAL(e.target.name, "wall");
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_not_move_into_monster)
@@ -103,7 +106,10 @@ TEST_FIXTURE(GameWithDummy, should_not_move_into_monster)
 	game.level.monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
 	Move(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into stub.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::BUMPS_INTO);
+		EQUAL(e.target.name, "stub");
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_object)
@@ -111,7 +117,10 @@ TEST_FIXTURE(GameWithDummy, should_not_move_into_impassable_object)
 	game.level.objects.push_back(Object::Builder(game.object_types.get("stub")).pos(Point(1, 0)));
 	Move(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy bump into stub.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::BUMPS_INTO);
+		EQUAL(e.target.name, "stub");
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_move_into_opened_object)
@@ -126,7 +135,10 @@ TEST_FIXTURE(GameWithDummy, should_not_move_into_closed_object)
 	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
 	Move(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
-	EQUAL(game.messages.messages, MakeVector<std::string>("Door is closed.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::BUMPS_INTO);
+		EQUAL(e.target.name, "door");
+	} DONE(e);
 }
 
 }
@@ -162,7 +174,9 @@ TEST_FIXTURE(GameWithDummy, should_drink_fountains)
 {
 	game.level.objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 0)));
 	Drink(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy drink from well.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::DRINKS);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_heal_from_fountains)
@@ -171,7 +185,11 @@ TEST_FIXTURE(GameWithDummy, should_heal_from_fountains)
 	dummy().hp -= 5;
 	Drink(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().hp, 96);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy drink from well. It helps a bit.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::DRINKS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::HEALS);
+	} DONE(e);
 }
 
 }
@@ -195,7 +213,9 @@ TEST_FIXTURE(GameWithDummy, should_open_closed_doors)
 	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
 	Open(Point(0, -1)).commit(dummy(), game);
 	ASSERT(game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy opened the door.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::OPENS);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_not_open_locked_doors_without_a_key)
@@ -216,7 +236,11 @@ TEST_FIXTURE(GameWithDummy, should_open_locked_doors_with_a_key)
 	Open(Point(0, -1)).commit(dummy(), game);
 	ASSERT(!game.level.objects[0].locked);
 	ASSERT(game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unlocked the door.")("Dummy opened the door.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::UNLOCKS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::OPENS);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_not_open_empty_cell)
@@ -233,7 +257,9 @@ TEST_FIXTURE(GameWithDummy, should_open_containers_and_drop_items)
 	Open(Point(0, -1)).commit(dummy(), game);
 	EQUAL(game.level.items[0].type, item.type);
 	ASSERT(game.level.objects[0].items.empty());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy took up a item from pot.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::TAKES_FROM);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_not_open_empty_containers)
@@ -258,7 +284,9 @@ TEST_FIXTURE(GameWithDummy, should_close_opened_doors)
 	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
 	Close(Point(0, -1)).commit(dummy(), game);
 	ASSERT(!game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy closed the door.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::CLOSES);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_not_close_already_closed_doors)
@@ -288,7 +316,9 @@ TEST_FIXTURE(GameWithDummy, should_hit_impassable_cells_on_swing)
 	game.cell_types.insert(CellType::Builder("wall").name("wall").passable(false));
 	game.level.map.set_cell_type(Point(1, 0), game.cell_types.get("wall"));
 	Swing(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy hit wall.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::HITS);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_open_closed_doors_on_swing)
@@ -296,20 +326,30 @@ TEST_FIXTURE(GameWithDummy, should_open_closed_doors_on_swing)
 	game.level.objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
 	Swing(Point(0, -1)).commit(dummy(), game);
 	ASSERT(game.level.objects[0].opened());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy swing at door.")("Dummy opened the door.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::HITS);
+		EQUAL(e.target.name, "door");
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::OPENS);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_hit_monsters_on_swing)
 {
 	game.level.monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
 	Swing(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy hit stub for 0 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::HITS_FOR_HEALTH);
+		EQUAL(e.amount, 0);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_swing_at_nothing_at_empty_cell)
 {
 	Swing(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy swing at nothing.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::SWINGS_AT_NOTHING);
+	} DONE(e);
 }
 
 }
@@ -343,7 +383,12 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_it
 	game.cell_types.insert(CellType::Builder("wall").name("wall").transparent(false));
 	game.level.map.set_cell_type(Point(1, 0), game.cell_types.get("wall"));
 	Fire(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hit wall.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::THROWS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::HITS);
+		EQUAL(e.actor.name, "spear");
+	} DONE(e);
 	ASSERT(!game.level.items.empty());
 	EQUAL(game.level.items[0].pos, Point(1, 1));
 }
@@ -352,7 +397,12 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_impassable_object_and_d
 {
 	game.level.objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)));
 	Fire(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hit door.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::THROWS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::HITS);
+		EQUAL(e.actor.name, "spear");
+	} DONE(e);
 	ASSERT(!game.level.items.empty());
 	EQUAL(game.level.items[0].pos, Point(1, 1));
 }
@@ -361,7 +411,12 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_container_and_drop_item
 {
 	game.level.objects.push_back(Object::Builder(game.object_types.get("pot")).pos(Point(1, 0)));
 	Fire(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear falls into pot.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::THROWS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::FALLS_INTO);
+		EQUAL(e.actor.name, "spear");
+	} DONE(e);
 	ASSERT(game.level.items.empty());
 	ASSERT(!game.level.objects[0].items.empty());
 	EQUAL(game.level.objects[0].items[0].type->name, "spear");
@@ -371,7 +426,12 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_fountain_and_erase_item
 {
 	game.level.objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 0)));
 	Fire(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear falls into well. Forever lost.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::THROWS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::FALLS_INTO);
+		EQUAL(e.actor.name, "spear");
+	} DONE(e);
 	ASSERT(game.level.items.empty());
 }
 
@@ -379,7 +439,14 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_monster_and_drop_item_u
 {
 	game.level.monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
 	Fire(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy throw spear.")("Spear hits stub.")("Dummy hit stub for 3 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::THROWS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::HITS_FOR_HEALTH);
+		EQUAL(e.actor.name, "spear");
+		EQUAL(e.target.name, "stub");
+		EQUAL(e.amount, 3);
+	} DONE(e);
 	ASSERT(!game.level.items.empty());
 	EQUAL(game.level.items[0].pos, Point(1, 0));
 }
@@ -413,7 +480,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_from_monster_w
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_on_the_floor_if_passable)
 {
 	Put(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy dropped spear on the floor.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::DROPS_AT);
+	} DONE(e);
 	ASSERT(!game.level.items.empty());
 	EQUAL(game.level.items[0].pos, Point(1, 1));
 }
@@ -423,7 +492,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_refill_item_if_emptyable_an
 	game.level.objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 1)));
 	dummy().inventory.wield(3);
 	Put(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy refill empty flask.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::REFILLS);
+	} DONE(e);
 	ASSERT(dummy().inventory.has_item(3));
 	ASSERT(dummy().inventory.get_item(3).is_full());
 	ASSERT(game.level.items.empty());
@@ -447,7 +518,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_under_monster_if_t
 	game.cell_types.insert(CellType::Builder("wall").name("wall").transparent(false));
 	game.level.map.set_cell_type(Point(1, 1), game.cell_types.get("wall"));
 	Put(Point(0, -1)).commit(dummy(), game);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy dropped spear on the floor.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::DROPS_AT);
+	} DONE(e);
 	ASSERT(!game.level.items.empty());
 	EQUAL(game.level.items[0].pos, Point(1, 2));
 }

@@ -99,7 +99,11 @@ TEST_FIXTURE(GameWithDummyOnTrap, should_hurt_monster_if_trap_is_set)
 {
 	game.process_environment(dummy());
 	EQUAL(dummy().hp, 99);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy trigger the trap.")("Dummy loses 1 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::TRIGGERS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::LOSES_HEALTH);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummyOnTrap, should_leave_bolt_if_trap_is_set)
@@ -113,7 +117,9 @@ TEST_FIXTURE(GameWithDummyOnTrap, should_not_hurt_monster_if_trap_is_triggered_a
 	game.level.objects.front().items.clear();
 	game.process_environment(dummy());
 	EQUAL(dummy().hp, 100);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Trap is already triggered.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::TRAP_IS_OUT_OF_ITEMS);
+	} DONE(e);
 }
 
 struct GameWithDummy {
@@ -140,7 +146,11 @@ TEST_FIXTURE(GameWithDummy, should_hurt_monster_if_cell_hurts)
 	game.cell_types.insert(CellType::Builder("floor").hurts(true));
 	game.process_environment(dummy());
 	EQUAL(dummy().hp, 99);
-	EQUAL(game.messages.messages, MakeVector<std::string>("It hurts!")("Dummy loses 1 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::HURTS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::LOSES_HEALTH);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_hurt_monster_is_poisoned)
@@ -148,7 +158,11 @@ TEST_FIXTURE(GameWithDummy, should_hurt_monster_is_poisoned)
 	dummy().poisoning = 10;
 	game.process_environment(dummy());
 	EQUAL(dummy().hp, 99);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy is poisoned.")("Dummy loses 1 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::IS_HURT_BY_POISONING);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::LOSES_HEALTH);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_decrease_poisoning_each_turn)
@@ -163,14 +177,17 @@ TEST_FIXTURE(GameWithDummy, should_drop_loot_if_monster_is_dead)
 {
 	game.die(dummy());
 	EQUAL(game.level.items.front().pos, dummy().pos);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy drops item.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::DROPS_AT);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::DIED);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_end_game_if_player_is_dead)
 {
 	game.die(player());
 	EQUAL(game.state, Game::PLAYER_DIED);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy drops item.")("You died.").result);
 }
 
 
@@ -178,7 +195,10 @@ TEST_FIXTURE(GameWithDummy, should_hurt_monster)
 {
 	game.hurt(dummy(), 5);
 	EQUAL(dummy().hp, 95);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy loses 5 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::LOSES_HEALTH);
+		EQUAL(e.amount, 5);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_hurt_if_damage_exceeds_defence)
@@ -186,7 +206,10 @@ TEST_FIXTURE(GameWithDummy, should_hurt_if_damage_exceeds_defence)
 	dummy().inventory.wear(0);
 	game.hurt(dummy(), 5);
 	EQUAL(dummy().hp, 98);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy loses 2 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::LOSES_HEALTH);
+		EQUAL(e.amount, 2);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_hurt_at_full_damage_if_piercing)
@@ -194,14 +217,24 @@ TEST_FIXTURE(GameWithDummy, should_hurt_at_full_damage_if_piercing)
 	dummy().inventory.wear(0);
 	game.hurt(dummy(), 5, true);
 	EQUAL(dummy().hp, 95);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy loses 5 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::LOSES_HEALTH);
+		EQUAL(e.amount, 5);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummy, should_die_if_hurts_too_much)
 {
 	game.hurt(dummy(), 105);
 	ASSERT(dummy().is_dead());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy loses 105 hp and dies.")("Dummy drops item.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::LOSES_HEALTH);
+		EQUAL(e.amount, 105);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::DROPS_AT);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::DIED);
+	} DONE(e);
 }
 
 
@@ -226,7 +259,10 @@ TEST_FIXTURE(GameWithDummyAndKiller, should_hit_monster)
 {
 	game.hit(killer(), dummy(), 5);
 	EQUAL(dummy().hp, 95);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Killer hit dummy for 5 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::HITS_FOR_HEALTH);
+		EQUAL(e.amount, 5);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummyAndKiller, should_hit_if_damage_exceeds_defence)
@@ -234,14 +270,22 @@ TEST_FIXTURE(GameWithDummyAndKiller, should_hit_if_damage_exceeds_defence)
 	dummy().inventory.wear(0);
 	game.hit(killer(), dummy(), 5);
 	EQUAL(dummy().hp, 98);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Killer hit dummy for 2 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::HITS_FOR_HEALTH);
+		EQUAL(e.amount, 2);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummyAndKiller, should_poison_monster)
 {
 	game.hit(poisoner(), dummy(), 5);
 	EQUAL(dummy().poisoning, 5);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Poisoner poisons dummy.")("Poisoner hit dummy for 5 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::HITS_FOR_HEALTH);
+		EQUAL(e.amount, 5);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::POISONS);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummyAndKiller, should_poison_monster_no_more_than_some_max)
@@ -249,14 +293,26 @@ TEST_FIXTURE(GameWithDummyAndKiller, should_poison_monster_no_more_than_some_max
 	dummy().poisoning =  3;
 	game.hit(poisoner(), dummy(), 5);
 	EQUAL(dummy().poisoning, 5);
-	EQUAL(game.messages.messages, MakeVector<std::string>("Poisoner poisons dummy.")("Poisoner hit dummy for 5 hp.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::HITS_FOR_HEALTH);
+		EQUAL(e.amount, 5);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::POISONS);
+	} DONE(e);
 }
 
 TEST_FIXTURE(GameWithDummyAndKiller, should_die_if_hit_was_too_much)
 {
 	game.hit(killer(), dummy(), 105);
 	ASSERT(dummy().is_dead());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Killer hit dummy for 105 hp and kills it.")("Dummy drops item.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::HITS_FOR_HEALTH);
+		EQUAL(e.amount, 105);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::DROPS_AT);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::DIED);
+	} DONE(e);
 }
 
 }

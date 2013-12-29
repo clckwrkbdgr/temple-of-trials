@@ -47,7 +47,7 @@ void Grab::commit(Monster & someone, Game & game)
 	game.level.items.erase(item_index);
 	game.event(someone, GameEvent::PICKS_UP_FROM, item, game.cell_type_at(someone.pos));
 	if(item.type->quest) {
-		game.event(someone, GameEvent::SHOULD_GET_QUEST_ITEM);
+		game.event(someone, GameEvent::PICKED_UP_A_QUEST_ITEM);
 	}
 }
 

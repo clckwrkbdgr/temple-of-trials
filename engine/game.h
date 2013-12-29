@@ -33,6 +33,7 @@ struct GameEvent {
 	GameEvent(const Info & event_actor, EventType event_type, const Info & event_target = Info(), const Info & event_help = Info());
 	GameEvent(const Info & event_actor, EventType event_type, int event_amount, const Info & event_target = Info(), const Info & event_help = Info());
 };
+std::string to_string(const GameEvent & e);
 
 struct Game {
 	// TODO all level stuff compile in one Dungeon class.
@@ -66,6 +67,7 @@ struct Game {
 	void die(Monster & someone);
 	void hurt(Monster & someone, int damage, bool pierce_armour = false);
 	void hit(Monster & someone, Monster & other, int damage);
+	void hit(Item & item, Monster & other, int damage);
 
 	CompiledInfo get_info(int x, int y) const;
 	CompiledInfo get_info(const Point & pos) const;

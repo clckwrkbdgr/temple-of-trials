@@ -86,27 +86,33 @@ void test_equal_containers(const ContainerA & a, const ContainerB & b, const cha
 template<class Container>
 struct TestContainer {
 	TestContainer(const char * filename, int line, const Container & test_container, const std::string & container_name)
-		: is_done(false), container(test_container), error("Expected value, but the end of " + container_name + " was found.")
+		: is_done(false), container(test_container), name(container_name)
 	{
 		it = container.begin();
 		if(it == container.end()) {
-			throw AssertException(filename, line, error);
+			throw AssertException(filename, line, "Expected value, but the end of " + name + " was found.");
 		}
 	}
 	bool done() const { return is_done; }
 	void to_next(const char * filename, int line)
 	{
 		if(++it == container.end()) {
-			throw AssertException(filename, line, error);
+			throw AssertException(filename, line, "Expected value, but the end of " + name + " was found.");
 		}
 		is_done = false;
 	}
 	void mark_done() { is_done = true; }
 	const typename Container::value_type & value() const { return *it; }
+	void check_at_end(const char * filename, int line)
+	{
+		if(++it != container.end()) {
+			throw AssertException(filename, line, "Expected end of " + name + ", but value (" + to_string(*it) + " was found.");
+		}
+	}
 private:
 	bool is_done;
 	const Container & container;
-	const std::string error;
+	const std::string name;
 	typename Container::const_iterator it;
 };
 
@@ -118,6 +124,9 @@ private:
 #define NEXT(var) \
 	for(test_c_##var.to_next(__FILE__, __LINE__); !test_c_##var.done(); ) \
 	for(decltype(test_c_##var.value()) & e = test_c_##var.value(); !test_c_##var.done(); test_c_##var.mark_done())
+
+#define DONE(var) \
+	test_c_##var.check_at_end(__FILE__, __LINE__)
 
 int run_all_tests(int argc, char ** argv);
 

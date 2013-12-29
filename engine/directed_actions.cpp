@@ -30,7 +30,9 @@ void Drink::commit(Monster & someone, Game & game)
     Object & object = find_at(game.level.objects, new_pos);
 	assert(object.valid() && object.type->drinkable, NOTHING_TO_DRINK, someone, object);
 	game.event(someone, GameEvent::DRINKS, object);
-	someone.heal_by(1);
+	if(someone.heal_by(1)) {
+		game.event(object, GameEvent::HEALS, someone);
+	}
 }
 
 void Open::commit(Monster & someone, Game & game)
@@ -129,10 +131,9 @@ void Fire::commit(Monster & someone, Game & game)
 		}
 		Monster & monster = find_at(game.level.monsters, item.pos + shift);
 		if(monster.valid()) {
-			game.event(item, GameEvent::HITS, monster);
 			item.pos += shift;
 			game.level.items.push_back(item);
-			game.hit(someone, monster, item.type->damage);
+			game.hit(item, monster, item.type->damage);
 			break;
 		}
 		item.pos += shift;

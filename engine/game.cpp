@@ -19,6 +19,11 @@ GameEvent::GameEvent(const Info & event_actor, EventType event_type, int event_a
 {
 }
 
+std::string to_string(const GameEvent & e)
+{
+	return format("<{1}> do #{0} ({2}) on <{3}> with <{4}>", e.type, e.actor.id, e.amount, e.target.id, e.help.id);
+}
+
 
 Game::Game(LevelGenerator * level_generator)
 	: current_level(0), generator(level_generator), state(PLAYING), turns(0)
@@ -167,15 +172,24 @@ void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 	}
 }
 
+void Game::hit(Item & item, Monster & other, int damage)
+{
+	int received_damage = damage - other.inventory.worn_item().type->defence;
+	other.hp -= received_damage;
+	event(item, GameEvent::HITS_FOR_HEALTH, received_damage, other);
+	if(other.is_dead()) {
+		die(other);
+	}
+}
 void Game::hit(Monster & someone, Monster & other, int damage)
 {
 	int received_damage = damage - other.inventory.worn_item().type->defence;
 	other.hp -= received_damage;
+	event(someone, GameEvent::HITS_FOR_HEALTH, received_damage, other);
 	if(someone.type->poisonous) {
 		event(someone, GameEvent::POISONS, other);
 		other.poisoning = std::min(5, std::max(5, other.poisoning));
 	}
-	event(someone, GameEvent::HITS_FOR_HEALTH, received_damage, other);
 	if(other.is_dead()) {
 		die(other);
 	}
