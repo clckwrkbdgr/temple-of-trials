@@ -6,6 +6,7 @@ class Item;
 class Object;
 class Monster;
 class Cell;
+class CellType;
 class Point;
 class Map;
 
@@ -21,6 +22,7 @@ struct Info {
 	Info(const Object & base);
 	Info(const Monster & base);
 	Info(const Cell & base);
+	Info(const CellType & base);
 	bool valid() const;
 };
 

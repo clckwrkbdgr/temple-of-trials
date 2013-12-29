@@ -11,6 +11,7 @@
 
 Action * player_control(Monster & player, Game & game)
 {
+	game.events_to_messages();
 	Console & console = Console::instance();
 	while(game.state == Game::PLAYING) {
 		if(!player.plan.empty()) {

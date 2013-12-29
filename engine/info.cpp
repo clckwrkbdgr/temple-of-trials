@@ -38,6 +38,11 @@ Info::Info(const Cell & base)
 {
 }
 
+Info::Info(const CellType & base)
+	: id(base.id), sprite(base.sprite), name(base.name), passable(base.passable), transparent(base.transparent)
+{
+}
+
 bool Info::valid() const
 {
 	return !id.empty();

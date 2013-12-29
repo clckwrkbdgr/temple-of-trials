@@ -9,6 +9,17 @@
 #include <cassert>
 #include <cmath>
 
+GameEvent::GameEvent(const Info & event_actor, EventType event_type, const Info & event_target, const Info & event_help)
+	: type(event_type), amount(0), actor(event_actor), target(event_target), help(event_help)
+{
+}
+
+GameEvent::GameEvent(const Info & event_actor, EventType event_type, int event_amount, const Info & event_target, const Info & event_help)
+	: type(event_type), amount(event_amount), actor(event_actor), target(event_target), help(event_help)
+{
+}
+
+
 Game::Game(LevelGenerator * level_generator)
 	: current_level(0), generator(level_generator), state(PLAYING), turns(0)
 {
@@ -59,6 +70,29 @@ void Game::run(ControllerFactory controller_factory)
 	}
 }
 
+void Game::event(const GameEvent & e)
+{
+	events.push_back(e);
+}
+
+void Game::event(const Info & event_actor, GameEvent::EventType event_type, const Info & event_target, const Info & event_help)
+{
+	events.push_back(GameEvent(event_actor, event_type, event_target, event_help));
+}
+
+void Game::event(const Info & event_actor, GameEvent::EventType event_type, int event_amount, const Info & event_target, const Info & event_help)
+{
+	events.push_back(GameEvent(event_actor, event_type, event_amount, event_target, event_help));
+}
+
+void Game::events_to_messages()
+{
+	foreach(const GameEvent & e, events) {
+		messages.message(e);
+	}
+	events.clear();
+}
+
 void Game::generate(int level_index)
 {
 	if(current_level != 0) {
@@ -85,15 +119,15 @@ void Game::generate(int level_index)
 void Game::process_environment(Monster & someone)
 {
 	if(cell_type_at(someone.pos).hurts) {
-		messages.terrain_hurts();
+		event(cell_type_at(someone.pos), GameEvent::HURTS, someone);
 		hurt(someone, 1);
 	}
 	Object & object = find_at(level.objects, someone.pos);
 	if(object.valid() && object.type->triggerable) {
 		if(object.items.empty()) {
-			messages.trap_is_dead(object);
+			event(object, GameEvent::TRAP_IS_OUT_OF_ITEMS);
 		} else {
-			messages.triggers_trap(someone, object);
+			event(someone, GameEvent::TRIGGERS, object);
 			object.items.back().pos = object.pos;
 			level.items.push_back(object.items.back());
 			object.items.pop_back();
@@ -101,7 +135,7 @@ void Game::process_environment(Monster & someone)
 		}
 	}
 	if(someone.poisoning > 0) {
-		messages.poisoned(someone);
+		event(someone, GameEvent::IS_HURT_BY_POISONING);
 		--someone.poisoning;
 		hurt(someone, 1, true);
 	} else if(someone.poisoning < 0) {
@@ -115,10 +149,10 @@ void Game::die(Monster & someone)
 	while((item = someone.inventory.take_first_item()).valid()) {
 		item.pos = someone.pos;
 		level.items.push_back(item);
-		messages.drops(someone, item);
+		event(someone, GameEvent::DROPS_AT, item, cell_type_at(someone.pos));
 	}
+	event(someone, GameEvent::DIED);
 	if(someone.type->faction == Monster::PLAYER) {
-		messages.player_died();
 		state = PLAYER_DIED;
 	}
 }
@@ -127,7 +161,7 @@ void Game::hurt(Monster & someone, int damage, bool pierce_armour)
 {
 	int received_damage = damage - (pierce_armour ? 0 : someone.inventory.worn_item().type->defence);
 	someone.hp -= received_damage;
-	messages.hurts(someone, received_damage);
+	event(someone, GameEvent::LOSES_HEALTH, received_damage);
 	if(someone.is_dead()) {
 		die(someone);
 	}
@@ -138,10 +172,10 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 	int received_damage = damage - other.inventory.worn_item().type->defence;
 	other.hp -= received_damage;
 	if(someone.type->poisonous) {
-		messages.poisons(someone, other);
+		event(someone, GameEvent::POISONS, other);
 		other.poisoning = std::min(5, std::max(5, other.poisoning));
 	}
-	messages.hits(someone, other, received_damage);
+	event(someone, GameEvent::HITS_FOR_HEALTH, received_damage, other);
 	if(other.is_dead()) {
 		die(other);
 	}

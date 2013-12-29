@@ -24,17 +24,17 @@ void Drop::commit(Monster & someone, Game & game)
 	assert(!someone.inventory.empty(), NOTHING_TO_DROP, someone);
 	assert(someone.inventory.get_item(slot).valid(), NO_SUCH_ITEM, someone);
 	if(someone.inventory.wields(slot)) {
-		game.messages.unwields(someone, someone.inventory.wielded_item());
+		game.event(someone, GameEvent::UNWIELDS, someone.inventory.wielded_item());
 		someone.inventory.unwield();
 	}
 	if(someone.inventory.wears(slot)) {
-		game.messages.takes_off(someone, someone.inventory.worn_item());
+		game.event(someone, GameEvent::TAKES_OFF, someone.inventory.worn_item());
 		someone.inventory.take_off();
 	}
 	Item item = someone.inventory.take_item(slot);
 	item.pos = someone.pos;
 	game.level.items.push_back(item);
-	game.messages.drops(someone, item, game.cell_type_at(someone.pos));
+	game.event(someone, GameEvent::DROPS_AT, item, game.cell_type_at(someone.pos));
 }
 
 void Grab::commit(Monster & someone, Game & game)
@@ -45,9 +45,9 @@ void Grab::commit(Monster & someone, Game & game)
 	unsigned slot = someone.inventory.insert(item);
 	assert(slot != Inventory::NOTHING, NO_SPACE_LEFT, someone);
 	game.level.items.erase(item_index);
-	game.messages.picks_up(someone, item, game.cell_type_at(someone.pos));
+	game.event(someone, GameEvent::PICKS_UP_FROM, item, game.cell_type_at(someone.pos));
 	if(item.type->quest) {
-		game.messages.return_to_gates_with_item();
+		game.event(someone, GameEvent::SHOULD_GET_QUEST_ITEM);
 	}
 }
 
@@ -56,22 +56,22 @@ void Wield::commit(Monster & someone, Game & game)
 	assert(!someone.inventory.empty(), NOTHING_TO_WIELD, someone);
 	assert(someone.inventory.get_item(slot).valid(), NO_SUCH_ITEM, someone);
 	if(someone.inventory.wielded_item().valid()) {
-		game.messages.unwields(someone, someone.inventory.wielded_item());
+		game.event(someone, GameEvent::UNWIELDS, someone.inventory.wielded_item());
 		someone.inventory.unwield();
 	}
 	if(someone.inventory.wears(slot)) {
-		game.messages.takes_off(someone, someone.inventory.worn_item());
+		game.event(someone, GameEvent::TAKES_OFF, someone.inventory.worn_item());
 		someone.inventory.take_off();
 	}
 	someone.inventory.wield(slot);
-	game.messages.wields(someone, someone.inventory.wielded_item());
+	game.event(someone, GameEvent::WIELDS, someone.inventory.wielded_item());
 }
 
 void Unwield::commit(Monster & someone, Game & game)
 {
 	const Item & item = someone.inventory.wielded_item();
 	assert(item.valid(), NOTHING_TO_UNWIELD, someone);
-	game.messages.unwields(someone, item);
+	game.event(someone, GameEvent::UNWIELDS, item);
 	someone.inventory.unwield();
 }
 
@@ -82,22 +82,22 @@ void Wear::commit(Monster & someone, Game & game)
 	assert(item.valid(), NO_SUCH_ITEM, someone);
 	assert(item.type->wearable, CANNOT_WEAR, someone, item);
 	if(someone.inventory.wields(slot)) {
-		game.messages.unwields(someone, someone.inventory.wielded_item());
+		game.event(someone, GameEvent::UNWIELDS, someone.inventory.wielded_item());
 		someone.inventory.unwield();
 	}
 	if(someone.inventory.worn_item().valid()) {
-		game.messages.takes_off(someone, someone.inventory.worn_item());
+		game.event(someone, GameEvent::TAKES_OFF, someone.inventory.worn_item());
 		someone.inventory.take_off();
 	}
 	someone.inventory.wear(slot);
-	game.messages.wears(someone, item);
+	game.event(someone, GameEvent::WEARS, item);
 }
 
 void TakeOff::commit(Monster & someone, Game & game)
 {
 	const Item & item = someone.inventory.worn_item();
 	assert(item.valid(), NOTHING_TO_TAKE_OFF, someone);
-	game.messages.takes_off(someone, item);
+	game.event(someone, GameEvent::TAKES_OFF, item);
 	someone.inventory.unwield();
 }
 
@@ -108,30 +108,26 @@ void Eat::commit(Monster & someone, Game & game)
 	assert(item.valid(), NO_SUCH_ITEM, someone);
 	assert(item.type->edible, CANNOT_EAT, someone, item);
 	if(someone.inventory.wears(slot)) {
-		game.messages.takes_off(someone, someone.inventory.worn_item());
+		game.event(someone, GameEvent::TAKES_OFF, someone.inventory.worn_item());
 		someone.inventory.take_off();
 	}
 	if(!item.is_emptyable() && someone.inventory.wields(slot)) {
-		game.messages.unwields(someone, someone.inventory.wielded_item());
+		game.event(someone, GameEvent::UNWIELDS, someone.inventory.wielded_item());
 		someone.inventory.unwield();
 	}
-	game.messages.eats(someone, item);
+	game.event(someone, GameEvent::EATS, item);
 	if(item.type->antidote > 0 && someone.poisoning > 0) {
 		someone.poisoning -= item.type->antidote;
 		someone.poisoning = std::max(0, someone.poisoning);
-		if(someone.poisoning > 0) {
-			game.messages.cures_poisoning_a_little(item);
-		} else {
-			game.messages.cures_poisoning_fully(item);
-		}
+		game.event(item, GameEvent::CURES_POISONING, someone);
 	}
 	if(item.type->healing > 0) {
 		if(someone.heal_by(item.type->healing)) {
-			game.messages.heals(item, someone);
+			game.event(item, GameEvent::HEALS, someone);
 		}
 	}
 	if(item.is_emptyable()) {
-		game.messages.is_empty_now(item);
+		game.event(someone, GameEvent::EMPTIES, item);
 		item.make_empty();
 	} else {
 		someone.inventory.take_item(slot);
@@ -145,13 +141,13 @@ void GoUp::commit(Monster & someone, Game & game)
 	if(object.is_exit_up()) {
 		const Item & quest_item = someone.inventory.quest_item();
 		if(quest_item.valid()) {
-			game.messages.win_the_game(someone, quest_item);
+			game.event(someone, GameEvent::WINS_GAME_WITH, quest_item);
 			game.state = Game::COMPLETED;
 		} else {
-			game.messages.sending_to_quest(someone);
+			game.event(someone, GameEvent::SHOULD_GET_QUEST_ITEM);
 		}
 	} else {
-		game.messages.goes_up(someone);
+		game.event(someone, GameEvent::GOES_UP);
 		game.generate(object.up_destination);
 	}
 }
@@ -163,13 +159,13 @@ void GoDown::commit(Monster & someone, Game & game)
 	if(object.is_exit_down()) {
 		const Item & quest_item = someone.inventory.quest_item();
 		if(quest_item.valid()) {
-			game.messages.win_the_game(someone, quest_item);
+			game.event(someone, GameEvent::WINS_GAME_WITH, quest_item);
 			game.state = Game::COMPLETED;
 		} else {
-			game.messages.sending_to_quest(someone);
+			game.event(someone, GameEvent::SHOULD_GET_QUEST_ITEM);
 		}
 	} else {
-		game.messages.goes_down(someone);
+		game.event(someone, GameEvent::GOES_DOWN);
 		game.generate(object.down_destination);
 	}
 }
