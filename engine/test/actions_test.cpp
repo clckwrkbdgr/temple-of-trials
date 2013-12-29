@@ -12,7 +12,6 @@ struct GameWithDummyWieldingAndWearing {
 	const MonsterType * dummy_type;
 	const MonsterType * stub_type;
 	GameWithDummyWieldingAndWearing() {
-		TRACE(1);
 		game.level.map = Map(2, 3);
 		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
@@ -33,7 +32,6 @@ struct GameWithDummyWieldingAndWearing {
 		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).
 				item(Item(spear)).item(Item(armor)).wield(0).wear(1).
 				item(jacket).item(Item::Builder(full_flask, empty_flask).make_empty()));
-		TRACE(dummy().inventory.size());
 	}
 	Monster & dummy() { return game.level.monsters[0]; }
 };
@@ -152,14 +150,22 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_droppin
 {
 	Drop(0).commit(dummy(), game);
 	ASSERT(!dummy().inventory.wielded_item().valid());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy unwields spear.")("Dummy dropped spear on the floor.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::UNWIELDS);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::DROPS_AT);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_before_dropping)
 {
 	Drop(1).commit(dummy(), game);
 	ASSERT(!dummy().inventory.worn_item().valid());
-	EQUAL(game.messages.messages, MakeVector<std::string>("Dummy takes off armor.")("Dummy dropped armor on the floor.").result);
+	TEST_CONTAINER(game.events, e) {
+		EQUAL(e.type, GameEvent::TAKES_OFF);
+	} NEXT(e) {
+		EQUAL(e.type, GameEvent::DROPS_AT);
+	}
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_item_from_inventory_when_dropped)

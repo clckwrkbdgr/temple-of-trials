@@ -83,5 +83,41 @@ void test_equal_containers(const ContainerA & a, const ContainerB & b, const cha
 		throw AssertException(__FILE__, __LINE__, "expected exception " #exception_class " was not thrown"); \
 	} catch(const exception_class & exception_variable)
 
+template<class Container>
+struct TestContainer {
+	TestContainer(const char * filename, int line, const Container & test_container, const std::string & container_name)
+		: is_done(false), container(test_container), error("Expected value, but the end of " + container_name + " was found.")
+	{
+		it = container.begin();
+		if(it == container.end()) {
+			throw AssertException(filename, line, error);
+		}
+	}
+	bool done() const { return is_done; }
+	void to_next(const char * filename, int line)
+	{
+		if(++it == container.end()) {
+			throw AssertException(filename, line, error);
+		}
+		is_done = false;
+	}
+	void mark_done() { is_done = true; }
+	const typename Container::value_type & value() const { return *it; }
+private:
+	bool is_done;
+	const Container & container;
+	const std::string error;
+	typename Container::const_iterator it;
+};
+
+#define TEST_CONTAINER(container, var) \
+	TestContainer<decltype(container)> test_c_##var(__FILE__, __LINE__, container, #container); \
+	for(; !test_c_##var.done(); ) \
+	for(decltype(test_c_##var.value()) & e = test_c_##var.value(); !test_c_##var.done(); test_c_##var.mark_done())
+
+#define NEXT(var) \
+	for(test_c_##var.to_next(__FILE__, __LINE__); !test_c_##var.done(); ) \
+	for(decltype(test_c_##var.value()) & e = test_c_##var.value(); !test_c_##var.done(); test_c_##var.mark_done())
+
 int run_all_tests(int argc, char ** argv);
 
