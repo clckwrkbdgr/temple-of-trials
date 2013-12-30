@@ -30,25 +30,23 @@ GameWithDummyWieldingAndWearing::GameWithDummyWieldingAndWearing()
 	: game(&dungeon)
 {
 	game.level().map = Map(2, 3);
-	game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
-	dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-	stub_type = game.monster_types.insert(MonsterType::Builder("stub").name("stub").max_hp(100));
-	game.object_types.insert(ObjectType::Builder("door").name("door"));
-	game.object_types.insert(ObjectType::Builder("pot").name("pot").containable());
-	game.object_types.insert(ObjectType::Builder("well").name("well").drinkable());
-	const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
-	const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear"));
-	game.item_types.insert(ItemType::Builder("item").sprite(1).name("item"));
-	game.item_types.insert(ItemType::Builder("quest_item").sprite(1).name("item").quest());
-	game.item_types.insert(ItemType::Builder("stub").sprite(2).name("stub"));
-	const ItemType * jacket = game.item_types.insert(ItemType::Builder("jacket").sprite(1).name("jacket").wearable());
-	const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(1).name("water flask"));
-	const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(2).name("empty flask"));
+	game.add_cell_type("floor").passable(true).transparent(true).name("floor");
+	game.add_monster_type("dummy").max_hp(100).name("dummy");
+	game.add_monster_type("stub").name("stub").max_hp(100);
+	game.add_object_type("door").name("door");
+	game.add_object_type("pot").name("pot").containable();
+	game.add_object_type("well").name("well").drinkable();
+	game.add_item_type("armor").sprite(1).wearable().defence(3).name("armor");
+	game.add_item_type("spear").sprite(2).damage(3).name("spear");
+	game.add_item_type("item").sprite(1).name("item");
+	game.add_item_type("quest_item").sprite(1).name("item").quest();
+	game.add_item_type("stub").sprite(2).name("stub");
+	game.add_item_type("jacket").sprite(1).name("jacket").wearable();
+	game.add_item_type("full_flask").sprite(1).name("water flask");
+	game.add_item_type("empty_flask").sprite(2).name("empty flask");
 
-	game.level().map.fill(game.cell_types.get("floor"));
-	game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).
-			item(Item(spear)).item(Item(armor)).wield(0).wear(1).
-			item(jacket).item(Item::Builder(full_flask, empty_flask).make_empty()));
+	game.level().map.fill(game.cell_type("floor"));
+	game.add_monster("dummy").pos(Point(1, 2)).item(Item(game.item_type("spear"))).item(Item(game.item_type("armor"))).wield(0).wear(1).item(game.item_type("jacket")).item(Item::Builder(game.item_type("full_flask"), game.item_type("empty_flask")).make_empty());
 }
 Monster & GameWithDummyWieldingAndWearing::dummy() { return game.level().monsters[0]; }
 
@@ -56,14 +54,14 @@ GameWithDummyWithItems::GameWithDummyWithItems()
 	: game(&dungeon)
 {
 	game.level().map = Map(2, 3);
-	game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
-	dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-	const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
-	const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear"));
-	const ItemType * pot = game.item_types.insert(ItemType::Builder("pot").sprite(1).name("pot"));
+	game.add_cell_type("floor").passable(true).transparent(true).name("floor");
+	game.add_monster_type("dummy").max_hp(100).name("dummy");
+	game.add_item_type("armor").sprite(1).wearable().defence(3).name("armor");
+	game.add_item_type("spear").sprite(2).damage(3).name("spear");
+	game.add_item_type("pot").sprite(1).name("pot");
 
-	game.level().map.fill(game.cell_types.get("floor"));
-	game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(spear).item(armor).item(pot).item(pot));
+	game.level().map.fill(game.cell_type("floor"));
+	game.add_monster("dummy").pos(Point(1, 2)).item(game.item_type("spear")).item(game.item_type("armor")).item(game.item_type("pot")).item(game.item_type("pot"));
 	dummy().inventory.take_item(2);
 }
 Monster & GameWithDummyWithItems::dummy() { return game.level().monsters[0]; }
@@ -72,35 +70,30 @@ GameWithDummyAndFood::GameWithDummyAndFood()
 	: game(&dungeon)
 {
 	game.level().map = Map(2, 2);
-	dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
+	game.add_monster_type("dummy").max_hp(100).name("dummy");
 
-	const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor").edible());
-	const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear").edible());
-	const ItemType * junk = game.item_types.insert(ItemType::Builder("junk").sprite(3).name("junk"));
-	const ItemType * food = game.item_types.insert(ItemType::Builder("food").sprite(4).name("food").edible());
-	const ItemType * medkit = game.item_types.insert(ItemType::Builder("medkit").sprite(4).name("medkit").edible().healing(5));
-	const ItemType * megasphere = game.item_types.insert(ItemType::Builder("megasphere").sprite(4).name("megasphere").edible().healing(100));
-	const ItemType * antidote = game.item_types.insert(ItemType::Builder("antidote").sprite(4).name("antidote").edible().antidote(5));
-	const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(7).name("water flask").edible());
-	const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(8).name("empty flask"));
-	game.level().monsters.push_back(
-			Monster::Builder(dummy_type).hp(90)
-			.item(armor).item(spear).wear(0).wield(1)
-			.item(junk).item(food).item(medkit).item(megasphere).item(antidote)
-			.item(Item()).item(Item(full_flask, empty_flask)).item(Item::Builder(full_flask, empty_flask).make_empty())
-			);
+	game.add_item_type("armor").sprite(1).wearable().defence(3).name("armor").edible();
+	game.add_item_type("spear").sprite(2).damage(3).name("spear").edible();
+	game.add_item_type("junk").sprite(3).name("junk");
+	game.add_item_type("food").sprite(4).name("food").edible();
+	game.add_item_type("medkit").sprite(4).name("medkit").edible().healing(5);
+	game.add_item_type("megasphere").sprite(4).name("megasphere").edible().healing(100);
+	game.add_item_type("antidote").sprite(4).name("antidote").edible().antidote(5);
+	game.add_item_type("full_flask").sprite(7).name("water flask").edible();
+	game.add_item_type("empty_flask").sprite(8).name("empty flask");
+	game.add_monster("dummy").hp(90).item(game.item_type("armor")).item(game.item_type("spear")).wear(0).wield(1).item(game.item_type("junk")).item(game.item_type("food")).item(game.item_type("medkit")).item(game.item_type("megasphere")).item(game.item_type("antidote")).item(Item()).item(Item(game.item_type("full_flask"), game.item_type("empty_flask"))).item(Item::Builder(game.item_type("full_flask"), game.item_type("empty_flask")).make_empty());
 }
 Monster & GameWithDummyAndFood::dummy() { return game.level().monsters[0]; }
 
 GameWithDummyAndStairs::GameWithDummyAndStairs()
 	: dungeon(Point(1, 1), Point(2, 2)), game(&dungeon)
 {
-	const MonsterType * dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").name("dummy"));
-	const ObjectType * stairs_type = game.object_types.insert(ObjectType::Builder("stairs").name("stairs").transporting());
-	game.item_types.insert(ItemType::Builder("yendor").name("Yendor").quest().sprite(1));
+	game.add_monster_type("dummy").name("dummy");
+	game.add_object_type("stairs").name("stairs").transporting();
+	game.add_item_type("yendor").name("Yendor").quest().sprite(1);
 	game.level().map = Map(2, 2);
-	game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
-	game.level().objects.push_back(Object::Builder(stairs_type).pos(Point(1, 1)));
+	game.add_monster("dummy").pos(Point(1, 1));
+	game.add_object("stairs").pos(Point(1, 1));
 }
 Monster & GameWithDummyAndStairs::dummy() { return game.level().monsters[0]; }
 Object & GameWithDummyAndStairs::stairs() { return game.level().objects[0]; }
@@ -109,29 +102,29 @@ GameWithDummyAndObjects::GameWithDummyAndObjects()
 	: game(&dungeon)
 {
 	game.level().map = Map(2, 2);
-	floor_type = game.cell_types.insert(CellType::Builder("floor").name("floor").passable(true));
-	dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-	stub_type = game.monster_types.insert(MonsterType::Builder("stub").name("stub"));
-	game.object_types.insert(ObjectType::Builder("stub").name("stub"));
-	opened_door = game.object_types.insert(ObjectType::Builder("opened_door").name("door").transparent().passable().openable().sprite(1));
-	closed_door = game.object_types.insert(ObjectType::Builder("closed_door").name("door").openable().sprite(2));
-	game.object_types.insert(ObjectType::Builder("pot").name("pot").containable());
-	game.object_types.insert(ObjectType::Builder("well").name("well").drinkable());
-	game.item_types.insert(ItemType::Builder("key").name("item").sprite(1));
-	game.level().map.fill(floor_type);
-	game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
+	game.add_cell_type("floor").name("floor").passable(true);
+	game.add_monster_type("dummy").max_hp(100).name("dummy");
+	game.add_monster_type("stub").name("stub");
+	game.add_object_type("stub").name("stub");
+	game.add_object_type("opened_door").name("door").transparent().passable().openable().sprite(1);
+	game.add_object_type("closed_door").name("door").openable().sprite(2);
+	game.add_object_type("pot").name("pot").containable();
+	game.add_object_type("well").name("well").drinkable();
+	game.add_item_type("key").name("item").sprite(1);
+	game.level().map.fill(game.cell_type("floor"));
+	game.add_monster("dummy").pos(Point(1, 1));
 }
 Monster & GameWithDummyAndObjects::dummy() { return game.level().monsters[0]; }
 
 GameWithDummyOnTrap::GameWithDummyOnTrap()
 	: game(&dungeon)
 {
-	dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
+	game.add_monster_type("dummy").max_hp(100).name("dummy");
 	game.level().map = Map(2, 2);
-	game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
-	const ObjectType * trap_type = game.object_types.insert(ObjectType::Builder("trap").name("trap").triggerable());
-	const ItemType * item = game.item_types.insert(ItemType::Builder("item").name("item").sprite(1));
-	game.level().objects.push_back(Object::Builder(trap_type).pos(Point(1, 1)).item(item));
+	game.add_monster("dummy").pos(Point(1, 1));
+	game.add_object_type("trap").name("trap").triggerable();
+	game.add_item_type("item").name("item").sprite(1);
+	game.add_object("trap").pos(Point(1, 1)).item(game.item_type("item"));
 }
 Monster & GameWithDummyOnTrap::dummy() { return game.level().monsters.front(); }
 
@@ -139,14 +132,14 @@ GameWithDummy::GameWithDummy()
 	: game(&dungeon)
 {
 	game.level().map = Map(2, 2);
-	game.cell_types.insert(CellType("floor"));
-	dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-	player_type = game.monster_types.insert(MonsterType::Builder("player").max_hp(100).name("dummy").faction(Monster::PLAYER));
+	game.add_cell_type("floor");
+	game.add_monster_type("dummy").max_hp(100).name("dummy");
+	game.add_monster_type("player").max_hp(100).name("dummy").faction(Monster::PLAYER);
 
-	game.level().map.fill(game.cell_types.get("floor"));
-	const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("item"));
-	game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
-	game.level().monsters.push_back(Monster::Builder(player_type).pos(Point(1, 1)).item(armor));
+	game.level().map.fill(game.cell_type("floor"));
+	game.add_item_type("armor").sprite(1).wearable().defence(3).name("item");
+	game.add_monster("dummy").pos(Point(1, 1)).item(game.item_type("armor"));
+	game.add_monster("player").pos(Point(1, 1)).item(game.item_type("armor"));
 }
 Monster & GameWithDummy::dummy() { return game.level().monsters.front(); }
 Monster & GameWithDummy::player() { return game.level().monsters.back(); }
@@ -154,14 +147,14 @@ Monster & GameWithDummy::player() { return game.level().monsters.back(); }
 GameWithDummyAndKiller::GameWithDummyAndKiller()
 	: game(&dungeon)
 {
-	const MonsterType * dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-	const MonsterType * killer_type = game.monster_types.insert(MonsterType::Builder("killer").max_hp(100).name("killer"));
-	const MonsterType * poisoner_type = game.monster_types.insert(MonsterType::Builder("poisoner").max_hp(100).name("poisoner").poisonous(true));
+	game.add_monster_type("dummy").max_hp(100).name("dummy");
+	game.add_monster_type("killer").max_hp(100).name("killer");
+	game.add_monster_type("poisoner").max_hp(100).name("poisoner").poisonous(true);
 	game.level().map = Map(2, 2);
-	const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("item"));
-	game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
-	game.level().monsters.push_back(Monster::Builder(killer_type).pos(Point(0, 1)));
-	game.level().monsters.push_back(Monster::Builder(poisoner_type).pos(Point(1, 0)));
+	game.add_item_type("armor").sprite(1).wearable().defence(3).name("item");
+	game.add_monster("dummy").pos(Point(1, 1)).item(game.item_type("armor"));
+	game.add_monster("killer").pos(Point(0, 1));
+	game.add_monster("poisoner").pos(Point(1, 0));
 }
 Monster & GameWithDummyAndKiller::dummy() { return game.level().monsters[0]; }
 Monster & GameWithDummyAndKiller::killer() { return game.level().monsters[1]; }
@@ -171,21 +164,23 @@ Game2x2::Game2x2()
 	: game(&dungeon)
 {
 	game.level() = Level(2, 2);
-	game.cell_types.insert(CellType::Builder("floor").sprite(1).passable(true).transparent(true));
-	monster_type = game.monster_types.insert(MonsterType::Builder("monster").sprite(3).faction(Monster::PLAYER));
-	game.object_types.insert(ObjectType::Builder("stone").name("stone"));
-	game.object_types.insert(ObjectType::Builder("passable").passable().sprite(2));
-	game.object_types.insert(ObjectType::Builder("transparent").transparent());
-	game.item_types.insert(ItemType::Builder("item").sprite(4));
-	game.level().map.fill(game.cell_types.get("floor"));
+	game.add_cell_type("floor").sprite(1).passable(true).transparent(true);
+	game.add_monster_type("monster").sprite(3).faction(Monster::PLAYER);
+	game.add_object_type("stone").name("stone");
+	game.add_object_type("passable").passable().sprite(2);
+	game.add_object_type("transparent").transparent();
+	game.add_item_type("item").sprite(4);
+	game.level().map.fill(game.cell_type("floor"));
 }
 
 LevelWithPath::LevelWithPath()
 	: game(&dungeon)
 {
 	game.level() = Level(4, 4);
-	const CellType * f = game.cell_types.insert(CellType::Builder("f").passable(true));
-	const CellType * w = game.cell_types.insert(CellType::Builder("w").passable(false));
+	game.add_cell_type("floor").passable(true);
+	game.add_cell_type("wall").passable(false);
+	const CellType * f = game.cell_type("floor");
+	const CellType * w = game.cell_type("wall");
 	const CellType * a[] = {
 		f, w, f, f,
 		w, f, f, w,
@@ -199,15 +194,17 @@ LevelForSeeing::LevelForSeeing()
 	: game(&dungeon)
 {
 	game.level() = Level(3, 2);
-	const CellType * f = game.cell_types.insert(CellType::Builder("f").sprite(1).passable(true).transparent(true));
-	const CellType * w = game.cell_types.insert(CellType::Builder("w").sprite(2).passable(false).transparent(false));
+	game.add_cell_type("floor").sprite(1).passable(true).transparent(true);
+	game.add_cell_type("wall").sprite(2).passable(false).transparent(false);
+	const CellType * f = game.cell_type("floor");
+	const CellType * w = game.cell_type("wall");
 	const CellType * a[] = {
 		w, f, w,
 		f, w, f,
 	};
 	game.level().map.fill(a);
-	const MonsterType * player_type = game.monster_types.insert(MonsterType::Builder("player").faction(Monster::PLAYER).sight(3).sprite(100));
-	game.level().monsters.push_back(Monster::Builder(player_type).pos(Point(2, 1)));
+	game.add_monster_type("player").faction(Monster::PLAYER).sight(3).sprite(100);
+	game.add_monster("player").pos(Point(2, 1));
 }
 
 

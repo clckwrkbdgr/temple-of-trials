@@ -18,8 +18,10 @@ struct MonsterType {
 	struct Builder;
 };
 struct MonsterType::Builder {
-	MonsterType result;
-	Builder(const std::string & type_id) : result(type_id) {}
+	MonsterType value_result;
+	MonsterType & result;
+	Builder(const std::string & type_id) : value_result(type_id), result(value_result) {}
+	Builder(MonsterType & type) : result(type) {}
 	operator MonsterType() { return result; }
 	Builder & faction(int value);
 	Builder & sprite(const int & sprite);
@@ -53,8 +55,10 @@ struct Monster {
 	struct Builder;
 };
 struct Monster::Builder {
-	Monster result;
-	Builder(const MonsterType * type) : result(type) {}
+	Monster value_result;
+	Monster & result;
+	Builder(const Type * type) : value_result(type), result(value_result) {}
+	Builder(Monster & monster) : result(monster) {}
 	operator Monster() { return result; }
 	Builder & pos(const Point & value);
 	Builder & hp(int value);

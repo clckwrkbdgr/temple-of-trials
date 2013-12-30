@@ -1,5 +1,9 @@
 #pragma once
 #include "map.h"
+#include "monsters.h"
+#include "objects.h"
+#include "items.h"
+#include "cell.h"
 #include <vector>
 #include <list>
 class Monster;
@@ -31,13 +35,23 @@ struct Level {
 
 class Dungeon {
 public:
+	TypeRegistry<Cell> cell_types;
+	TypeRegistry<Monster> monster_types;
+	TypeRegistry<Object> object_types;
+	TypeRegistry<Item> item_types;
+
 	int current_level_index;
 	std::map<int, Level> levels;
 
 	Dungeon();
 	virtual ~Dungeon() {}
 	virtual void generate(Level & level, int level_index) = 0;
-	virtual void create_types(Game & game) = 0;
+
+	Item::Builder add_item(Level & level, const std::string & type_id);
+	Item::Builder add_item(Level & level, const std::string & full_type_id, const std::string & empty_type_id);
+	Object::Builder add_object(Level & level, const std::string & type_id);
+	Object::Builder add_object(Level & level, const std::string & closed_type_id, const std::string & opened_type_id);
+	Monster::Builder add_monster(Level & level, const std::string & type_id);
 
 	Level & level();
 	const Level & level() const;

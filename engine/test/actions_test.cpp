@@ -73,7 +73,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_if_floor_is_empty)
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_grabbed_item_to_the_first_empty_slot)
 {
-	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
+	game.add_item("item").pos(Point(1, 2));
 	Grab().commit(dummy(), game);
 	EQUAL(dummy().inventory.get_item(4).type->name, "item");
 	TEST_CONTAINER(game.events, e) {
@@ -83,14 +83,14 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_grabbed_item_to_the_fir
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_grabbed_item_from_map)
 {
-	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
+	game.add_item("item").pos(Point(1, 2));
 	Grab().commit(dummy(), game);
 	ASSERT(game.level().items.empty());
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_notify_if_quest_item)
 {
-	game.level().items.push_back(Item::Builder(game.item_types.get("quest_item")).pos(Point(1, 2)));
+	game.add_item("quest_item").pos(Point(1, 2));
 	Grab().commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::PICKS_UP_FROM);
@@ -102,9 +102,9 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_notify_if_quest_item)
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_item_if_inventory_is_full)
 {
 	for(int i = 2; i < 26; ++i) {
-		dummy().inventory.insert(Item(game.item_types.get("stub")));
+		dummy().inventory.insert(Item(game.item_type("stub")));
 	}
-	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
+	game.add_item("item").pos(Point(1, 2));
 	CATCH(Grab().commit(dummy(), game), Action::Exception, e) {
 		EQUAL(e.type, Action::NO_SPACE_LEFT);
 	}
@@ -420,7 +420,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_send_to_quest_on_upstairs_to_the_sur
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_upstairs_when_have_quest_item)
 {
-	dummy().inventory.insert(Item(game.item_types.get("yendor")));
+	dummy().inventory.insert(Item(game.item_type("yendor")));
 	stairs().up_destination = -1;
 	GoUp().commit(dummy(), game);
 	EQUAL(game.state, Game::COMPLETED);
@@ -467,7 +467,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_send_to_quest_on_downstairs_to_the_s
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_win_game_on_downstairs_when_have_quest_item)
 {
-	dummy().inventory.insert(Item(game.item_types.get("yendor")));
+	dummy().inventory.insert(Item(game.item_type("yendor")));
 	stairs().down_destination = -1;
 	GoDown().commit(dummy(), game);
 	EQUAL(game.state, Game::COMPLETED);

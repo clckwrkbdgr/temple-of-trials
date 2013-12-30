@@ -121,7 +121,6 @@ template<class T> bool operator!=(const TypePtr<T> & typeptr, const TypePtr<T> &
 template<class T> bool operator!=(const TypePtr<T> & typeptr, const T * ptr) { return !operator==(typeptr, ptr); }
 template<class T> bool operator!=(const T * ptr, const TypePtr<T> & typeptr) { return !operator==(typeptr, ptr); }
 
-// TODO rename all types using domains.
 template<class Value>
 struct TypeRegistry {
 	typedef typename Value::Type ValueType;
@@ -141,5 +140,10 @@ struct TypeRegistry {
 	const ValueType * insert(const ValueType & type)
 	{
 		return &(types[type.id] = type);
+	}
+	typename ValueType::Builder insert(const std::string & id)
+	{
+		types[id].id = id;
+		return typename ValueType::Builder(types[id]);
 	}
 };

@@ -29,7 +29,6 @@ Game::Game(Dungeon * game_dungeon)
 	: dungeon(game_dungeon), state(PLAYING), turns(0)
 {
 	assert(dungeon);
-	dungeon->create_types(*this);
 }
 
 void Game::create_new_game()
@@ -46,6 +45,72 @@ const Level & Game::level() const
 {
 	return dungeon->level();
 }
+
+const ItemType * Game::item_type(const std::string & id) const
+{
+	return dungeon->item_types.get(id);
+}
+
+const ObjectType * Game::object_type(const std::string & id) const
+{
+	return dungeon->object_types.get(id);
+}
+
+const MonsterType * Game::monster_type(const std::string & id) const
+{
+	return dungeon->monster_types.get(id);
+}
+
+const CellType * Game::cell_type(const std::string & id) const
+{
+	return dungeon->cell_types.get(id);
+}
+
+ItemType::Builder Game::add_item_type(const std::string & id) const
+{
+	return dungeon->item_types.insert(id);
+}
+
+ObjectType::Builder Game::add_object_type(const std::string & id) const
+{
+	return dungeon->object_types.insert(id);
+}
+
+MonsterType::Builder Game::add_monster_type(const std::string & id) const
+{
+	return dungeon->monster_types.insert(id);
+}
+
+CellType::Builder Game::add_cell_type(const std::string & id) const
+{
+	return dungeon->cell_types.insert(id);
+}
+
+Item::Builder Game::add_item(const std::string & type_id)
+{
+	return dungeon->add_item(dungeon->level(), type_id);
+}
+
+Item::Builder Game::add_item(const std::string & full_type_id, const std::string & empty_type_id)
+{
+	return dungeon->add_item(dungeon->level(), full_type_id, empty_type_id);
+}
+
+Object::Builder Game::add_object(const std::string & type_id)
+{
+	return dungeon->add_object(dungeon->level(), type_id);
+}
+
+Object::Builder Game::add_object(const std::string & closed_type_id, const std::string & opened_type_id)
+{
+	return dungeon->add_object(dungeon->level(), closed_type_id, opened_type_id);
+}
+
+Monster::Builder Game::add_monster(const std::string & type_id)
+{
+	return dungeon->add_monster(dungeon->level(), type_id);
+}
+
 
 void Game::run(ControllerFactory controller_factory)
 {

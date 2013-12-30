@@ -229,6 +229,36 @@ void Dungeon::go_to_level(int level_index)
 	}
 }
 
+Item::Builder Dungeon::add_item(Level & level, const std::string & type_id)
+{
+	level.items.push_back(Item(item_types.get(type_id)));
+	return Item::Builder(level.items.back());
+}
+
+Item::Builder Dungeon::add_item(Level & level, const std::string & full_type_id, const std::string & empty_type_id)
+{
+	level.items.push_back(Item(item_types.get(full_type_id), item_types.get(empty_type_id)));
+	return Item::Builder(level.items.back());
+}
+
+Object::Builder Dungeon::add_object(Level & level, const std::string & type_id)
+{
+	level.objects.push_back(Object(object_types.get(type_id)));
+	return Object::Builder(level.objects.back());
+}
+
+Object::Builder Dungeon::add_object(Level & level, const std::string & closed_type_id, const std::string & opened_type_id)
+{
+	level.objects.push_back(Object(object_types.get(closed_type_id), object_types.get(opened_type_id)));
+	return Object::Builder(level.objects.back());
+}
+
+Monster::Builder Dungeon::add_monster(Level & level, const std::string & type_id)
+{
+	level.monsters.push_back(Monster(monster_types.get(type_id)));
+	return Monster::Builder(level.monsters.back());
+}
+
 void Dungeon::fill_room(Map & map, const std::pair<Point, Point> & room, const CellType * type)
 {
 	for(int x = room.first.x; x <= room.second.x; ++x) {

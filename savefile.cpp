@@ -78,10 +78,10 @@ SAVEFILE_STORE_EXT(Level, level)
 
 SAVEFILE_STORE_EXT(Game, game)
 {
-	savefile.add_type_registry(game.cell_types);
-	savefile.add_type_registry(game.monster_types);
-	savefile.add_type_registry(game.object_types);
-	savefile.add_type_registry(game.item_types);
+	savefile.add_type_registry(game.dungeon->cell_types);
+	savefile.add_type_registry(game.dungeon->monster_types);
+	savefile.add_type_registry(game.dungeon->object_types);
+	savefile.add_type_registry(game.dungeon->item_types);
 
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
 	savefile.newline();

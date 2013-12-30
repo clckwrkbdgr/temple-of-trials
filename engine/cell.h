@@ -14,8 +14,10 @@ struct CellType {
 	struct Builder;
 };
 struct CellType::Builder {
-	CellType result;
-	Builder(const std::string & id) : result(id) {}
+	CellType value_result;
+	CellType & result;
+	Builder(const std::string & type_id) : value_result(type_id), result(value_result) {}
+	Builder(CellType & type) : result(type) {}
 	operator CellType() { return result; }
 	Builder & sprite(const int & sprite);
 	Builder & name(const std::string & value);

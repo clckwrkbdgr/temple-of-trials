@@ -15,7 +15,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_move_when_cell_is_empty)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_move_into_impassable_cell)
 {
-	game.cell_types.insert(CellType::Builder("floor").name("wall").passable(false));
+	game.add_cell_type("floor").name("wall").passable(false);
 	Move(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
 	TEST_CONTAINER(game.events, e) {
@@ -26,7 +26,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_move_into_impassable_cell)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_move_into_monster)
 {
-	game.level().monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
+	game.add_monster("stub").pos(Point(1, 0));
 	Move(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
 	TEST_CONTAINER(game.events, e) {
@@ -37,7 +37,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_move_into_monster)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_move_into_impassable_object)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("stub")).pos(Point(1, 0)));
+	game.add_object("stub").pos(Point(1, 0));
 	Move(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
 	TEST_CONTAINER(game.events, e) {
@@ -48,14 +48,14 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_move_into_impassable_object)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_move_into_opened_object)
 {
-	game.level().objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
+	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(true);
 	Move(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 0));
 }
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_move_into_closed_object)
 {
-	game.level().objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
+	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(false);
 	Move(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().pos, Point(1, 1));
 	TEST_CONTAINER(game.events, e) {
@@ -70,7 +70,7 @@ SUITE(drink) {
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_drink_monsters)
 {
-	game.level().monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
+	game.add_monster("stub").pos(Point(1, 0));
 	CATCH(Drink(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
 		EQUAL(e.type, Action::CANNOT_DRINK);
 	}
@@ -78,7 +78,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_drink_monsters)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_drink_not_drinkable_objects)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("pot")).pos(Point(1, 0)));
+	game.add_object("pot").pos(Point(1, 0));
 	CATCH(Drink(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
 		EQUAL(e.type, Action::NOTHING_TO_DRINK);
 	}
@@ -93,7 +93,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_drink_at_empty_cell)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_drink_fountains)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 0)));
+	game.add_object("well").pos(Point(1, 0));
 	Drink(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::DRINKS);
@@ -102,7 +102,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_drink_fountains)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_heal_from_fountains)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 0)));
+	game.add_object("well").pos(Point(1, 0));
 	dummy().hp -= 5;
 	Drink(Point(0, -1)).commit(dummy(), game);
 	EQUAL(dummy().hp, 96);
@@ -119,7 +119,7 @@ SUITE(open) {
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_already_opened_doors)
 {
-	game.level().objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
+	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(true);
 	CATCH(Open(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
 		EQUAL(e.type, Action::ALREADY_OPENED);
 		EQUAL(e.subject.name, "door");
@@ -129,7 +129,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_already_opened_doors)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_open_closed_doors)
 {
-	game.level().objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
+	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(false);
 	Open(Point(0, -1)).commit(dummy(), game);
 	ASSERT(game.level().objects[0].opened());
 	TEST_CONTAINER(game.events, e) {
@@ -139,7 +139,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_open_closed_doors)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_locked_doors_without_a_key)
 {
-	game.level().objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false).locked(true).lock_type(1));
+	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(false).locked(true).lock_type(1);
 	CATCH(Open(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
 		EQUAL(e.type, Action::LOCKED);
 		EQUAL(e.subject.name, "door");
@@ -150,8 +150,8 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_locked_doors_without_a_key
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_open_locked_doors_with_a_key)
 {
-	game.level().objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false).locked(true).lock_type(1));
-	dummy().inventory.set_item(1, Item::Builder(game.item_types.get("key")).key_type(1));
+	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(false).locked(true).lock_type(1);
+	dummy().inventory.set_item(1, Item::Builder(game.item_type("key")).key_type(1));
 	Open(Point(0, -1)).commit(dummy(), game);
 	ASSERT(!game.level().objects[0].locked);
 	ASSERT(game.level().objects[0].opened());
@@ -171,8 +171,8 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_empty_cell)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_open_containers_and_drop_items)
 {
-	Item item(game.item_types.get("key"));
-	game.level().objects.push_back(Object::Builder(game.object_types.get("pot")).pos(Point(1, 0)).item(item));
+	Item item(game.item_type("key"));
+	game.add_object("pot").pos(Point(1, 0)).item(item);
 	Open(Point(0, -1)).commit(dummy(), game);
 	EQUAL(game.level().items[0].type, item.type);
 	ASSERT(game.level().objects[0].items.empty());
@@ -183,7 +183,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_open_containers_and_drop_items)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_empty_containers)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("pot")).pos(Point(1, 0)));
+	game.add_object("pot").pos(Point(1, 0));
 	CATCH(Open(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
 		EQUAL(e.type, Action::HAS_NO_ITEMS);
 		EQUAL(e.subject.name, "pot");
@@ -198,7 +198,7 @@ SUITE(close) {
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_close_opened_doors)
 {
-	game.level().objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(true));
+	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(true);
 	Close(Point(0, -1)).commit(dummy(), game);
 	ASSERT(!game.level().objects[0].opened());
 	TEST_CONTAINER(game.events, e) {
@@ -208,7 +208,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_close_opened_doors)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_close_already_closed_doors)
 {
-	game.level().objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
+	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(false);
 	CATCH(Close(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
 		EQUAL(e.type, Action::ALREADY_CLOSED);
 	}
@@ -228,8 +228,8 @@ SUITE(swing) {
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_hit_impassable_cells_on_swing)
 {
-	game.cell_types.insert(CellType::Builder("wall").name("wall").passable(false));
-	game.level().map.set_cell_type(Point(1, 0), game.cell_types.get("wall"));
+	game.add_cell_type("wall").name("wall").passable(false);
+	game.level().map.set_cell_type(Point(1, 0), game.cell_type("wall"));
 	Swing(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::HITS);
@@ -238,7 +238,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_hit_impassable_cells_on_swing)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_open_closed_doors_on_swing)
 {
-	game.level().objects.push_back(Object::Builder(closed_door, opened_door).pos(Point(1, 0)).opened(false));
+	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(false);
 	Swing(Point(0, -1)).commit(dummy(), game);
 	ASSERT(game.level().objects[0].opened());
 	TEST_CONTAINER(game.events, e) {
@@ -251,7 +251,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_open_closed_doors_on_swing)
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_hit_monsters_on_swing)
 {
-	game.level().monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
+	game.add_monster("stub").pos(Point(1, 0));
 	Swing(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::HITS_FOR_HEALTH);
@@ -293,8 +293,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_from_monster_w
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_item_before_it)
 {
-	game.cell_types.insert(CellType::Builder("wall").name("wall").transparent(false));
-	game.level().map.set_cell_type(Point(1, 0), game.cell_types.get("wall"));
+	game.add_cell_type("wall").name("wall").transparent(false);
+	game.level().map.set_cell_type(Point(1, 0), game.cell_type("wall"));
 	Fire(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::THROWS);
@@ -308,7 +308,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_it
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_impassable_object_and_drop_item_before_it)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("door")).pos(Point(1, 0)));
+	game.add_object("door").pos(Point(1, 0));
 	Fire(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::THROWS);
@@ -322,7 +322,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_impassable_object_and_d
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_container_and_drop_item_in_it)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("pot")).pos(Point(1, 0)));
+	game.add_object("pot").pos(Point(1, 0));
 	Fire(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::THROWS);
@@ -337,7 +337,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_container_and_drop_item
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_fountain_and_erase_item_forever)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 0)));
+	game.add_object("well").pos(Point(1, 0));
 	Fire(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::THROWS);
@@ -350,7 +350,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_fountain_and_erase_item
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_monster_and_drop_item_under_it)
 {
-	game.level().monsters.push_back(Monster::Builder(stub_type).pos(Point(1, 0)));
+	game.add_monster("stub").pos(Point(1, 0));
 	Fire(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::THROWS);
@@ -400,7 +400,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_on_the_floor_if_pa
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_refill_item_if_emptyable_and_object_is_drinkable)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 1)));
+	game.add_object("well").pos(Point(1, 1));
 	dummy().inventory.wield(3);
 	Put(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
@@ -413,7 +413,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_refill_item_if_emptyable_an
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_refill_already_full_item)
 {
-	game.level().objects.push_back(Object::Builder(game.object_types.get("well")).pos(Point(1, 1)));
+	game.add_object("well").pos(Point(1, 1));
 	dummy().inventory.get_item(3).make_full();
 	dummy().inventory.wield(3);
 	CATCH(Put(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
@@ -426,8 +426,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_refill_already_full_ite
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_under_monster_if_target_is_impassable)
 {
-	game.cell_types.insert(CellType::Builder("wall").name("wall").transparent(false));
-	game.level().map.set_cell_type(Point(1, 1), game.cell_types.get("wall"));
+	game.add_cell_type("wall").name("wall").transparent(false);
+	game.level().map.set_cell_type(Point(1, 1), game.cell_type("wall"));
 	Put(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::DROPS_AT);

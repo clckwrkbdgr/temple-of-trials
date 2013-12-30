@@ -18,8 +18,10 @@ struct ItemType {
 	struct Builder;
 };
 struct ItemType::Builder {
-	ItemType result;
-	Builder(const std::string & type_id) : result(type_id) {}
+	ItemType value_result;
+	ItemType & result;
+	Builder(const std::string & type_id) : value_result(type_id), result(value_result) {}
+	Builder(ItemType & type) : result(type) {}
 	operator ItemType() { return result; }
 	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
@@ -52,9 +54,11 @@ struct Item {
 	struct Builder;
 };
 struct Item::Builder {
-	Item result;
-	Builder(const Type * type) : result(type) {}
-	Builder(const Type * full_type, const Type * empty_type) : result(full_type, empty_type) {}
+	Item value_result;
+	Item & result;
+	Builder(const Type * type) : value_result(type), result(value_result) {}
+	Builder(const Type * full_type, const Type * empty_type) : value_result(full_type, empty_type), result(value_result) {}
+	Builder(Item & item) : result(item) {}
 	operator Item() { return result; }
 	Builder & pos(const Point & value);
 	Builder & key_type(int value);

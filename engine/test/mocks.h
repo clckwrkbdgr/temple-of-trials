@@ -28,8 +28,6 @@ private:
 struct GameWithDummyWieldingAndWearing {
 	DummyDungeon dungeon;
 	Game game;
-	const MonsterType * dummy_type;
-	const MonsterType * stub_type;
 	GameWithDummyWieldingAndWearing();
 	Monster & dummy();
 };
@@ -37,7 +35,6 @@ struct GameWithDummyWieldingAndWearing {
 struct GameWithDummyWithItems {
 	DummyDungeon dungeon;
 	Game game;
-	const MonsterType * dummy_type;
 	GameWithDummyWithItems();
 	Monster & dummy();
 };
@@ -45,7 +42,6 @@ struct GameWithDummyWithItems {
 struct GameWithDummyAndFood {
 	DummyDungeon dungeon;
 	Game game;
-	const MonsterType * dummy_type;
 	enum { ARMOR, SPEAR, JUNK, FOOD, MEDKIT, MEGASPHERE, ANTIDOTE, FULL_FLASK, EMPTY_FLASK, EMPTY, NONE };
 	GameWithDummyAndFood();
 	Monster & dummy();
@@ -62,11 +58,6 @@ struct GameWithDummyAndStairs {
 struct GameWithDummyAndObjects {
 	DummyDungeon dungeon;
 	Game game;
-	const CellType * floor_type;
-	const MonsterType * dummy_type;
-	const MonsterType * stub_type;
-	const ObjectType * opened_door;
-	const ObjectType * closed_door;
 	GameWithDummyAndObjects();
 	Monster & dummy();
 };
@@ -74,7 +65,6 @@ struct GameWithDummyAndObjects {
 struct GameWithDummyOnTrap {
 	DummyDungeon dungeon;
 	Game game;
-	const MonsterType * dummy_type;
 	GameWithDummyOnTrap();
 	Monster & dummy();
 };
@@ -82,8 +72,6 @@ struct GameWithDummyOnTrap {
 struct GameWithDummy {
 	DummyDungeon dungeon;
 	Game game;
-	const MonsterType * dummy_type;
-	const MonsterType * player_type;
 	GameWithDummy();
 	Monster & dummy();
 	Monster & player();
@@ -101,7 +89,6 @@ struct GameWithDummyAndKiller {
 struct Game2x2 {
 	DummyDungeon dungeon;
 	Game game;
-	const MonsterType * monster_type;
 	Game2x2();
 };
 

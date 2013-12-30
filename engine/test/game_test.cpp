@@ -44,7 +44,7 @@ TEST_FIXTURE(GameWithDummyOnTrap, should_not_hurt_monster_if_trap_is_triggered_a
 
 TEST_FIXTURE(GameWithDummy, should_hurt_monster_if_cell_hurts)
 {
-	game.cell_types.insert(CellType::Builder("floor").hurts(true));
+	game.add_cell_type("floor").hurts(true);
 	game.process_environment(dummy());
 	EQUAL(dummy().hp, 99);
 	TEST_CONTAINER(game.events, e) {

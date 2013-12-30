@@ -17,8 +17,10 @@ struct ObjectType {
 	struct Builder;
 };
 struct ObjectType::Builder {
-	ObjectType result;
-	Builder(const std::string & type_id) : result(type_id) {}
+	ObjectType value_result;
+	ObjectType & result;
+	Builder(const std::string & type_id) : value_result(type_id), result(value_result) {}
+	Builder(ObjectType & type) : result(type) {}
 	operator ObjectType() { return result; }
 	Builder & sprite(const int & value);
 	Builder & name(const std::string & value);
@@ -53,9 +55,11 @@ struct Object {
 	struct Builder;
 };
 struct Object::Builder {
-	Object result;
-	Builder(const Type * type) : result(type) {}
-	Builder(const Type * closed_type, const Type * opened_type) : result(closed_type, opened_type) {}
+	Object value_result;
+	Object & result;
+	Builder(const Type * type) : value_result(type), result(value_result) {}
+	Builder(const Type * closed_type, const Type * opened_type) : value_result(closed_type, opened_type), result(value_result) {}
+	Builder(Object & object) : result(object) {}
 	operator Object() { return result; }
 	Builder & pos(const Point & value);
 	Builder & item(const Item & value);

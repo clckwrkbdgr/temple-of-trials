@@ -36,18 +36,12 @@ struct GameEvent {
 std::string to_string(const GameEvent & e);
 
 struct Game {
-	// TODO all level stuff compile in one Dungeon class.
 	enum State { PLAYING, TURN_ENDED, SUSPENDED, PLAYER_DIED, COMPLETED };
 	Dungeon * dungeon;
 	State state;
 	Messages messages;
 	int turns;
 	std::vector<GameEvent> events;
-
-	TypeRegistry<Cell> cell_types;
-	TypeRegistry<Monster> monster_types;
-	TypeRegistry<Object> object_types;
-	TypeRegistry<Item> item_types;
 
 	Game(Dungeon * game_dungeon);
 	void create_new_game();
@@ -60,6 +54,22 @@ struct Game {
 
 	Level & level();
 	const Level & level() const;
+
+	const ItemType * item_type(const std::string & id) const;
+	const ObjectType * object_type(const std::string & id) const;
+	const MonsterType * monster_type(const std::string & id) const;
+	const CellType * cell_type(const std::string & id) const;
+
+	ItemType::Builder add_item_type(const std::string & id) const;
+	ObjectType::Builder add_object_type(const std::string & id) const;
+	MonsterType::Builder add_monster_type(const std::string & id) const;
+	CellType::Builder add_cell_type(const std::string & id) const;
+
+	Item::Builder add_item(const std::string & type_id);
+	Item::Builder add_item(const std::string & full_type_id, const std::string & empty_type_id);
+	Object::Builder add_object(const std::string & type_id);
+	Object::Builder add_object(const std::string & closed_type_id, const std::string & opened_type_id);
+	Monster::Builder add_monster(const std::string & type_id);
 
 	void process_environment(Monster & someone);
 	void die(Monster & someone);
