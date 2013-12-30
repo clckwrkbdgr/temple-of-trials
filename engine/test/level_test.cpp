@@ -1,40 +1,11 @@
+#include "mocks.h"
 #include "../level.h"
 #include "../game.h"
 #include "../test.h"
 
+using namespace GameMocks;
+
 SUITE(dungeon) {
-
-class TestDungeon : public Dungeon {
-public:
-	TestDungeon(const Point & player_pos1, const Point & player_pos2)
-		: generated(false), pos1(player_pos1), pos2(player_pos2)
-	{
-		player_one = MonsterType::Builder("player_one").sprite(1).faction(Monster::PLAYER);
-		player_two = MonsterType::Builder("player_two").sprite(2).faction(Monster::PLAYER);
-	}
-	virtual void create_types(Game &) { }
-	virtual void generate(Level & level, int level_index)
-	{
-		generated = true;
-		level = Level(4, 4);
-		if(level_index == 1) {
-			level.monsters.push_back(Monster::Builder(&player_one).pos(pos1));
-		} else {
-			level.monsters.push_back(Monster::Builder(&player_two).pos(pos2));
-		}
-	}
-	bool was_generated() const { return generated; }
-private:
-	bool generated;
-	Point pos1, pos2;
-	MonsterType player_one;
-	MonsterType player_two;
-};
-
-struct GameWithLevels {
-	TestDungeon dungeon;
-	GameWithLevels(): dungeon(Point(1, 1), Point(2, 2)) {}
-};
 
 TEST_FIXTURE(GameWithLevels, should_save_current_level_as_visited)
 {
@@ -68,31 +39,6 @@ TEST_FIXTURE(GameWithLevels, should_generated_newly_visited_level)
 }
 
 SUITE(level) {
-
-struct DummyDungeon : public Dungeon {
-	DummyDungeon() : Dungeon() {}
-	virtual ~DummyDungeon() {}
-	virtual void generate(Level & /*level*/, int /*level_index*/) {}
-	virtual void create_types(Game & /*game*/) {}
-};
-
-struct Game2x2 {
-	DummyDungeon dungeon;
-	Game game;
-	const MonsterType * monster_type;
-	Game2x2()
-		: game(&dungeon)
-	{
-		game.level() = Level(2, 2);
-		game.cell_types.insert(CellType::Builder("floor").sprite(1).passable(true).transparent(true));
-		monster_type = game.monster_types.insert(MonsterType::Builder("monster").sprite(3).faction(Monster::PLAYER));
-		game.object_types.insert(ObjectType::Builder("stone").name("stone"));
-		game.object_types.insert(ObjectType::Builder("passable").passable().sprite(2));
-		game.object_types.insert(ObjectType::Builder("transparent").transparent());
-		game.item_types.insert(ItemType::Builder("item").sprite(4));
-		game.level().map.fill(game.cell_types.get("floor"));
-	}
-};
 
 TEST_FIXTURE(Game2x2, impassable_cells_should_be_impassable)
 {
@@ -206,25 +152,6 @@ TEST_FIXTURE(Game2x2, should_get_player_from_const_monsters)
 }
 
 
-struct LevelWithPath {
-	DummyDungeon dungeon;
-	Game game;
-	LevelWithPath()
-		: game(&dungeon)
-	{
-		game.level() = Level(4, 4);
-		const CellType * f = game.cell_types.insert(CellType::Builder("f").passable(true));
-		const CellType * w = game.cell_types.insert(CellType::Builder("w").passable(false));
-		const CellType * a[] = {
-			f, w, f, f,
-			w, f, f, w,
-			f, w, w, f,
-			f, w, f, w,
-		};
-		game.level().map.fill(a);
-	}
-};
-
 TEST_FIXTURE(LevelWithPath, should_find_path_between_points)
 {
 	std::list<Point> path = game.level().find_path(Point(0, 3), Point(2, 3));
@@ -242,25 +169,6 @@ TEST_FIXTURE(LevelWithPath, should_not_find_path_if_target_is_the_same_as_start)
 	std::list<Point> path = game.level().find_path(Point(0, 3), Point(0, 3));
 	ASSERT(path.empty());
 }
-
-struct LevelForSeeing {
-	DummyDungeon dungeon;
-	Game game;
-	LevelForSeeing()
-		: game(&dungeon)
-	{
-		game.level() = Level(3, 2);
-		const CellType * f = game.cell_types.insert(CellType::Builder("f").sprite(1).passable(true).transparent(true));
-		const CellType * w = game.cell_types.insert(CellType::Builder("w").sprite(2).passable(false).transparent(false));
-		const CellType * a[] = {
-			w, f, w,
-			f, w, f,
-		};
-		game.level().map.fill(a);
-		const MonsterType * player_type = game.monster_types.insert(MonsterType::Builder("player").faction(Monster::PLAYER).sight(3).sprite(100));
-		game.level().monsters.push_back(Monster::Builder(player_type).pos(Point(2, 1)));
-	}
-};
 
 TEST_FIXTURE(LevelForSeeing, should_store_seen_sprites)
 {

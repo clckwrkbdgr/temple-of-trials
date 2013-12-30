@@ -1,32 +1,13 @@
+#include "mocks.h"
 #include "../game.h"
 #include "../monsters.h"
 #include "../cell.h"
 #include "../format.h"
 #include "../test.h"
 
+using namespace GameMocks;
+
 SUITE(game) {
-
-struct DummyDungeon : public Dungeon {
-	DummyDungeon() : Dungeon() {}
-	virtual ~DummyDungeon() {}
-	virtual void generate(Level & /*level*/, int /*level_index*/) {}
-	virtual void create_types(Game & /*game*/) {}
-};
-
-struct GameWithDummyOnTrap {
-	DummyDungeon dungeon;
-	Game game;
-	const MonsterType * dummy_type;
-	GameWithDummyOnTrap() : game(&dungeon) {
-		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-		game.level().map = Map(2, 2);
-		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
-		const ObjectType * trap_type = game.object_types.insert(ObjectType::Builder("trap").name("trap").triggerable());
-		const ItemType * item = game.item_types.insert(ItemType::Builder("item").name("item").sprite(1));
-		game.level().objects.push_back(Object::Builder(trap_type).pos(Point(1, 1)).item(item));
-	}
-	Monster & dummy() { return game.level().monsters.front(); }
-};
 
 TEST_FIXTURE(GameWithDummyOnTrap, should_trigger_trap_if_trap_is_set)
 {
@@ -60,26 +41,6 @@ TEST_FIXTURE(GameWithDummyOnTrap, should_not_hurt_monster_if_trap_is_triggered_a
 		EQUAL(e.type, GameEvent::TRAP_IS_OUT_OF_ITEMS);
 	} DONE(e);
 }
-
-struct GameWithDummy {
-	DummyDungeon dungeon;
-	Game game;
-	const MonsterType * dummy_type;
-	const MonsterType * player_type;
-	GameWithDummy() : game(&dungeon) {
-		game.level().map = Map(2, 2);
-		game.cell_types.insert(CellType("floor"));
-		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-		player_type = game.monster_types.insert(MonsterType::Builder("player").max_hp(100).name("dummy").faction(Monster::PLAYER));
-
-		game.level().map.fill(game.cell_types.get("floor"));
-		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("item"));
-		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
-		game.level().monsters.push_back(Monster::Builder(player_type).pos(Point(1, 1)).item(armor));
-	}
-	Monster & dummy() { return game.level().monsters.front(); }
-	Monster & player() { return game.level().monsters.back(); }
-};
 
 TEST_FIXTURE(GameWithDummy, should_hurt_monster_if_cell_hurts)
 {
@@ -177,24 +138,6 @@ TEST_FIXTURE(GameWithDummy, should_die_if_hurts_too_much)
 	} DONE(e);
 }
 
-
-struct GameWithDummyAndKiller {
-	DummyDungeon dungeon;
-	Game game;
-	GameWithDummyAndKiller() : game(&dungeon) {
-		const MonsterType * dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-		const MonsterType * killer_type = game.monster_types.insert(MonsterType::Builder("killer").max_hp(100).name("killer"));
-		const MonsterType * poisoner_type = game.monster_types.insert(MonsterType::Builder("poisoner").max_hp(100).name("poisoner").poisonous(true));
-		game.level().map = Map(2, 2);
-		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("item"));
-		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
-		game.level().monsters.push_back(Monster::Builder(killer_type).pos(Point(0, 1)));
-		game.level().monsters.push_back(Monster::Builder(poisoner_type).pos(Point(1, 0)));
-	}
-	Monster & dummy() { return game.level().monsters[0]; }
-	Monster & killer() { return game.level().monsters[1]; }
-	Monster & poisoner() { return game.level().monsters[2]; }
-};
 
 TEST_FIXTURE(GameWithDummyAndKiller, should_hit_monster)
 {

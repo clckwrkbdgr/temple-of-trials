@@ -1,3 +1,4 @@
+#include "mocks.h"
 #include "../actions.h"
 #include "../game.h"
 #include "../monsters.h"
@@ -5,141 +6,9 @@
 #include "../format.h"
 #include "../test.h"
 
-namespace ActionsFixture {
-
-struct DummyDungeon : public Dungeon {
-	DummyDungeon() : Dungeon() {}
-	virtual ~DummyDungeon() {}
-	virtual void generate(Level & /*level*/, int /*level_index*/) {}
-	virtual void create_types(Game & /*game*/) {}
-};
-
-struct GameWithDummyWieldingAndWearing {
-	DummyDungeon dungeon;
-	Game game;
-	const MonsterType * dummy_type;
-	const MonsterType * stub_type;
-	GameWithDummyWieldingAndWearing() : game(&dungeon) {
-		game.level().map = Map(2, 3);
-		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
-		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-		stub_type = game.monster_types.insert(MonsterType::Builder("stub").name("stub").max_hp(100));
-		game.object_types.insert(ObjectType::Builder("door").name("door"));
-		game.object_types.insert(ObjectType::Builder("pot").name("pot").containable());
-		game.object_types.insert(ObjectType::Builder("well").name("well").drinkable());
-		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
-		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear"));
-		game.item_types.insert(ItemType::Builder("item").sprite(1).name("item"));
-		game.item_types.insert(ItemType::Builder("quest_item").sprite(1).name("item").quest());
-		game.item_types.insert(ItemType::Builder("stub").sprite(2).name("stub"));
-		const ItemType * jacket = game.item_types.insert(ItemType::Builder("jacket").sprite(1).name("jacket").wearable());
-		const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(1).name("water flask"));
-		const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(2).name("empty flask"));
-
-		game.level().map.fill(game.cell_types.get("floor"));
-		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).
-				item(Item(spear)).item(Item(armor)).wield(0).wear(1).
-				item(jacket).item(Item::Builder(full_flask, empty_flask).make_empty()));
-	}
-	Monster & dummy() { return game.level().monsters[0]; }
-};
-
-struct GameWithDummyWithItems {
-	DummyDungeon dungeon;
-	Game game;
-	const MonsterType * dummy_type;
-	GameWithDummyWithItems() : game(&dungeon) {
-		game.level().map = Map(2, 3);
-		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
-		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
-		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear"));
-		const ItemType * pot = game.item_types.insert(ItemType::Builder("pot").sprite(1).name("pot"));
-
-		game.level().map.fill(game.cell_types.get("floor"));
-		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(spear).item(armor).item(pot).item(pot));
-		dummy().inventory.take_item(2);
-	}
-	Monster & dummy() { return game.level().monsters[0]; }
-};
-
-struct GameWithDummyAndFood {
-	DummyDungeon dungeon;
-	Game game;
-	const MonsterType * dummy_type;
-	enum { ARMOR, SPEAR, JUNK, FOOD, MEDKIT, MEGASPHERE, ANTIDOTE, FULL_FLASK, EMPTY_FLASK, EMPTY, NONE };
-	GameWithDummyAndFood() : game(&dungeon) {
-		game.level().map = Map(2, 2);
-		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-
-		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor").edible());
-		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear").edible());
-		const ItemType * junk = game.item_types.insert(ItemType::Builder("junk").sprite(3).name("junk"));
-		const ItemType * food = game.item_types.insert(ItemType::Builder("food").sprite(4).name("food").edible());
-		const ItemType * medkit = game.item_types.insert(ItemType::Builder("medkit").sprite(4).name("medkit").edible().healing(5));
-		const ItemType * megasphere = game.item_types.insert(ItemType::Builder("megasphere").sprite(4).name("megasphere").edible().healing(100));
-		const ItemType * antidote = game.item_types.insert(ItemType::Builder("antidote").sprite(4).name("antidote").edible().antidote(5));
-		const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(7).name("water flask").edible());
-		const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(8).name("empty flask"));
-		game.level().monsters.push_back(
-				Monster::Builder(dummy_type).hp(90)
-				.item(armor).item(spear).wear(0).wield(1)
-				.item(junk).item(food).item(medkit).item(megasphere).item(antidote)
-				.item(Item()).item(Item(full_flask, empty_flask)).item(Item::Builder(full_flask, empty_flask).make_empty())
-				);
-	}
-	Monster & dummy() { return game.level().monsters[0]; }
-};
-
-class TestDungeon : public Dungeon {
-public:
-	TestDungeon(const Point & player_pos1, const Point & player_pos2)
-		: generated(false), pos1(player_pos1), pos2(player_pos2) { }
-	virtual void create_types(Game & game)
-	{
-		player_one = game.monster_types.insert(MonsterType::Builder("player_one").sprite(1).faction(Monster::PLAYER));
-		player_two = game.monster_types.insert(MonsterType::Builder("player_two").sprite(2).faction(Monster::PLAYER));
-	}
-	virtual void generate(Level & level, int level_index)
-	{
-		generated = true;
-		level = Level(4, 4);
-		if(level_index == 1) {
-			level.monsters.push_back(Monster::Builder(player_one).pos(pos1));
-		} else {
-			level.monsters.push_back(Monster::Builder(player_two).pos(pos2));
-		}
-	}
-	bool was_generated() const { return generated; }
-private:
-	bool generated;
-	Point pos1, pos2;
-	const MonsterType * player_one;
-	const MonsterType * player_two;
-};
-
-struct GameWithDummyAndStairs {
-	TestDungeon dungeon;
-	Game game;
-	GameWithDummyAndStairs()
-		: dungeon(Point(1, 1), Point(2, 2)), game(&dungeon)
-	{
-		const MonsterType * dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").name("dummy"));
-		const ObjectType * stairs_type = game.object_types.insert(ObjectType::Builder("stairs").name("stairs").transporting());
-		game.item_types.insert(ItemType::Builder("yendor").name("Yendor").quest().sprite(1));
-		game.level().map = Map(2, 2);
-		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
-		game.level().objects.push_back(Object::Builder(stairs_type).pos(Point(1, 1)));
-	}
-	Monster & dummy() { return game.level().monsters[0]; }
-	Object & stairs() { return game.level().objects[0]; }
-};
-
-};
+using namespace GameMocks;
 
 SUITE(drop) {
-
-using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_drop_if_nothing_to_drop)
 {
@@ -195,8 +64,6 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_place_item_on_the_floor_whe
 
 SUITE(grab) {
 
-using namespace ActionsFixture;
-
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_if_floor_is_empty)
 {
 	CATCH(Grab().commit(dummy(), game), Action::Exception, e) {
@@ -246,8 +113,6 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_item_if_inventory_
 }
 
 SUITE(wield) {
-
-using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWithItems, should_wield_any_item)
 {
@@ -304,8 +169,6 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_before_wieldi
 
 SUITE(unwield) {
 
-using namespace ActionsFixture;
-
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_if_wielded)
 {
 	Unwield().commit(dummy(), game);
@@ -324,8 +187,6 @@ TEST_FIXTURE(GameWithDummyWithItems, should_not_unwield_item_if_not_wielded)
 }
 
 SUITE(wear) {
-
-using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyWithItems, should_wear_any_item)
 {
@@ -389,8 +250,6 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_before_wearing
 
 SUITE(take_off) {
 
-using namespace ActionsFixture;
-
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_if_worn)
 {
 	TakeOff().commit(dummy(), game);
@@ -410,8 +269,6 @@ TEST_FIXTURE(GameWithDummyWithItems, should_not_take_off_item_if_not_worn)
 }
 
 SUITE(eat) {
-
-using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_invalid_slot)
 {
@@ -536,8 +393,6 @@ TEST_FIXTURE(GameWithDummyAndFood, should_make_flask_empty_after_eating_it_and_n
 
 SUITE(go_up) {
 
-using namespace ActionsFixture;
-
 TEST_FIXTURE(GameWithDummyAndStairs, should_go_up_on_upstairs)
 {
 	stairs().up_destination = 1;
@@ -584,8 +439,6 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_go
 }
 
 SUITE(go_down) {
-
-using namespace ActionsFixture;
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_go_down_on_downstairs)
 {
