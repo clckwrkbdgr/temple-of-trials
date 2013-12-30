@@ -143,7 +143,7 @@ void Console::draw_game(const Game & game)
 	for(unsigned x = 0; x < map.width; ++x) {
 		for(unsigned y = 0; y < map.height; ++y) {
 			if(map.cell(x, y).visible) {
-				print_tile(x, y, game.get_info(Point(x, y)).compiled().sprite);
+				print_tile(x, y, game.level().get_info(Point(x, y)).compiled().sprite);
 			} else if(map.cell(x, y).seen_sprite) {
 				print_fow(x, y, map.cell(x, y).seen_sprite);
 			}
@@ -175,7 +175,7 @@ void Console::draw_game(const Game & game)
 	mvprintw(0, 0, "%s", notification_text.c_str());
 	notification_text.clear();
 
-	const Monster & player = game.get_player();
+	const Monster & player = game.level().get_player();
 	if(!player.valid()) {
 		return;
 	}
@@ -201,9 +201,9 @@ Point Console::target_mode(Game & game, const Point & start)
 	while(ch != 'x' && ch != 27 && ch != '.') {
 		if(game.level().map.valid(target)) {
 			if(game.level().map.cell(target).visible) {
-				notification(format("You see {0}.", game.get_info(target).compiled().name));
+				notification(format("You see {0}.", game.level().get_info(target).compiled().name));
 			} else if(game.level().map.cell(target).seen_sprite) {
-				notification(format("You recall {0}.", game.get_info(target).compiled().name));
+				notification(format("You recall {0}.", game.level().get_info(target).compiled().name));
 			} else {
 				notification("You cannot see there.");
 			}

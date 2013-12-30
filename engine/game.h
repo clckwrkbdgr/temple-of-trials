@@ -48,7 +48,6 @@ struct Game {
 	TypeRegistry<Monster> monster_types;
 	TypeRegistry<Object> object_types;
 	TypeRegistry<Item> item_types;
-	const CellType & cell_type_at(const Point & pos) const;
 
 	Game(Dungeon * game_dungeon);
 	void run(ControllerFactory controller_factory);
@@ -67,14 +66,4 @@ struct Game {
 	void hurt(Monster & someone, int damage, bool pierce_armour = false);
 	void hit(Monster & someone, Monster & other, int damage);
 	void hit(Item & item, Monster & other, int damage);
-
-	CompiledInfo get_info(int x, int y) const;
-	CompiledInfo get_info(const Point & pos) const;
-
-	const Monster & get_player() const;
-	Monster & get_player();
-
-	std::list<Point> find_path(const Point & player_pos, const Point & target);
-	void invalidate_fov(Monster & monster);
-	void erase_dead_monsters();
 };

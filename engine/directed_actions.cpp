@@ -15,8 +15,8 @@ void Move::commit(Monster & someone, Game & game)
 		game.event(someone, GameEvent::BUMPS_INTO, object);
 		return;
 	}
-	if(!game.cell_type_at(new_pos).passable) {
-		game.event(someone, GameEvent::BUMPS_INTO, game.cell_type_at(new_pos));
+	if(!game.level().cell_type_at(new_pos).passable) {
+		game.event(someone, GameEvent::BUMPS_INTO, game.level().cell_type_at(new_pos));
 		return;
 	}
     someone.pos = new_pos;
@@ -92,8 +92,8 @@ void Swing::commit(Monster & someone, Game & game)
 		}
 		return;
 	}
-	if(!game.cell_type_at(new_pos).passable) {
-		game.event(someone, GameEvent::HITS, game.cell_type_at(new_pos));
+	if(!game.level().cell_type_at(new_pos).passable) {
+		game.event(someone, GameEvent::HITS, game.level().cell_type_at(new_pos));
 		return;
 	}
     game.event(someone, GameEvent::SWINGS_AT_NOTHING);
@@ -109,8 +109,8 @@ void Fire::commit(Monster & someone, Game & game)
 		if(!game.level().map.valid(item.pos)) {
 			break;
 		}
-		if(!game.cell_type_at(item.pos + shift).transparent) {
-			game.event(item, GameEvent::HITS, game.cell_type_at(item.pos + shift));
+		if(!game.level().cell_type_at(item.pos + shift).transparent) {
+			game.event(item, GameEvent::HITS, game.level().cell_type_at(item.pos + shift));
 			game.level().items.push_back(item);
 			break;
 		}
@@ -155,10 +155,10 @@ void Put::commit(Monster & someone, Game & game)
 		return;
 	}
 	
-	if(game.cell_type_at(item.pos + shift).passable) {
+	if(game.level().cell_type_at(item.pos + shift).passable) {
 		item.pos += shift;
 	}
-	game.event(someone, GameEvent::DROPS_AT, item, game.cell_type_at(item.pos));
+	game.event(someone, GameEvent::DROPS_AT, item, game.level().cell_type_at(item.pos));
 	game.level().items.push_back(item);
 	someone.inventory.take_wielded_item();
 }

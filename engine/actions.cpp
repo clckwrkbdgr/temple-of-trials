@@ -34,7 +34,7 @@ void Drop::commit(Monster & someone, Game & game)
 	Item item = someone.inventory.take_item(slot);
 	item.pos = someone.pos;
 	game.level().items.push_back(item);
-	game.event(someone, GameEvent::DROPS_AT, item, game.cell_type_at(someone.pos));
+	game.event(someone, GameEvent::DROPS_AT, item, game.level().cell_type_at(someone.pos));
 }
 
 void Grab::commit(Monster & someone, Game & game)
@@ -45,7 +45,7 @@ void Grab::commit(Monster & someone, Game & game)
 	unsigned slot = someone.inventory.insert(item);
 	assert(slot != Inventory::NOTHING, NO_SPACE_LEFT, someone);
 	game.level().items.erase(item_index);
-	game.event(someone, GameEvent::PICKS_UP_FROM, item, game.cell_type_at(someone.pos));
+	game.event(someone, GameEvent::PICKS_UP_FROM, item, game.level().cell_type_at(someone.pos));
 	if(item.type->quest) {
 		game.event(someone, GameEvent::PICKED_UP_A_QUEST_ITEM);
 	}

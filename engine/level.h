@@ -7,6 +7,7 @@ class Item;
 class Object;
 class Action;
 class Game;
+class CompiledInfo;
 
 struct Level {
 	Map map;
@@ -17,6 +18,15 @@ struct Level {
 	Level();
 	~Level();
 	Level(int map_width, int map_height);
+
+	const CellType & cell_type_at(const Point & pos) const;
+	CompiledInfo get_info(int x, int y) const;
+	CompiledInfo get_info(const Point & pos) const;
+	const Monster & get_player() const;
+	Monster & get_player();
+	std::list<Point> find_path(const Point & player_pos, const Point & target);
+	void invalidate_fov(Monster & monster);
+	void erase_dead_monsters();
 };
 
 class Dungeon {
