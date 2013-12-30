@@ -2,7 +2,7 @@
 #include "engine/game.h"
 #include "engine/files.h"
 
-enum { SAVEFILE_MAJOR_VERSION = 34, SAVEFILE_MINOR_VERSION = 1 };
+enum { SAVEFILE_MAJOR_VERSION = 34, SAVEFILE_MINOR_VERSION = 2 };
 
 SAVEFILE_STORE_EXT(CellType, celltype)
 {
@@ -90,10 +90,13 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.store(game.turns);
 	savefile.newline();
 
-	savefile.store(game.dungeon->current_level);
-	savefile.newline();
+	if(savefile.version() < 2) {
+		savefile.store(game.dungeon->levels[game.dungeon->current_level_index]);
+		savefile.newline();
+		savefile.check("current_level");
+	}
 
-	savefile.store(game.dungeon->saved_levels, "levels");
+	savefile.store(game.dungeon->levels, "levels");
 	savefile.newline();
 }
 

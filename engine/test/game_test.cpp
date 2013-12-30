@@ -6,68 +6,6 @@
 
 SUITE(game) {
 
-class TestDungeon : public Dungeon {
-public:
-	TestDungeon(const Point & player_pos1, const Point & player_pos2)
-		: generated(false), pos1(player_pos1), pos2(player_pos2)
-	{
-		player_one = MonsterType::Builder("player_one").sprite(1).faction(Monster::PLAYER);
-		player_two = MonsterType::Builder("player_two").sprite(2).faction(Monster::PLAYER);
-	}
-	virtual void create_types(Game &) { }
-	virtual void generate(Level & level, int level_index)
-	{
-		generated = true;
-		level = Level(4, 4);
-		if(level_index == 1) {
-			level.monsters.push_back(Monster::Builder(&player_one).pos(pos1));
-		} else {
-			level.monsters.push_back(Monster::Builder(&player_two).pos(pos2));
-		}
-	}
-	bool was_generated() const { return generated; }
-private:
-	bool generated;
-	Point pos1, pos2;
-	MonsterType player_one;
-	MonsterType player_two;
-};
-
-struct GameWithLevels {
-	TestDungeon dungeon;
-	GameWithLevels(): dungeon(Point(1, 1), Point(2, 2)) {}
-};
-
-TEST_FIXTURE(GameWithLevels, should_save_current_level_as_visited)
-{
-	dungeon.go_to_level(1);
-	dungeon.go_to_level(2);
-	EQUAL(dungeon.saved_levels.count(1), (unsigned)1);
-}
-
-TEST_FIXTURE(GameWithLevels, should_restore_player_from_the_old_level_at_new_pos)
-{
-	dungeon.go_to_level(1);
-	dungeon.go_to_level(2);
-	EQUAL(dungeon.level().get_player().pos, Point(2, 2));
-}
-
-TEST_FIXTURE(GameWithLevels, should_restore_previously_visited_level)
-{
-	dungeon.go_to_level(1);
-	dungeon.level().get_player().hp = 3;
-	dungeon.go_to_level(2);
-	dungeon.go_to_level(1);
-	EQUAL(dungeon.level().get_player().hp, 3);
-}
-
-TEST_FIXTURE(GameWithLevels, should_generated_newly_visited_level)
-{
-	dungeon.go_to_level(1);
-	EQUAL(dungeon.level().get_player().type->sprite, 1);
-}
-
-
 struct DummyDungeon : public Dungeon {
 	DummyDungeon() : Dungeon() {}
 	virtual ~DummyDungeon() {}

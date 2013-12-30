@@ -32,8 +32,7 @@ struct Level {
 class Dungeon {
 public:
 	int current_level_index;
-	Level current_level;
-	std::map<int, Level> saved_levels;
+	std::map<int, Level> levels;
 
 	Dungeon();
 	virtual ~Dungeon() {}
