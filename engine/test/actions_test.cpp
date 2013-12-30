@@ -547,6 +547,13 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_go_up_on_upstairs)
 	} DONE(e);
 }
 
+TEST_FIXTURE(GameWithDummyAndStairs, should_end_turn_when_going_up)
+{
+	stairs().up_destination = 1;
+	GoUp().commit(dummy(), game);
+	EQUAL(game.state, Game::TURN_ENDED);
+}
+
 TEST_FIXTURE(GameWithDummyAndStairs, should_send_to_quest_on_upstairs_to_the_surface)
 {
 	stairs().up_destination = -1;
@@ -587,6 +594,13 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_go_down_on_downstairs)
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::GOES_DOWN);
 	} DONE(e);
+}
+
+TEST_FIXTURE(GameWithDummyAndStairs, should_end_turn_when_going_down)
+{
+	stairs().down_destination = 1;
+	GoDown().commit(dummy(), game);
+	EQUAL(game.state, Game::TURN_ENDED);
 }
 
 TEST_FIXTURE(GameWithDummyAndStairs, should_send_to_quest_on_downstairs_to_the_surface)

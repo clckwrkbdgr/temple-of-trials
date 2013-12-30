@@ -199,8 +199,40 @@ void Level::erase_dead_monsters()
 
 
 Dungeon::Dungeon()
-	: current_level(0)
+	: current_level_index(0)
 {
+}
+
+Level & Dungeon::level()
+{
+	return current_level;
+}
+
+const Level & Dungeon::level() const
+{
+	return current_level;
+}
+
+void Dungeon::go_to_level(int level_index)
+{
+	if(current_level_index != 0) {
+		saved_levels[current_level_index] = current_level;
+	}
+
+	Monster player = current_level.get_player();
+	if(saved_levels.count(level_index) > 0) {
+		current_level = saved_levels[level_index];
+		saved_levels.erase(level_index);
+	} else {
+		generate(current_level, level_index);
+	}
+	if(player.valid()) {
+		player.pos = current_level.get_player().pos;
+		current_level.get_player() = player;
+	} else {
+		log("Player wasn't found on the level when travelling!");
+	}
+	current_level_index = level_index;
 }
 
 void Dungeon::fill_room(Map & map, const std::pair<Point, Point> & room, const CellType * type)

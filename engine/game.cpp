@@ -32,14 +32,19 @@ Game::Game(Dungeon * game_dungeon)
 	dungeon->create_types(*this);
 }
 
+void Game::create_new_game()
+{
+	dungeon->go_to_level(1);
+}
+
 Level & Game::level()
 {
-	return dungeon->level;
+	return dungeon->level();
 }
 
 const Level & Game::level() const
 {
-	return dungeon->level;
+	return dungeon->level();
 }
 
 void Game::run(ControllerFactory controller_factory)
@@ -107,27 +112,6 @@ void Game::events_to_messages()
 	events.clear();
 }
 
-void Game::generate(int level_index)
-{
-	if(dungeon->current_level != 0) {
-		dungeon->saved_levels[dungeon->current_level] = dungeon->level;
-	}
-
-	Monster player = level().get_player();
-	if(dungeon->saved_levels.count(level_index) > 0) {
-		dungeon->level = dungeon->saved_levels[level_index];
-		dungeon->saved_levels.erase(level_index);
-	} else {
-		dungeon->generate(dungeon->level, level_index);
-	}
-	if(player.valid()) {
-		player.pos = level().get_player().pos;
-		level().get_player() = player;
-	}
-	dungeon->current_level = level_index;
-	state = TURN_ENDED;
-}
-
 void Game::process_environment(Monster & someone)
 {
 	if(level().cell_type_at(someone.pos).hurts) {
@@ -188,6 +172,7 @@ void Game::hit(Item & item, Monster & other, int damage)
 		die(other);
 	}
 }
+
 void Game::hit(Monster & someone, Monster & other, int damage)
 {
 	int received_damage = damage - other.inventory.worn_item().type->defence;

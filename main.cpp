@@ -40,7 +40,7 @@ int main()
 		}
 	} catch(const Reader::Exception & e) {
 		log(e.message);
-		game.generate(1);
+		game.create_new_game();
 	}
 
 	game.run(get_controller);

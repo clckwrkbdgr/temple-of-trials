@@ -50,6 +50,7 @@ struct Game {
 	TypeRegistry<Item> item_types;
 
 	Game(Dungeon * game_dungeon);
+	void create_new_game();
 	void run(ControllerFactory controller_factory);
 
 	void event(const GameEvent & e);
@@ -59,7 +60,6 @@ struct Game {
 
 	Level & level();
 	const Level & level() const;
-	void generate(int level);
 
 	void process_environment(Monster & someone);
 	void die(Monster & someone);

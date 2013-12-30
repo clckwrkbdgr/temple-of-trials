@@ -148,7 +148,8 @@ void GoUp::commit(Monster & someone, Game & game)
 		}
 	} else {
 		game.event(someone, GameEvent::GOES_UP);
-		game.generate(object.up_destination);
+		game.dungeon->go_to_level(object.up_destination);
+		game.state = Game::TURN_ENDED;
 	}
 }
 
@@ -166,6 +167,7 @@ void GoDown::commit(Monster & someone, Game & game)
 		}
 	} else {
 		game.event(someone, GameEvent::GOES_DOWN);
-		game.generate(object.down_destination);
+		game.dungeon->go_to_level(object.down_destination);
+		game.state = Game::TURN_ENDED;
 	}
 }

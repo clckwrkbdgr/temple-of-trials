@@ -180,7 +180,7 @@ void Console::draw_game(const Game & game)
 		return;
 	}
 	int row = 0;
-	print_stat(row++, format("Level: {0}", game.dungeon->current_level));
+	print_stat(row++, format("Level: {0}", game.dungeon->current_level_index));
 	print_stat(row++, format("Turns: {0}", game.turns));
 	print_stat(row++, format("HP   : {0}/{1}", player.hp, player.type->max_hp));
 	print_stat(row++, format("Items: {0}", player.inventory.size()));
