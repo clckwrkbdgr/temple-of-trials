@@ -86,14 +86,14 @@ SAVEFILE_STORE_EXT(Game, game)
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
 	savefile.newline();
 
-	savefile.store(game.current_level);
+	savefile.store(game.dungeon->current_level);
 	savefile.store(game.turns);
 	savefile.newline();
 
-	savefile.store(game.level);
+	savefile.store(game.dungeon->level);
 	savefile.newline();
 
-	savefile.store(game.saved_levels, "levels");
+	savefile.store(game.dungeon->saved_levels, "levels");
 	savefile.newline();
 }
 

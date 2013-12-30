@@ -41,10 +41,10 @@ Action * player_control(Monster & player, Game & game)
 			{
 				Point shift = console.directions[ch];
 				Point new_pos = player.pos + shift;
-				if(find_at(game.level.monsters, new_pos).valid()) {
+				if(find_at(game.level().monsters, new_pos).valid()) {
 					return new Swing(shift);
 				}
-				Object & object = find_at(game.level.objects, new_pos);
+				Object & object = find_at(game.level().objects, new_pos);
 				if(object.valid()) {
 					if(object.type->openable && !object.opened()) {
 						player.plan.push_front(new Move(shift));
@@ -84,7 +84,7 @@ Action * player_control(Monster & player, Game & game)
 Action * angry_and_wander(Monster & monster, Game & game)
 {
 	const Monster & player = game.get_player();
-	bool sees_player = game.level.map.cell(player.pos).visible;
+	bool sees_player = game.level().map.cell(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 			sign(player.pos.x - monster.pos.x),
@@ -106,7 +106,7 @@ Action * angry_and_wander(Monster & monster, Game & game)
 Action * angry_and_still(Monster & monster, Game & game)
 {
 	const Monster & player = game.get_player();
-	bool sees_player = game.level.map.cell(player.pos).visible;
+	bool sees_player = game.level().map.cell(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 		sign(player.pos.x - monster.pos.x),
@@ -124,7 +124,7 @@ Action * angry_and_still(Monster & monster, Game & game)
 Action * calm_and_still(Monster & monster, Game & game)
 {
 	const Monster & player = game.get_player();
-	bool sees_player = game.level.map.cell(player.pos).visible;
+	bool sees_player = game.level().map.cell(player.pos).visible;
 	int d = distance(monster.pos, player.pos);
 	Point shift = Point(
 		sign(player.pos.x - monster.pos.x),

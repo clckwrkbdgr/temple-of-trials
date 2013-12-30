@@ -5,7 +5,7 @@
 #include "engine/format.h"
 #include <cstdlib>
 
-void LinearGenerator::create_types(Game & game)
+void LinearDungeon::create_types(Game & game)
 {
 	floor = game.cell_types.insert(CellType::Builder("floor").sprite(Sprites::FLOOR).name("floor").passable(true).transparent(true));
 	wall = game.cell_types.insert(CellType::Builder("wall").sprite(Sprites::WALL).name("wall").passable(false));
@@ -43,7 +43,7 @@ void LinearGenerator::create_types(Game & game)
 	full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(Sprites::FLASK).name("water flask").edible().healing(5));
 }
 
-void LinearGenerator::generate(Level & level, int level_index)
+void LinearDungeon::generate(Level & level, int level_index)
 {
 	log("Generating level {0}...", level_index);
 

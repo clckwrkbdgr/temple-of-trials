@@ -21,8 +21,8 @@ int main()
 	std::ofstream log_file("temple.log", std::ios::app);
 	direct_log(&log_file);
 
-	LinearGenerator generator;
-	Game game(&generator);
+	LinearDungeon dungeon;
+	Game game(&dungeon);
 	game.messages.log_messages = true;
 	try {
 		if(!file_exists(SAVEFILE)) {

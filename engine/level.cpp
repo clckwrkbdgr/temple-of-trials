@@ -20,8 +20,12 @@ Level::Level(int map_width, int map_height)
 {
 }
 
+Dungeon::Dungeon()
+	: current_level(0)
+{
+}
 
-void LevelGenerator::fill_room(Map & map, const std::pair<Point, Point> & room, const CellType * type)
+void Dungeon::fill_room(Map & map, const std::pair<Point, Point> & room, const CellType * type)
 {
 	for(int x = room.first.x; x <= room.second.x; ++x) {
 		for(int y = room.first.y; y <= room.second.y; ++y) {
@@ -30,7 +34,7 @@ void LevelGenerator::fill_room(Map & map, const std::pair<Point, Point> & room, 
 	}
 }
 
-std::vector<Point> LevelGenerator::random_positions(const std::pair<Point, Point> & room, int count)
+std::vector<Point> Dungeon::random_positions(const std::pair<Point, Point> & room, int count)
 {
 	std::vector<Point> result;
 	for(int i = 0; i < count; ++i) {
@@ -52,7 +56,7 @@ std::vector<Point> LevelGenerator::random_positions(const std::pair<Point, Point
 	return result;
 }
 
-std::pair<Point, Point> LevelGenerator::connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const CellType * type)
+std::pair<Point, Point> Dungeon::connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const CellType * type)
 {
 	if(a.first.x < b.first.x) {
 		int start_y = std::max(a.first.y, b.first.y);
@@ -93,7 +97,7 @@ std::pair<Point, Point> LevelGenerator::connect_rooms(Level & level, const std::
 	return std::make_pair(Point(), Point());
 }
 
-std::vector<std::pair<Point, Point> > LevelGenerator::shuffle_rooms(const std::vector<std::pair<Point, Point> > & rooms)
+std::vector<std::pair<Point, Point> > Dungeon::shuffle_rooms(const std::vector<std::pair<Point, Point> > & rooms)
 {
 	static int a00[] = { 8, 1, 2, 7, 0, 3, 6, 5, 4, };
 	static int a01[] = { 6, 7, 8, 5, 0, 1, 4, 3, 2, };
@@ -142,7 +146,7 @@ std::vector<std::pair<Point, Point> > LevelGenerator::shuffle_rooms(const std::v
 	return new_rooms;
 }
 
-void LevelGenerator::pop_player_front(std::vector<Monster> & monsters)
+void Dungeon::pop_player_front(std::vector<Monster> & monsters)
 {
 	if(monsters.empty()) {
 		return;

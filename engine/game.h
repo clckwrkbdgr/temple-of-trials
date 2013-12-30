@@ -37,11 +37,8 @@ std::string to_string(const GameEvent & e);
 
 struct Game {
 	// TODO all level stuff compile in one Dungeon class.
-	int current_level;
-	LevelGenerator * generator;
-	Level level;
-	std::map<int, Level> saved_levels;
 	enum State { PLAYING, TURN_ENDED, SUSPENDED, PLAYER_DIED, COMPLETED };
+	Dungeon * dungeon;
 	State state;
 	Messages messages;
 	int turns;
@@ -53,7 +50,7 @@ struct Game {
 	TypeRegistry<Item> item_types;
 	const CellType & cell_type_at(const Point & pos) const;
 
-	Game(LevelGenerator * level_generator = 0);
+	Game(Dungeon * game_dungeon);
 	void run(ControllerFactory controller_factory);
 
 	void event(const GameEvent & e);
@@ -61,6 +58,8 @@ struct Game {
 	void event(const Info & event_actor, GameEvent::EventType event_type, int event_amount, const Info & event_target = Info(), const Info & event_help = Info());
 	void events_to_messages();
 
+	Level & level();
+	const Level & level() const;
 	void generate(int level);
 
 	void process_environment(Monster & someone);

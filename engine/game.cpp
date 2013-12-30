@@ -25,19 +25,28 @@ std::string to_string(const GameEvent & e)
 }
 
 
-Game::Game(LevelGenerator * level_generator)
-	: current_level(0), generator(level_generator), state(PLAYING), turns(0)
+Game::Game(Dungeon * game_dungeon)
+	: dungeon(game_dungeon), state(PLAYING), turns(0)
 {
-	if(generator) {
-		generator->create_types(*this);
-	}
+	assert(dungeon);
+	dungeon->create_types(*this);
+}
+
+Level & Game::level()
+{
+	return dungeon->level;
+}
+
+const Level & Game::level() const
+{
+	return dungeon->level;
 }
 
 void Game::run(ControllerFactory controller_factory)
 {
 	state = PLAYING;
 	while(state == PLAYING) {
-		foreach(Monster & monster, level.monsters) {
+		foreach(Monster & monster, level().monsters) {
 			if(monster.is_dead()) {
 				continue;
 			}
@@ -100,24 +109,22 @@ void Game::events_to_messages()
 
 void Game::generate(int level_index)
 {
-	if(current_level != 0) {
-		saved_levels[current_level] = level;
+	if(dungeon->current_level != 0) {
+		dungeon->saved_levels[dungeon->current_level] = dungeon->level;
 	}
 
 	Monster player = get_player();
-	if(saved_levels.count(level_index) > 0) {
-		level = saved_levels[level_index];
-		saved_levels.erase(level_index);
-	} else if(generator) {
-		generator->generate(level, level_index);
+	if(dungeon->saved_levels.count(level_index) > 0) {
+		dungeon->level = dungeon->saved_levels[level_index];
+		dungeon->saved_levels.erase(level_index);
 	} else {
-		return;
+		dungeon->generate(dungeon->level, level_index);
 	}
 	if(player.valid()) {
 		player.pos = get_player().pos;
 		get_player() = player;
 	}
-	current_level = level_index;
+	dungeon->current_level = level_index;
 	state = TURN_ENDED;
 }
 
@@ -127,14 +134,14 @@ void Game::process_environment(Monster & someone)
 		event(cell_type_at(someone.pos), GameEvent::HURTS, someone);
 		hurt(someone, 1);
 	}
-	Object & object = find_at(level.objects, someone.pos);
+	Object & object = find_at(level().objects, someone.pos);
 	if(object.valid() && object.type->triggerable) {
 		if(object.items.empty()) {
 			event(object, GameEvent::TRAP_IS_OUT_OF_ITEMS);
 		} else {
 			event(someone, GameEvent::TRIGGERS, object);
 			object.items.back().pos = object.pos;
-			level.items.push_back(object.items.back());
+			level().items.push_back(object.items.back());
 			object.items.pop_back();
 			hurt(someone, 1);
 		}
@@ -153,7 +160,7 @@ void Game::die(Monster & someone)
 	Item item;
 	while((item = someone.inventory.take_first_item()).valid()) {
 		item.pos = someone.pos;
-		level.items.push_back(item);
+		level().items.push_back(item);
 		event(someone, GameEvent::DROPS_AT, item, cell_type_at(someone.pos));
 	}
 	event(someone, GameEvent::DIED);
@@ -198,13 +205,13 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 
 const CellType & Game::cell_type_at(const Point & pos) const
 {
-	return *(level.map.cell(pos).type);
+	return *(level().map.cell(pos).type);
 }
 
 
 const Monster & Game::get_player() const
 {
-	foreach(const Monster & monster, level.monsters) {
+	foreach(const Monster & monster, level().monsters) {
 		if(monster.type->faction == Monster::PLAYER) {
 			return monster;
 		}
@@ -215,7 +222,7 @@ const Monster & Game::get_player() const
 
 Monster & Game::get_player()
 {
-	foreach( Monster & monster, level.monsters) {
+	foreach( Monster & monster, level().monsters) {
 		if(monster.type->faction == Monster::PLAYER) {
 			return monster;
 		}
@@ -228,7 +235,7 @@ Monster & Game::get_player()
 CompiledInfo Game::get_info(int x, int y) const
 {
 	CompiledInfo result(Point(x, y));
-	return result.in(level.monsters).in(level.items).in(level.objects).in(level.map);
+	return result.in(level().monsters).in(level().items).in(level().objects).in(level().map);
 }
 
 CompiledInfo Game::get_info(const Point & pos) const
@@ -238,14 +245,14 @@ CompiledInfo Game::get_info(const Point & pos) const
 
 void Game::invalidate_fov(Monster & monster)
 {
-	for(unsigned x = 0; x < level.map.width; ++x) {
-		for(unsigned y = 0; y < level.map.height; ++y) {
-			level.map.cell(x, y).visible = false;
+	for(unsigned x = 0; x < level().map.width; ++x) {
+		for(unsigned y = 0; y < level().map.height; ++y) {
+			level().map.cell(x, y).visible = false;
 		}
 	}
 	for(int x = monster.pos.x - monster.type->sight; x <= monster.pos.x + monster.type->sight; ++x) {
 		for(int y = monster.pos.y - monster.type->sight; y <= monster.pos.y + monster.type->sight; ++y) {
-			if(!level.map.valid(x, y)) {
+			if(!level().map.valid(x, y)) {
 				continue;
 			}
 			int dx = std::abs(x - monster.pos.x);
@@ -290,9 +297,9 @@ void Game::invalidate_fov(Monster & monster)
 					}
 				}
 			}
-			level.map.cell(x, y).visible = can_see;
+			level().map.cell(x, y).visible = can_see;
 			if(can_see && monster.type->faction == Monster::PLAYER) {
-				level.map.cell(x, y).seen_sprite = get_info(x, y).compiled().sprite;
+				level().map.cell(x, y).seen_sprite = get_info(x, y).compiled().sprite;
 			}
 		}
 	}
@@ -370,6 +377,6 @@ std::list<Point> Game::find_path(const Point & player_pos, const Point & target)
 
 void Game::erase_dead_monsters()
 {
-	level.monsters.erase(std::remove_if(level.monsters.begin(), level.monsters.end(), std::mem_fun_ref(&Monster::is_dead)), level.monsters.end());
+	level().monsters.erase(std::remove_if(level().monsters.begin(), level().monsters.end(), std::mem_fun_ref(&Monster::is_dead)), level().monsters.end());
 }
 

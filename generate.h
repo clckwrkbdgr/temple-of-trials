@@ -1,9 +1,9 @@
 #pragma once
 #include "engine/game.h"
 
-class LinearGenerator : public LevelGenerator {
+class LinearDungeon : public Dungeon {
 public:
-	virtual ~LinearGenerator() {}
+	virtual ~LinearDungeon() {}
 	virtual void generate(Level & level, int level_index);
 	virtual void create_types(Game & game);
 private:

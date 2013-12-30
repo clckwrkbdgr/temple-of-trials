@@ -7,12 +7,20 @@
 
 namespace ActionsFixture {
 
+struct DummyDungeon : public Dungeon {
+	DummyDungeon() : Dungeon() {}
+	virtual ~DummyDungeon() {}
+	virtual void generate(Level & /*level*/, int /*level_index*/) {}
+	virtual void create_types(Game & /*game*/) {}
+};
+
 struct GameWithDummyWieldingAndWearing {
+	DummyDungeon dungeon;
 	Game game;
 	const MonsterType * dummy_type;
 	const MonsterType * stub_type;
-	GameWithDummyWieldingAndWearing() {
-		game.level.map = Map(2, 3);
+	GameWithDummyWieldingAndWearing() : game(&dungeon) {
+		game.level().map = Map(2, 3);
 		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
 		stub_type = game.monster_types.insert(MonsterType::Builder("stub").name("stub").max_hp(100));
@@ -28,38 +36,40 @@ struct GameWithDummyWieldingAndWearing {
 		const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(1).name("water flask"));
 		const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(2).name("empty flask"));
 
-		game.level.map.fill(game.cell_types.get("floor"));
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).
+		game.level().map.fill(game.cell_types.get("floor"));
+		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).
 				item(Item(spear)).item(Item(armor)).wield(0).wear(1).
 				item(jacket).item(Item::Builder(full_flask, empty_flask).make_empty()));
 	}
-	Monster & dummy() { return game.level.monsters[0]; }
+	Monster & dummy() { return game.level().monsters[0]; }
 };
 
 struct GameWithDummyWithItems {
+	DummyDungeon dungeon;
 	Game game;
 	const MonsterType * dummy_type;
-	GameWithDummyWithItems() {
-		game.level.map = Map(2, 3);
+	GameWithDummyWithItems() : game(&dungeon) {
+		game.level().map = Map(2, 3);
 		game.cell_types.insert(CellType::Builder("floor").passable(true).transparent(true).name("floor"));
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
 		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor"));
 		const ItemType * spear = game.item_types.insert(ItemType::Builder("spear").sprite(2).damage(3).name("spear"));
 		const ItemType * pot = game.item_types.insert(ItemType::Builder("pot").sprite(1).name("pot"));
 
-		game.level.map.fill(game.cell_types.get("floor"));
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(spear).item(armor).item(pot).item(pot));
+		game.level().map.fill(game.cell_types.get("floor"));
+		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 2)).item(spear).item(armor).item(pot).item(pot));
 		dummy().inventory.take_item(2);
 	}
-	Monster & dummy() { return game.level.monsters[0]; }
+	Monster & dummy() { return game.level().monsters[0]; }
 };
 
 struct GameWithDummyAndFood {
+	DummyDungeon dungeon;
 	Game game;
 	const MonsterType * dummy_type;
 	enum { ARMOR, SPEAR, JUNK, FOOD, MEDKIT, MEGASPHERE, ANTIDOTE, FULL_FLASK, EMPTY_FLASK, EMPTY, NONE };
-	GameWithDummyAndFood() {
-		game.level.map = Map(2, 2);
+	GameWithDummyAndFood() : game(&dungeon) {
+		game.level().map = Map(2, 2);
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
 
 		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("armor").edible());
@@ -71,19 +81,19 @@ struct GameWithDummyAndFood {
 		const ItemType * antidote = game.item_types.insert(ItemType::Builder("antidote").sprite(4).name("antidote").edible().antidote(5));
 		const ItemType * full_flask = game.item_types.insert(ItemType::Builder("full_flask").sprite(7).name("water flask").edible());
 		const ItemType * empty_flask = game.item_types.insert(ItemType::Builder("empty_flask").sprite(8).name("empty flask"));
-		game.level.monsters.push_back(
+		game.level().monsters.push_back(
 				Monster::Builder(dummy_type).hp(90)
 				.item(armor).item(spear).wear(0).wield(1)
 				.item(junk).item(food).item(medkit).item(megasphere).item(antidote)
 				.item(Item()).item(Item(full_flask, empty_flask)).item(Item::Builder(full_flask, empty_flask).make_empty())
 				);
 	}
-	Monster & dummy() { return game.level.monsters[0]; }
+	Monster & dummy() { return game.level().monsters[0]; }
 };
 
-class TestLevelGenerator : public LevelGenerator {
+class TestDungeon : public Dungeon {
 public:
-	TestLevelGenerator(const Point & player_pos1, const Point & player_pos2)
+	TestDungeon(const Point & player_pos1, const Point & player_pos2)
 		: generated(false), pos1(player_pos1), pos2(player_pos2) { }
 	virtual void create_types(Game & game)
 	{
@@ -109,20 +119,20 @@ private:
 };
 
 struct GameWithDummyAndStairs {
-	TestLevelGenerator generator;
+	TestDungeon dungeon;
 	Game game;
 	GameWithDummyAndStairs()
-		: generator(Point(1, 1), Point(2, 2)), game(&generator)
+		: dungeon(Point(1, 1), Point(2, 2)), game(&dungeon)
 	{
 		const MonsterType * dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").name("dummy"));
 		const ObjectType * stairs_type = game.object_types.insert(ObjectType::Builder("stairs").name("stairs").transporting());
 		game.item_types.insert(ItemType::Builder("yendor").name("Yendor").quest().sprite(1));
-		game.level.map = Map(2, 2);
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
-		game.level.objects.push_back(Object::Builder(stairs_type).pos(Point(1, 1)));
+		game.level().map = Map(2, 2);
+		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
+		game.level().objects.push_back(Object::Builder(stairs_type).pos(Point(1, 1)));
 	}
-	Monster & dummy() { return game.level.monsters[0]; }
-	Object & stairs() { return game.level.objects[0]; }
+	Monster & dummy() { return game.level().monsters[0]; }
+	Object & stairs() { return game.level().objects[0]; }
 };
 
 };
@@ -177,8 +187,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_item_from_inventory_
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_place_item_on_the_floor_when_dropped)
 {
 	Drop(0).commit(dummy(), game);
-	EQUAL(game.level.items.size(), 1);
-	EQUAL(game.level.items[0].type->name, "spear");
+	EQUAL(game.level().items.size(), 1);
+	EQUAL(game.level().items[0].type->name, "spear");
 }
 
 }
@@ -196,7 +206,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_if_floor_is_empty)
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_grabbed_item_to_the_first_empty_slot)
 {
-	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
+	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
 	Grab().commit(dummy(), game);
 	EQUAL(dummy().inventory.get_item(4).type->name, "item");
 	TEST_CONTAINER(game.events, e) {
@@ -206,14 +216,14 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_grabbed_item_to_the_fir
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_remove_grabbed_item_from_map)
 {
-	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
+	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
 	Grab().commit(dummy(), game);
-	ASSERT(game.level.items.empty());
+	ASSERT(game.level().items.empty());
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_notify_if_quest_item)
 {
-	game.level.items.push_back(Item::Builder(game.item_types.get("quest_item")).pos(Point(1, 2)));
+	game.level().items.push_back(Item::Builder(game.item_types.get("quest_item")).pos(Point(1, 2)));
 	Grab().commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::PICKS_UP_FROM);
@@ -227,7 +237,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_item_if_inventory_
 	for(int i = 2; i < 26; ++i) {
 		dummy().inventory.insert(Item(game.item_types.get("stub")));
 	}
-	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
+	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 2)));
 	CATCH(Grab().commit(dummy(), game), Action::Exception, e) {
 		EQUAL(e.type, Action::NO_SPACE_LEFT);
 	}
@@ -561,7 +571,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_go
 {
 	stairs().up_destination = 1;
 	GoUp().commit(dummy(), game);
-	ASSERT(generator.was_generated());
+	ASSERT(dungeon.was_generated());
 }
 
 }
@@ -603,7 +613,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_go
 {
 	stairs().down_destination = 1;
 	GoDown().commit(dummy(), game);
-	ASSERT(generator.was_generated());
+	ASSERT(dungeon.was_generated());
 }
 
 }

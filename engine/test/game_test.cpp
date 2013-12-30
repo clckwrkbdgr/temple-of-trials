@@ -6,9 +6,9 @@
 
 SUITE(game) {
 
-class TestLevelGenerator : public LevelGenerator {
+class TestDungeon : public Dungeon {
 public:
-	TestLevelGenerator(const Point & player_pos1, const Point & player_pos2)
+	TestDungeon(const Point & player_pos1, const Point & player_pos2)
 		: generated(false), pos1(player_pos1), pos2(player_pos2) { }
 	virtual void create_types(Game & game)
 	{
@@ -34,16 +34,16 @@ private:
 };
 
 struct GameWithLevels {
-	TestLevelGenerator generator;
+	TestDungeon dungeon;
 	Game game;
-	GameWithLevels(): generator(Point(1, 1), Point(2, 2)), game(&generator) {}
+	GameWithLevels(): dungeon(Point(1, 1), Point(2, 2)), game(&dungeon) {}
 };
 
 TEST_FIXTURE(GameWithLevels, should_save_current_level_as_visited)
 {
 	game.generate(1);
 	game.generate(2);
-	EQUAL(game.saved_levels.count(1), (unsigned)1);
+	EQUAL(game.dungeon->saved_levels.count(1), (unsigned)1);
 }
 
 TEST_FIXTURE(GameWithLevels, should_restore_player_from_the_old_level_at_new_pos)
@@ -75,24 +75,32 @@ TEST_FIXTURE(GameWithLevels, should_end_turn_after_generation)
 }
 
 
+struct DummyDungeon : public Dungeon {
+	DummyDungeon() : Dungeon() {}
+	virtual ~DummyDungeon() {}
+	virtual void generate(Level & /*level*/, int /*level_index*/) {}
+	virtual void create_types(Game & /*game*/) {}
+};
+
 struct GameWithDummyOnTrap {
+	DummyDungeon dungeon;
 	Game game;
 	const MonsterType * dummy_type;
-	GameWithDummyOnTrap() {
+	GameWithDummyOnTrap() : game(&dungeon) {
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
-		game.level.map = Map(2, 2);
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
+		game.level().map = Map(2, 2);
+		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)));
 		const ObjectType * trap_type = game.object_types.insert(ObjectType::Builder("trap").name("trap").triggerable());
 		const ItemType * item = game.item_types.insert(ItemType::Builder("item").name("item").sprite(1));
-		game.level.objects.push_back(Object::Builder(trap_type).pos(Point(1, 1)).item(item));
+		game.level().objects.push_back(Object::Builder(trap_type).pos(Point(1, 1)).item(item));
 	}
-	Monster & dummy() { return game.level.monsters.front(); }
+	Monster & dummy() { return game.level().monsters.front(); }
 };
 
 TEST_FIXTURE(GameWithDummyOnTrap, should_trigger_trap_if_trap_is_set)
 {
 	game.process_environment(dummy());
-	ASSERT(game.level.objects.front().items.empty());
+	ASSERT(game.level().objects.front().items.empty());
 }
 
 TEST_FIXTURE(GameWithDummyOnTrap, should_hurt_monster_if_trap_is_set)
@@ -109,12 +117,12 @@ TEST_FIXTURE(GameWithDummyOnTrap, should_hurt_monster_if_trap_is_set)
 TEST_FIXTURE(GameWithDummyOnTrap, should_leave_bolt_if_trap_is_set)
 {
 	game.process_environment(dummy());
-	EQUAL(game.level.items.front().type->sprite, 1);
+	EQUAL(game.level().items.front().type->sprite, 1);
 }
 
 TEST_FIXTURE(GameWithDummyOnTrap, should_not_hurt_monster_if_trap_is_triggered_already)
 {
-	game.level.objects.front().items.clear();
+	game.level().objects.front().items.clear();
 	game.process_environment(dummy());
 	EQUAL(dummy().hp, 100);
 	TEST_CONTAINER(game.events, e) {
@@ -123,22 +131,23 @@ TEST_FIXTURE(GameWithDummyOnTrap, should_not_hurt_monster_if_trap_is_triggered_a
 }
 
 struct GameWithDummy {
+	DummyDungeon dungeon;
 	Game game;
 	const MonsterType * dummy_type;
 	const MonsterType * player_type;
-	GameWithDummy() {
-		game.level.map = Map(2, 2);
+	GameWithDummy() : game(&dungeon) {
+		game.level().map = Map(2, 2);
 		game.cell_types.insert(CellType("floor"));
 		dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
 		player_type = game.monster_types.insert(MonsterType::Builder("player").max_hp(100).name("dummy").faction(Monster::PLAYER));
 
-		game.level.map.fill(game.cell_types.get("floor"));
+		game.level().map.fill(game.cell_types.get("floor"));
 		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("item"));
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
-		game.level.monsters.push_back(Monster::Builder(player_type).pos(Point(1, 1)).item(armor));
+		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
+		game.level().monsters.push_back(Monster::Builder(player_type).pos(Point(1, 1)).item(armor));
 	}
-	Monster & dummy() { return game.level.monsters.front(); }
-	Monster & player() { return game.level.monsters.back(); }
+	Monster & dummy() { return game.level().monsters.front(); }
+	Monster & player() { return game.level().monsters.back(); }
 };
 
 TEST_FIXTURE(GameWithDummy, should_hurt_monster_if_cell_hurts)
@@ -176,7 +185,7 @@ TEST_FIXTURE(GameWithDummy, should_decrease_poisoning_each_turn)
 TEST_FIXTURE(GameWithDummy, should_drop_loot_if_monster_is_dead)
 {
 	game.die(dummy());
-	EQUAL(game.level.items.front().pos, dummy().pos);
+	EQUAL(game.level().items.front().pos, dummy().pos);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::DROPS_AT);
 	} NEXT(e) {
@@ -239,20 +248,21 @@ TEST_FIXTURE(GameWithDummy, should_die_if_hurts_too_much)
 
 
 struct GameWithDummyAndKiller {
+	DummyDungeon dungeon;
 	Game game;
-	GameWithDummyAndKiller() {
+	GameWithDummyAndKiller() : game(&dungeon) {
 		const MonsterType * dummy_type = game.monster_types.insert(MonsterType::Builder("dummy").max_hp(100).name("dummy"));
 		const MonsterType * killer_type = game.monster_types.insert(MonsterType::Builder("killer").max_hp(100).name("killer"));
 		const MonsterType * poisoner_type = game.monster_types.insert(MonsterType::Builder("poisoner").max_hp(100).name("poisoner").poisonous(true));
-		game.level.map = Map(2, 2);
+		game.level().map = Map(2, 2);
 		const ItemType * armor = game.item_types.insert(ItemType::Builder("armor").sprite(1).wearable().defence(3).name("item"));
-		game.level.monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
-		game.level.monsters.push_back(Monster::Builder(killer_type).pos(Point(0, 1)));
-		game.level.monsters.push_back(Monster::Builder(poisoner_type).pos(Point(1, 0)));
+		game.level().monsters.push_back(Monster::Builder(dummy_type).pos(Point(1, 1)).item(armor));
+		game.level().monsters.push_back(Monster::Builder(killer_type).pos(Point(0, 1)));
+		game.level().monsters.push_back(Monster::Builder(poisoner_type).pos(Point(1, 0)));
 	}
-	Monster & dummy() { return game.level.monsters[0]; }
-	Monster & killer() { return game.level.monsters[1]; }
-	Monster & poisoner() { return game.level.monsters[2]; }
+	Monster & dummy() { return game.level().monsters[0]; }
+	Monster & killer() { return game.level().monsters[1]; }
+	Monster & poisoner() { return game.level().monsters[2]; }
 };
 
 TEST_FIXTURE(GameWithDummyAndKiller, should_hit_monster)
@@ -319,19 +329,28 @@ TEST_FIXTURE(GameWithDummyAndKiller, should_die_if_hit_was_too_much)
 
 SUITE(level) {
 
+struct DummyDungeon : public Dungeon {
+	DummyDungeon() : Dungeon() {}
+	virtual ~DummyDungeon() {}
+	virtual void generate(Level & /*level*/, int /*level_index*/) {}
+	virtual void create_types(Game & /*game*/) {}
+};
+
 struct Game2x2 {
+	DummyDungeon dungeon;
 	Game game;
 	const MonsterType * monster_type;
 	Game2x2()
+		: game(&dungeon)
 	{
-		game.level = Level(2, 2);
+		game.level() = Level(2, 2);
 		game.cell_types.insert(CellType::Builder("floor").sprite(1).passable(true).transparent(true));
 		monster_type = game.monster_types.insert(MonsterType::Builder("monster").sprite(3).faction(Monster::PLAYER));
 		game.object_types.insert(ObjectType::Builder("stone").name("stone"));
 		game.object_types.insert(ObjectType::Builder("passable").passable().sprite(2));
 		game.object_types.insert(ObjectType::Builder("transparent").transparent());
 		game.item_types.insert(ItemType::Builder("item").sprite(4));
-		game.level.map.fill(game.cell_types.get("floor"));
+		game.level().map.fill(game.cell_types.get("floor"));
 	}
 };
 
@@ -343,25 +362,25 @@ TEST_FIXTURE(Game2x2, impassable_cells_should_be_impassable)
 
 TEST_FIXTURE(Game2x2, monsters_should_be_impassable)
 {
-	game.level.monsters.push_back(Monster::Builder(monster_type).pos(Point(1, 1)));
+	game.level().monsters.push_back(Monster::Builder(monster_type).pos(Point(1, 1)));
 	ASSERT(!game.get_info(1, 1).compiled().passable);
 }
 
 TEST_FIXTURE(Game2x2, items_should_be_passable)
 {
-	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
+	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
 	ASSERT(game.get_info(1, 1).compiled().passable);
 }
 
 TEST_FIXTURE(Game2x2, impassable_objects_should_be_impassable)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("stone")).pos(Point(1, 1)).opened(false));
+	game.level().objects.push_back(Object::Builder(game.object_types.get("stone")).pos(Point(1, 1)).opened(false));
 	ASSERT(!game.get_info(1, 1).compiled().passable);
 }
 
 TEST_FIXTURE(Game2x2, passable_objects_should_be_passable)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
+	game.level().objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
 	ASSERT(game.get_info(1, 1).compiled().passable);
 }
 
@@ -379,25 +398,25 @@ TEST_FIXTURE(Game2x2, opaque_cells_should_be_opaque)
 
 TEST_FIXTURE(Game2x2, opaque_objects_should_be_opaque)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("stone")).pos(Point(1, 1)).opened(false));
+	game.level().objects.push_back(Object::Builder(game.object_types.get("stone")).pos(Point(1, 1)).opened(false));
 	ASSERT(!game.get_info(1, 1).compiled().transparent);
 }
 
 TEST_FIXTURE(Game2x2, transparent_objects_should_be_transparent)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("transparent")).pos(Point(1, 1)));
+	game.level().objects.push_back(Object::Builder(game.object_types.get("transparent")).pos(Point(1, 1)));
 	ASSERT(game.get_info(1, 1).compiled().transparent);
 }
 
 TEST_FIXTURE(Game2x2, monsters_should_be_transparent)
 {
-	game.level.monsters.push_back(Monster::Builder(monster_type).pos(Point(1, 1)));
+	game.level().monsters.push_back(Monster::Builder(monster_type).pos(Point(1, 1)));
 	ASSERT(game.get_info(1, 1).compiled().transparent);
 }
 
 TEST_FIXTURE(Game2x2, items_should_be_transparent)
 {
-	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
+	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
 	ASSERT(game.get_info(1, 1).compiled().transparent);
 }
 
@@ -409,24 +428,24 @@ TEST_FIXTURE(Game2x2, transparent_cells_should_be_transparent)
 
 TEST_FIXTURE(Game2x2, monster_should_be_on_top_of_all)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
-	game.level.monsters.push_back(Monster::Builder(monster_type).pos(Point(1, 1)));
-	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
+	game.level().objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
+	game.level().monsters.push_back(Monster::Builder(monster_type).pos(Point(1, 1)));
+	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
 	int sprite = game.get_info(1, 1).compiled().sprite;
 	EQUAL(sprite, 3);
 }
 
 TEST_FIXTURE(Game2x2, items_should_be_on_top_of_objects)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
-	game.level.items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
+	game.level().objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
+	game.level().items.push_back(Item::Builder(game.item_types.get("item")).pos(Point(1, 1)));
 	int sprite = game.get_info(Point(1, 1)).compiled().sprite;
 	EQUAL(sprite, 4);
 }
 
 TEST_FIXTURE(Game2x2, objects_should_be_below_everything)
 {
-	game.level.objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
+	game.level().objects.push_back(Object::Builder(game.object_types.get("passable")).pos(Point(1, 1)));
 	int sprite = game.get_info(Point(1, 1)).compiled().sprite;
 	EQUAL(sprite, 2);
 }
@@ -434,24 +453,26 @@ TEST_FIXTURE(Game2x2, objects_should_be_below_everything)
 
 TEST_FIXTURE(Game2x2, should_get_player_from_monsters)
 {
-	game.level.monsters.push_back(Monster::Builder(monster_type));
+	game.level().monsters.push_back(Monster::Builder(monster_type));
 	Monster & monster = game.get_player();
 	EQUAL(monster.type->faction, Monster::PLAYER);
 }
 
 TEST_FIXTURE(Game2x2, should_get_player_from_const_monsters)
 {
-	game.level.monsters.push_back(Monster::Builder(monster_type));
+	game.level().monsters.push_back(Monster::Builder(monster_type));
 	const Monster & monster = static_cast<const Game &>(game).get_player();
 	EQUAL(monster.type->faction, Monster::PLAYER);
 }
 
 
 struct LevelWithPath {
+	DummyDungeon dungeon;
 	Game game;
 	LevelWithPath()
+		: game(&dungeon)
 	{
-		game.level = Level(4, 4);
+		game.level() = Level(4, 4);
 		const CellType * f = game.cell_types.insert(CellType::Builder("f").passable(true));
 		const CellType * w = game.cell_types.insert(CellType::Builder("w").passable(false));
 		const CellType * a[] = {
@@ -460,7 +481,7 @@ struct LevelWithPath {
 			f, w, w, f,
 			f, w, f, w,
 		};
-		game.level.map.fill(a);
+		game.level().map.fill(a);
 	}
 };
 
@@ -483,29 +504,31 @@ TEST_FIXTURE(LevelWithPath, should_not_find_path_if_target_is_the_same_as_start)
 }
 
 struct LevelForSeeing {
+	DummyDungeon dungeon;
 	Game game;
 	LevelForSeeing()
+		: game(&dungeon)
 	{
-		game.level = Level(3, 2);
+		game.level() = Level(3, 2);
 		const CellType * f = game.cell_types.insert(CellType::Builder("f").sprite(1).passable(true).transparent(true));
 		const CellType * w = game.cell_types.insert(CellType::Builder("w").sprite(2).passable(false).transparent(false));
 		const CellType * a[] = {
 			w, f, w,
 			f, w, f,
 		};
-		game.level.map.fill(a);
+		game.level().map.fill(a);
 		const MonsterType * player_type = game.monster_types.insert(MonsterType::Builder("player").faction(Monster::PLAYER).sight(3).sprite(100));
-		game.level.monsters.push_back(Monster::Builder(player_type).pos(Point(2, 1)));
+		game.level().monsters.push_back(Monster::Builder(player_type).pos(Point(2, 1)));
 	}
 };
 
 TEST_FIXTURE(LevelForSeeing, should_store_seen_sprites)
 {
 	game.invalidate_fov(game.get_player());
-	EQUAL(game.level.map.cell(1, 0).seen_sprite, 1);
-	EQUAL(game.level.map.cell(2, 0).seen_sprite, 2);
-	EQUAL(game.level.map.cell(1, 1).seen_sprite, 2);
-	EQUAL(game.level.map.cell(2, 1).seen_sprite, 100);
+	EQUAL(game.level().map.cell(1, 0).seen_sprite, 1);
+	EQUAL(game.level().map.cell(2, 0).seen_sprite, 2);
+	EQUAL(game.level().map.cell(1, 1).seen_sprite, 2);
+	EQUAL(game.level().map.cell(2, 1).seen_sprite, 100);
 }
 
 TEST_FIXTURE(LevelForSeeing, should_remember_sprite_instead_of_content)
@@ -514,38 +537,39 @@ TEST_FIXTURE(LevelForSeeing, should_remember_sprite_instead_of_content)
 
 	game.get_player().pos = Point(0, 1);
 	game.invalidate_fov(game.get_player());
-	EQUAL(game.level.map.cell(2, 1).seen_sprite, 100);
+	EQUAL(game.level().map.cell(2, 1).seen_sprite, 100);
 }
 
 TEST_FIXTURE(LevelForSeeing, should_calculate_visible_area_within_sight_radius)
 {
 	game.invalidate_fov(game.get_player());
-	EQUAL(game.level.map.cell(0, 0).visible, false);
-	EQUAL(game.level.map.cell(0, 1).visible, false);
-	EQUAL(game.level.map.cell(1, 0).visible, true);
-	EQUAL(game.level.map.cell(2, 0).visible, true);
-	EQUAL(game.level.map.cell(1, 1).visible, true);
-	EQUAL(game.level.map.cell(2, 1).visible, true);
+	EQUAL(game.level().map.cell(0, 0).visible, false);
+	EQUAL(game.level().map.cell(0, 1).visible, false);
+	EQUAL(game.level().map.cell(1, 0).visible, true);
+	EQUAL(game.level().map.cell(2, 0).visible, true);
+	EQUAL(game.level().map.cell(1, 1).visible, true);
+	EQUAL(game.level().map.cell(2, 1).visible, true);
 }
 
 TEST_FIXTURE(LevelForSeeing, should_not_see_through_opaque_cells)
 {
 	game.invalidate_fov(game.get_player());
-	EQUAL(game.level.map.cell(0, 1).visible, false);
+	EQUAL(game.level().map.cell(0, 1).visible, false);
 }
 
 
 TEST(should_erase_dead_monsters)
 {
-	Game game;
-	game.level = Level(2, 2);
+	DummyDungeon dungeon;
+	Game game(&dungeon);
+	game.level() = Level(2, 2);
 	const MonsterType * monster_alive = game.monster_types.insert(MonsterType::Builder("alive").max_hp(100).sprite(1));
 	const MonsterType * monster_dead = game.monster_types.insert(MonsterType::Builder("dead").max_hp(100).sprite(2));
-	game.level.monsters.push_back(Monster::Builder(monster_alive).pos(Point(1, 1)).hp(0));
-	game.level.monsters.push_back(Monster::Builder(monster_dead).pos(Point(1, 1)));
+	game.level().monsters.push_back(Monster::Builder(monster_alive).pos(Point(1, 1)).hp(0));
+	game.level().monsters.push_back(Monster::Builder(monster_dead).pos(Point(1, 1)));
 	game.erase_dead_monsters();
-	EQUAL(game.level.monsters.size(), (unsigned)1);
-	EQUAL(game.level.monsters[0].type->sprite, 2);
+	EQUAL(game.level().monsters.size(), (unsigned)1);
+	EQUAL(game.level().monsters[0].type->sprite, 2);
 }
 
 }

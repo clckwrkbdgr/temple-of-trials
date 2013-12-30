@@ -19,9 +19,14 @@ struct Level {
 	Level(int map_width, int map_height);
 };
 
-class LevelGenerator {
+class Dungeon {
 public:
-	virtual ~LevelGenerator() {}
+	int current_level;
+	Level level;
+	std::map<int, Level> saved_levels;
+
+	Dungeon();
+	virtual ~Dungeon() {}
 	virtual void generate(Level & level, int level_index) = 0;
 	virtual void create_types(Game & game) = 0;
 protected:

@@ -138,7 +138,7 @@ void Console::draw_game(const Game & game)
 {
 	NCursesUpdate upd;
 
-	const Map & map = game.level.map;
+	const Map & map = game.level().map;
 
 	for(unsigned x = 0; x < map.width; ++x) {
 		for(unsigned y = 0; y < map.height; ++y) {
@@ -180,7 +180,7 @@ void Console::draw_game(const Game & game)
 		return;
 	}
 	int row = 0;
-	print_stat(row++, format("Level: {0}", game.current_level));
+	print_stat(row++, format("Level: {0}", game.dungeon->current_level));
 	print_stat(row++, format("Turns: {0}", game.turns));
 	print_stat(row++, format("HP   : {0}/{1}", player.hp, player.type->max_hp));
 	print_stat(row++, format("Items: {0}", player.inventory.size()));
@@ -199,17 +199,17 @@ Point Console::target_mode(Game & game, const Point & start)
 	int ch = 0;
 	curs_set(1);
 	while(ch != 'x' && ch != 27 && ch != '.') {
-		if(game.level.map.valid(target)) {
-			if(game.level.map.cell(target).visible) {
+		if(game.level().map.valid(target)) {
+			if(game.level().map.cell(target).visible) {
 				notification(format("You see {0}.", game.get_info(target).compiled().name));
-			} else if(game.level.map.cell(target).seen_sprite) {
+			} else if(game.level().map.cell(target).seen_sprite) {
 				notification(format("You recall {0}.", game.get_info(target).compiled().name));
 			} else {
 				notification("You cannot see there.");
 			}
 		}
 		draw_game(game);
-		if(game.level.map.valid(target)) {
+		if(game.level().map.valid(target)) {
 			int ch = mvinch(target.y + 1, target.x);
 			mvaddch(target.y + 1, target.x, ch ^ A_BLINK);
 			move(target.y + 1, target.x);
@@ -227,14 +227,14 @@ Point Console::target_mode(Game & game, const Point & start)
 
 		if(directions.count(ch) != 0) {
 			Point new_target = target + directions[ch];
-			if(game.level.map.valid(new_target)) {
+			if(game.level().map.valid(new_target)) {
 				target = new_target;
 			}
 		}
 	}
 	curs_set(0);
 	if(ch == '.') {
-		if(game.level.map.cell(target).seen_sprite == 0) {
+		if(game.level().map.cell(target).seen_sprite == 0) {
 			notification("You don't know how to get there.");
 		} else {
 			return target;
