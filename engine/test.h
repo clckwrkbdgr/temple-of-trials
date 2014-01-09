@@ -119,11 +119,11 @@ private:
 #define TEST_CONTAINER(container, var) \
 	TestContainer<decltype(container)> test_c_##var(__FILE__, __LINE__, container, #container); \
 	for(; !test_c_##var.done(); ) \
-	for(decltype(test_c_##var.value()) & e = test_c_##var.value(); !test_c_##var.done(); test_c_##var.mark_done())
+	for(decltype(test_c_##var.value()) & var = test_c_##var.value(); !test_c_##var.done(); test_c_##var.mark_done())
 
 #define NEXT(var) \
 	for(test_c_##var.to_next(__FILE__, __LINE__); !test_c_##var.done(); ) \
-	for(decltype(test_c_##var.value()) & e = test_c_##var.value(); !test_c_##var.done(); test_c_##var.mark_done())
+	for(decltype(test_c_##var.value()) & var = test_c_##var.value(); !test_c_##var.done(); test_c_##var.mark_done())
 
 #define DONE(var) \
 	test_c_##var.check_at_end(__FILE__, __LINE__)

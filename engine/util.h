@@ -44,31 +44,6 @@ std::vector<std::string> & operator<<(std::vector<std::string> & out, const char
 
 template<class T, size_t N>
 size_t size_of_array(T (&)[N]) { return N; }
-template<class T, size_t N>
-std::vector<T> make_vector(T (&a)[N]) { return std::vector<T>(a, a + N); }
-template<class T>
-std::vector<T> make_vector(const std::list<T> & a) { return std::vector<T>(a.begin(), a.end()); }
-
-template<class T>
-class MakeVector {
-public:
-	std::vector<T> result;
-	MakeVector(const T & value) : result(1, value) {}
-	MakeVector & operator()(const T & value) { result.push_back(value); return *this; }
-	operator std::vector<T> & () { return result; }
-	operator const std::vector<T> & () const { return result; }
-};
-
-template<class IteratorA, class IteratorB>
-bool equal_containers(IteratorA a_begin, IteratorA a_end, IteratorB b_begin, IteratorB b_end)
-{
-	for(; a_begin != a_end && b_begin != b_end; ++a_begin, ++b_begin) {
-		if(*a_begin != *b_begin) {
-			return false;
-		}
-	}
-	return a_begin == a_end && b_begin == b_end;
-}
 
 template<class T>
 struct TypePtr {

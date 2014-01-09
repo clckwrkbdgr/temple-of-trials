@@ -155,13 +155,25 @@ TEST_FIXTURE(Game2x2, should_get_player_from_const_monsters)
 TEST_FIXTURE(LevelWithPath, should_find_path_between_points)
 {
 	std::list<Point> path = game.level().find_path(Point(0, 3), Point(2, 3));
-	EQUAL_CONTAINERS(path, MakeVector<Point>(Point(0, -1))(Point(1, -1))(Point(1,  0))(Point(1,  1))(Point(-1, 1)).result);
+	TEST_CONTAINER(path, pos) {
+		EQUAL(pos, Point(0, -1));
+	} NEXT(pos) {
+		EQUAL(pos, Point(1, -1));
+	} NEXT(pos) {
+		EQUAL(pos, Point(1,  0));
+	} NEXT(pos) {
+		EQUAL(pos, Point(1,  1));
+	} NEXT(pos) {
+		EQUAL(pos, Point(-1, 1));
+	} DONE(pos);
 }
 
 TEST_FIXTURE(LevelWithPath, should_find_path_between_close_points)
 {
 	std::list<Point> path = game.level().find_path(Point(0, 3), Point(0, 2));
-	EQUAL_CONTAINERS(path, MakeVector<Point>(Point(0, -1)).result);
+	TEST_CONTAINER(path, pos) {
+		EQUAL(pos, Point(0, -1));
+	} DONE(pos);
 }
 
 TEST_FIXTURE(LevelWithPath, should_not_find_path_if_target_is_the_same_as_start)

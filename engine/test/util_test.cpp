@@ -23,7 +23,7 @@ TEST(should_return_sign_of_zero)
 
 TEST(should_iterate_for_each_value_in_vector)
 {
-	std::vector<int> v = MakeVector<int>(1)(2)(3);
+	std::vector<int> v; v << 1 << 2 << 3;
 	int j = 1;
 	foreach(int i, v) {
 		EQUAL(i, j);
@@ -33,12 +33,17 @@ TEST(should_iterate_for_each_value_in_vector)
 
 TEST(should_iterate_for_each_value_in_vector_by_ref)
 {
-	std::vector<int> v = MakeVector<int>(1)(2)(3);
+	std::vector<int> v; v << 1 << 2 << 3;
 	foreach(int & i, v) {
 		i *= i;
 	}
-	int a[] = {1, 4, 9};
-	EQUAL(v, make_vector(a));
+	TEST_CONTAINER(v, i) {
+		EQUAL(i, 1);
+	} NEXT(i) {
+		EQUAL(i, 4);
+	} NEXT(i) {
+		EQUAL(i, 9);
+	} DONE(i);
 }
 
 TEST(should_iterate_for_each_char_in_string)
@@ -78,40 +83,6 @@ TEST(should_push_back_c_string_to_vector)
 	stringlist << "hello";
 	EQUAL(stringlist.size(), (unsigned)1);
 	EQUAL(stringlist[0], "hello");
-}
-
-TEST(should_make_vector_from_array)
-{
-	int a[] = {1, 2, 3};
-	std::vector<int> v = make_vector(a);
-	EQUAL(v.size(), (unsigned)3);
-	EQUAL(v[0], 1);
-	EQUAL(v[1], 2);
-	EQUAL(v[2], 3);
-}
-
-TEST(should_make_vector_using_init_chain)
-{
-	std::vector<int> v = MakeVector<int>(1)(2)(3);
-	EQUAL(v.size(), (unsigned)3);
-	EQUAL(v[0], 1);
-	EQUAL(v[1], 2);
-	EQUAL(v[2], 3);
-}
-
-TEST(should_compare_containers)
-{
-	std::vector<int> v = MakeVector<int>(1)(2)(3);
-	std::list<int> l(v.begin(), v.end());
-	ASSERT(equal_containers(v.begin(), v.end(), l.begin(), l.end()));
-}
-
-TEST(should_compare_unequal_containers_unequal)
-{
-	std::vector<int> v = MakeVector<int>(1)(2)(3);
-	std::list<int> l(v.begin(), v.end());
-	v.push_back(4);
-	ASSERT(!equal_containers(v.begin(), v.end(), l.begin(), l.end()));
 }
 
 

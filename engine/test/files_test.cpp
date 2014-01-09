@@ -193,7 +193,13 @@ TEST(reader_should_resize_vector_and_read_it)
 	Reader reader(in);
 	std::vector<int> v;
 	reader.store(v, "vector");
-	EQUAL(v, MakeVector<int>(1)(2)(3).result);
+	TEST_CONTAINER(v, i) {
+		EQUAL(i, 1);
+	} NEXT(i) {
+		EQUAL(i, 2);
+	} NEXT(i) {
+		EQUAL(i, 3);
+	} DONE(i);
 }
 
 TEST(reader_should_read_map)
@@ -202,8 +208,16 @@ TEST(reader_should_read_map)
 	Reader reader(in);
 	std::map<int, char> m;
 	reader.store(m, "map");
-	std::vector<KeyValue> v = MakeVector<KeyValue>(KeyValue(1, 'A'))(KeyValue(2, 'B'))(KeyValue(3, 'C')).result;
-	EQUAL_CONTAINERS(m, v);
+	TEST_CONTAINER(m, i) {
+		EQUAL(i.first, 1);
+		EQUAL(i.second, 'A');
+	} NEXT(i) {
+		EQUAL(i.first, 2);
+		EQUAL(i.second, 'B');
+	} NEXT(i) {
+		EQUAL(i.first, 3);
+		EQUAL(i.second, 'C');
+	} DONE(i);
 }
 
 
@@ -343,8 +357,8 @@ TEST(writer_should_write_vector_preceeded_by_size)
 {
 	std::ostringstream out;
 	Writer writer(out);
-	int a[] = {1, 2, 3};
-	writer.store(make_vector(a), "vector");
+	std::vector<int> a; a << 1 << 2 << 3;
+	writer.store(a, "vector");
 	EQUAL(out.str(), "3 \n1 \n2 \n3 \n");
 }
 
@@ -352,9 +366,7 @@ TEST(writer_should_write_map)
 {
 	std::ostringstream out;
 	Writer writer(out);
-	typedef std::pair<int, char> KeyValue;
-	std::vector<KeyValue> v = MakeVector<KeyValue>(KeyValue(1, 'A'))(KeyValue(2, 'B'))(KeyValue(3, 'C')).result;
-	std::map<int, char> m(v.begin(), v.end());
+	std::map<int, char> m; m[1] = 'A'; m[2] = 'B'; m[3] = 'C';
 	writer.store(m, "map");
 	EQUAL(out.str(), "3 \n1 65 \n2 66 \n3 67 \n");
 }

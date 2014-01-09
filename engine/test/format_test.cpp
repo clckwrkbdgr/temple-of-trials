@@ -38,14 +38,14 @@ TEST(should_convert_string_to_string)
 
 TEST(should_convert_vector_to_string)
 {
-	std::vector<int> v = MakeVector<int>(1)(2)(3)(4);
+	std::vector<int> v; v << 1 << 2 << 3 << 4;
 	std::string result = to_string(v);
 	EQUAL(result, "1|2|3|4");
 }
 
 TEST(should_convert_list_to_string)
 {
-	std::vector<int> v = MakeVector<int>(1)(2)(3)(4);
+	std::vector<int> v; v << 1 << 2 << 3 << 4;
 	std::list<int> l(v.begin(), v.end());
 	std::string result = to_string(l);
 	EQUAL(result, "1|2|3|4");

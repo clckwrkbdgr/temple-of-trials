@@ -78,14 +78,14 @@ struct PosInt {
 
 TEST(should_find_item_in_vector)
 {
-	std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
+	std::vector<PosInt> v; v << PosInt(1, Point(1, 0)) << PosInt(2, Point(0, 1)) << PosInt(3, Point(0, 0));
 	PosInt & i = find_at(v, Point(0, 1));
 	EQUAL(i.value, 2);
 }
 
 TEST(should_change_found_item_in_vector)
 {
-	std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
+	std::vector<PosInt> v; v << PosInt(1, Point(1, 0)) << PosInt(2, Point(0, 1)) << PosInt(3, Point(0, 0));
 	PosInt & i = find_at(v, Point(0, 1));
 	i.value = 4;
 	EQUAL(v[1].value, 4);
@@ -93,7 +93,7 @@ TEST(should_change_found_item_in_vector)
 
 TEST(should_return_empty_item_if_not_found_in_vector)
 {
-	std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(1, 1)));
+	std::vector<PosInt> v; v << PosInt(1, Point(1, 0)) << PosInt(2, Point(0, 1)) << PosInt(3, Point(1, 1));
 	PosInt & i = find_at(v, Point(2, 2));
 	EQUAL(i.value, 0);
 	ASSERT(i.pos.null());
@@ -101,14 +101,16 @@ TEST(should_return_empty_item_if_not_found_in_vector)
 
 TEST(should_find_item_in_const_vector)
 {
-	const std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(0, 0)));
+	std::vector<PosInt> a; a << PosInt(1, Point(1, 0)) << PosInt(2, Point(0, 1)) << PosInt(3, Point(0, 0));
+	const std::vector<PosInt> & v = a;
 	PosInt i = find_at(v, Point(0, 1));
 	EQUAL(i.value, 2);
 }
 
 TEST(should_return_empty_item_if_not_found_in_const_vector)
 {
-	const std::vector<PosInt> v = MakeVector<PosInt>(PosInt(1, Point(1, 0)))(PosInt(2, Point(0, 1)))(PosInt(3, Point(1, 1)));
+	std::vector<PosInt> a; a << PosInt(1, Point(1, 0)) << PosInt(2, Point(0, 1)) << PosInt(3, Point(1, 1));
+	const std::vector<PosInt> & v = a;
 	PosInt i = find_at(v, Point(2, 2));
 	EQUAL(i.value, 0);
 	ASSERT(i.pos.null());
