@@ -2,11 +2,6 @@
 #include "../game.h"
 #include "../test.h"
 
-static std::string to_string(const TypePtr<ObjectType> & type)
-{
-	return type->id;
-}
-
 SUITE(objects) {
 
 TEST(should_not_open_not_openable_object)
@@ -32,7 +27,7 @@ TEST(object_should_be_of_opened_type_after_opening)
 	Object object = Object::Builder(&closed_door, &opened_door).opened(false);
 	bool ok = object.open();
 	ASSERT(ok);
-	EQUAL(object.type, &opened_door);
+	EQUAL(object.type->id, "opened");
 }
 
 TEST(object_should_be_of_closed_type_after_closing)
@@ -42,7 +37,7 @@ TEST(object_should_be_of_closed_type_after_closing)
 	Object object = Object::Builder(&closed_door, &opened_door).opened(true);
 	bool ok = object.close();
 	ASSERT(ok);
-	EQUAL(object.type, &closed_door);
+	EQUAL(object.type->id, "closed");
 }
 
 

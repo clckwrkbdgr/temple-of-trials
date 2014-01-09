@@ -10,43 +10,6 @@ std::string to_string(long unsigned value);
 std::string to_string(char value);
 std::string to_string(const std::string & value);
 std::string to_string(const char * value);
-template<class T>
-std::string to_string(const T * value)
-{
-	return to_string((unsigned)value);
-}
-template<class K, class V>
-std::string to_string(const std::pair<K, V> & value)
-{
-	return "(" + to_string(value.first) + ", " + to_string(value.second) + ")";
-}
-
-template<class Iterator>
-std::string to_string(Iterator begin, Iterator current, Iterator end)
-{
-	Iterator next = current;
-	++next;
-	if(begin == current) {
-		return (current != end) ? to_string(*current) + to_string(begin, next, end) : "";
-	} else {
-		return (current != end) ? "|" + to_string(*current) + to_string(begin, next, end) : "";
-	}
-}
-template<class K, class V>
-std::string to_string(const std::map<K, V> & m)
-{
-	return to_string(m.begin(), m.begin(), m.end());
-}
-template<class T>
-std::string to_string(const std::vector<T> & v)
-{
-	return to_string(v.begin(), v.begin(), v.end());
-}
-template<class T>
-std::string to_string(const std::list<T> & v)
-{
-	return to_string(v.begin(), v.begin(), v.end());
-}
 
 void subs_arg_str(std::string & result, int index, const std::string & value);
 template<class T>

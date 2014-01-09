@@ -106,7 +106,7 @@ struct TestContainer {
 	void check_at_end(const char * filename, int line)
 	{
 		if(++it != container.end()) {
-			throw AssertException(filename, line, "Expected end of " + name + ", but value (" + to_string(*it) + " was found.");
+			throw AssertException(filename, line, "Expected end of " + name + ", but value was found.");
 		}
 	}
 private:
