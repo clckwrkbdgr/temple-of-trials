@@ -1,5 +1,5 @@
 #pragma once
-#include "map.h"
+#include "point.h"
 #include "info.h"
 class Game;
 class Monster;

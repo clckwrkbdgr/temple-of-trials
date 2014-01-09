@@ -1,5 +1,6 @@
 #pragma once
 #include "map.h"
+#include "point.h"
 #include <string>
 
 struct ItemType {
