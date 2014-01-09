@@ -2,6 +2,11 @@
 #include "../game.h"
 #include "../test.h"
 
+static std::string to_string(const TypePtr<ObjectType> & type)
+{
+	return type->id;
+}
+
 SUITE(objects) {
 
 TEST(should_not_open_not_openable_object)

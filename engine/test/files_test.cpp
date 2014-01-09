@@ -138,7 +138,7 @@ TEST(reader_should_read_type_if_valid)
 {
 	std::istringstream in("\"type\" ");
 	Reader reader(in);
-	TypeRegistry<Cell> reg;
+	TypeRegistry<std::string, Cell> reg;
 	reader.add_type_registry(reg);
 	reg.insert(CellType("type"));
 	Cell value;
@@ -151,7 +151,7 @@ TEST(reader_should_read_invalid_type_if_type_id_is_unknown)
 {
 	std::istringstream in("\"unknown\" ");
 	Reader reader(in);
-	TypeRegistry<Cell> reg;
+	TypeRegistry<std::string, Cell> reg;
 	reader.add_type_registry(reg);
 	reg.insert(CellType("type"));
 	Cell value;

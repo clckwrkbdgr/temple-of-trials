@@ -1,7 +1,8 @@
 #pragma once
 #include "map.h"
-#include "util.h"
+#include "types.h"
 #include "point.h"
+#include "util.h"
 #include <string>
 
 struct ItemType {

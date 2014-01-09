@@ -35,10 +35,10 @@ struct Level {
 
 class Dungeon {
 public:
-	TypeRegistry<Cell> cell_types;
-	TypeRegistry<Monster> monster_types;
-	TypeRegistry<Object> object_types;
-	TypeRegistry<Item> item_types;
+	TypeRegistry<std::string, Cell> cell_types;
+	TypeRegistry<std::string, Monster> monster_types;
+	TypeRegistry<std::string, Object> object_types;
+	TypeRegistry<std::string, Item> item_types;
 
 	int current_level_index;
 	std::map<int, Level> levels;

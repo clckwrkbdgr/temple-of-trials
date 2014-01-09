@@ -1,6 +1,11 @@
 #include "../items.h"
 #include "../test.h"
 
+static std::string to_string(const TypePtr<ItemType> & type)
+{
+	return type->id;
+}
+
 SUITE(inventory) {
 
 TEST(should_not_empty_not_emptyable_item)

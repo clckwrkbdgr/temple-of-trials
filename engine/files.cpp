@@ -123,25 +123,25 @@ Reader & Reader::store(Point & value)
 	return *this;
 }
 
-Reader & Reader::add_type_registry(const TypeRegistry<Cell> & type_registry)
+Reader & Reader::add_type_registry(const TypeRegistry<std::string, Cell> & type_registry)
 {
 	cell_types = &type_registry;
 	return *this;
 }
 
-Reader & Reader::add_type_registry(const TypeRegistry<Monster> & type_registry)
+Reader & Reader::add_type_registry(const TypeRegistry<std::string, Monster> & type_registry)
 {
 	monster_types = &type_registry;
 	return *this;
 }
 
-Reader & Reader::add_type_registry(const TypeRegistry<Object> & type_registry)
+Reader & Reader::add_type_registry(const TypeRegistry<std::string, Object> & type_registry)
 {
 	object_types = &type_registry;
 	return *this;
 }
 
-Reader & Reader::add_type_registry(const TypeRegistry<Item> & type_registry)
+Reader & Reader::add_type_registry(const TypeRegistry<std::string, Item> & type_registry)
 {
 	item_types = &type_registry;
 	return *this;

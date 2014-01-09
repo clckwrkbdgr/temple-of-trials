@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <map>
-#include <list>
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #if GCC_VERSION < 403000
@@ -45,80 +43,3 @@ std::vector<std::string> & operator<<(std::vector<std::string> & out, const char
 template<class T, size_t N>
 size_t size_of_array(T (&)[N]) { return N; }
 
-template<class T>
-struct TypePtr {
-	explicit TypePtr(const T * type_pointer = 0)
-		: pointer(type_pointer) {}
-	bool valid() const
-	{
-		return pointer;
-	}
-	bool equal(const TypePtr<T> & other) const
-	{
-		return other == pointer;
-	}
-	bool equal(const T * other) const
-	{
-		return other == pointer;
-	}
-	const T & operator*() const
-	{
-		if(pointer) {
-			return *pointer;
-		}
-		static T empty;
-		return empty;
-	}
-	const T * operator->() const
-	{
-		return &(operator*());
-	}
-private:
-	const T * pointer;
-};
-template<class T>
-std::string to_string(const TypePtr<T> & ptr)
-{
-	return ptr->id;
-}
-template<class T>
-bool operator==(const TypePtr<T> & typeptr, const T * ptr)
-{
-	return typeptr.equal(ptr);
-}
-template<class T>
-bool operator==(const TypePtr<T> & typeptr, const TypePtr<T> & other)
-{
-	return typeptr.equal(other);
-}
-template<class T> bool operator==(const T * ptr, const TypePtr<T> & typeptr) { return operator==(typeptr, ptr); }
-template<class T> bool operator!=(const TypePtr<T> & typeptr, const TypePtr<T> & other) { return !operator==(typeptr, other); }
-template<class T> bool operator!=(const TypePtr<T> & typeptr, const T * ptr) { return !operator==(typeptr, ptr); }
-template<class T> bool operator!=(const T * ptr, const TypePtr<T> & typeptr) { return !operator==(typeptr, ptr); }
-
-template<class Value>
-struct TypeRegistry {
-	typedef typename Value::Type ValueType;
-	std::map<std::string, ValueType> types;
-
-	bool has(const std::string & id) const
-	{
-		return (types.count(id) > 0);
-	}
-	const ValueType * get(const std::string & id) const
-	{
-		if(has(id)) {
-			return &types.find(id)->second;
-		}
-		return 0;
-	}
-	const ValueType * insert(const ValueType & type)
-	{
-		return &(types[type.id] = type);
-	}
-	typename ValueType::Builder insert(const std::string & id)
-	{
-		types[id].id = id;
-		return typename ValueType::Builder(types[id]);
-	}
-};

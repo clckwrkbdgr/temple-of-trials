@@ -3,6 +3,11 @@
 #include "../game.h"
 #include "../test.h"
 
+static std::string to_string(const TypePtr<ItemType> & type)
+{
+	return type->id;
+}
+
 using namespace GameMocks;
 
 SUITE(move) {
