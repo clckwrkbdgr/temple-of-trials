@@ -2,7 +2,7 @@
 #include "ai.h"
 #include "sprites.h"
 #include "engine/monsters.h"
-#include "engine/format.h"
+#include "engine/log.h"
 #include <cstdlib>
 
 LinearDungeon::LinearDungeon()

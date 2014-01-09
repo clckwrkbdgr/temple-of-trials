@@ -2,6 +2,7 @@
 #include "sprites.h"
 #include "engine/game.h"
 #include "engine/monsters.h"
+#include "engine/log.h"
 #include "engine/format.h"
 #include <ncurses.h>
 

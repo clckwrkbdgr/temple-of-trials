@@ -2,6 +2,7 @@
 #include "actions.h"
 #include "monsters.h"
 #include "format.h"
+#include "log.h"
 #include <map>
 #include <memory>
 #include <algorithm>
@@ -122,7 +123,7 @@ void Game::run(ControllerFactory controller_factory)
 			}
 			Controller controller = controller_factory(monster.type->ai);
 			if(!controller) {
-				log(format("No controller found for AI #{0}!", monster.type->ai));
+				log("No controller found for AI #{0}!", monster.type->ai);
 				continue;
 			}
 			level().invalidate_fov(monster);

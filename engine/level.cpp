@@ -3,6 +3,7 @@
 #include "objects.h"
 #include "monsters.h"
 #include "items.h"
+#include "log.h"
 #include "format.h"
 #include <cmath>
 #include <algorithm>

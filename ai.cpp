@@ -5,6 +5,7 @@
 #include "engine/level.h"
 #include "engine/objects.h"
 #include "engine/monsters.h"
+#include "engine/log.h"
 #include "engine/format.h"
 #include <ncurses.h>
 #include <cstdlib>

@@ -3,6 +3,7 @@
 #include "objects.h"
 #include "monsters.h"
 #include "map.h"
+#include "log.h"
 #include "format.h"
 #include "util.h"
 
