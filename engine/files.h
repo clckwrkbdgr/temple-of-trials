@@ -1,11 +1,11 @@
 #pragma once
 #include "monsters.h"
+#include "cell.h"
 #include "objects.h"
 #include "util.h"
 #include <fstream>
 #include <vector>
 #include <map>
-class Map;
 
 bool file_exists(const std::string & filename);
 std::string read_string(std::istream & in, char quote = '"');
@@ -57,7 +57,14 @@ public:
 		return *this;
 	}
 
-	Reader & size_of(Map & map);
+	template<class T>
+	Reader & size_of(Map<T> & map)
+	{
+		unsigned width = 0, height = 0;
+		store(width).store(height);
+		map = Map<T>(width, height);
+		return *this;
+	}
 	template<class T>
 	Reader & size_of(std::vector<T> & v)
 	{
@@ -137,7 +144,12 @@ public:
 		return *this;
 	}
 
-	Writer & size_of(const Map & map);
+	template<class T>
+	Writer & size_of(const Map<T> & map)
+	{
+		store(map.width).store(map.height);
+		return *this;
+	}
 	template<class T>
 	Writer & size_of(const std::vector<T> & v)
 	{

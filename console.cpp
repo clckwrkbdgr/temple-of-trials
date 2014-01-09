@@ -138,7 +138,7 @@ void Console::draw_game(const Game & game)
 {
 	NCursesUpdate upd;
 
-	const Map & map = game.level().map;
+	const Map<Cell> & map = game.level().map;
 
 	for(unsigned x = 0; x < map.width; ++x) {
 		for(unsigned y = 0; y < map.height; ++y) {

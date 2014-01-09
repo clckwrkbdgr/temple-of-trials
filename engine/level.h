@@ -14,7 +14,7 @@ class Game;
 class CompiledInfo;
 
 struct Level {
-	Map map;
+	Map<Cell> map;
 	std::vector<Monster> monsters;
 	std::vector<Item> items;
 	std::vector<Object> objects;
@@ -57,7 +57,7 @@ public:
 	const Level & level() const;
 	void go_to_level(int level);
 protected:
-	static void fill_room(Map & map, const std::pair<Point, Point> & room, const CellType * type);
+	static void fill_room(Map<Cell> & map, const std::pair<Point, Point> & room, const CellType * type);
 	static std::vector<Point> random_positions(const std::pair<Point, Point> & room, int count);
 	static std::pair<Point, Point> connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const CellType * type);
 	static std::vector<std::pair<Point, Point> > shuffle_rooms(const std::vector<std::pair<Point, Point> > & rooms);

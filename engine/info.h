@@ -1,14 +1,14 @@
 #pragma once
+#include "map.h"
+#include "util.h"
 #include <string>
 #include <vector>
-#include "util.h"
 class Item;
 class Object;
 class Monster;
 class Cell;
 class CellType;
 class Point;
-class Map;
 
 struct Info {
 	std::string id;
@@ -40,6 +40,6 @@ struct CompiledInfo {
 		}
 		return *this;
 	}
-	CompiledInfo & in(const Map & map);
+	CompiledInfo & in(const Map<Cell> & map);
 	Info compiled() const;
 };

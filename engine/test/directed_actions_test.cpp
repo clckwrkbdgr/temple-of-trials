@@ -229,7 +229,7 @@ SUITE(swing) {
 TEST_FIXTURE(GameWithDummyAndObjects, should_hit_impassable_cells_on_swing)
 {
 	game.add_cell_type("wall").name("wall").passable(false);
-	game.level().map.set_cell_type(Point(1, 0), game.cell_type("wall"));
+	game.level().map.cell(Point(1, 0)) = Cell(game.cell_type("wall"));
 	Swing(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::HITS);
@@ -294,7 +294,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_from_monster_w
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_hit_opaque_cell_and_drop_item_before_it)
 {
 	game.add_cell_type("wall").name("wall").transparent(false);
-	game.level().map.set_cell_type(Point(1, 0), game.cell_type("wall"));
+	game.level().map.cell(Point(1, 0)) = Cell(game.cell_type("wall"));
 	Fire(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::THROWS);
@@ -427,7 +427,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_refill_already_full_ite
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_under_monster_if_target_is_impassable)
 {
 	game.add_cell_type("wall").name("wall").transparent(false);
-	game.level().map.set_cell_type(Point(1, 1), game.cell_type("wall"));
+	game.level().map.cell(Point(1, 1)) = Cell(game.cell_type("wall"));
 	Put(Point(0, -1)).commit(dummy(), game);
 	TEST_CONTAINER(game.events, e) {
 		EQUAL(e.type, GameEvent::DROPS_AT);

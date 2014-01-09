@@ -50,7 +50,7 @@ void LinearDungeon::generate(Level & level, int level_index)
 	level = Level(60, 23);
 	log("Level cleared.");
 
-	level.map.fill(cell_types.get("wall"));
+	level.map.fill(Cell(cell_types.get("wall")));
 	log("Map filled.");
 
 	std::vector<std::pair<Point, Point> > rooms;
@@ -112,10 +112,10 @@ void LinearDungeon::generate(Level & level, int level_index)
 			Point pos = positions.back();
 			positions.pop_back();
 			switch(cell) {
-				case '#' : level.map.set_cell_type(pos, cell_types.get("wall")); break;
-				case '~' : level.map.set_cell_type(pos, cell_types.get("goo")); break;
-				case ' ' : level.map.set_cell_type(pos, cell_types.get("floor")); break;
-				case '&' : level.map.set_cell_type(pos, cell_types.get("torch")); break;
+				case '#' : level.map.cell(pos) = Cell(cell_types.get("wall")); break;
+				case '~' : level.map.cell(pos) = Cell(cell_types.get("goo")); break;
+				case ' ' : level.map.cell(pos) = Cell(cell_types.get("floor")); break;
+				case '&' : level.map.cell(pos) = Cell(cell_types.get("torch")); break;
 
 				case '$' : add_item(level, "money").pos(pos); break;
 				case '%' : add_item(level, "apple").pos(pos); break;

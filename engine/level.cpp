@@ -259,11 +259,11 @@ Monster::Builder Dungeon::add_monster(Level & level, const std::string & type_id
 	return Monster::Builder(level.monsters.back());
 }
 
-void Dungeon::fill_room(Map & map, const std::pair<Point, Point> & room, const CellType * type)
+void Dungeon::fill_room(Map<Cell> & map, const std::pair<Point, Point> & room, const CellType * type)
 {
 	for(int x = room.first.x; x <= room.second.x; ++x) {
 		for(int y = room.first.y; y <= room.second.y; ++y) {
-			map.set_cell_type(Point(x, y), type);
+			map.cell(x, y) = Cell(type);
 		}
 	}
 }
@@ -297,7 +297,7 @@ std::pair<Point, Point> Dungeon::connect_rooms(Level & level, const std::pair<Po
 		int stop_y = std::min(a.second.y, b.second.y);
 		int way = start_y + rand() % (stop_y - start_y);
 		for(int x = a.second.x + 1; x != b.first.x; ++x) {
-			level.map.set_cell_type(Point(x, way), type);
+			level.map.cell(x, way) = Cell(type);
 		}
 		return std::make_pair(Point(a.second.x + 1, way), Point(b.first.x - 1, way));
 	}
@@ -306,7 +306,7 @@ std::pair<Point, Point> Dungeon::connect_rooms(Level & level, const std::pair<Po
 		int stop_y = std::min(a.second.y, b.second.y);
 		int way = start_y + rand() % (stop_y - start_y);
 		for(int x = b.second.x + 1; x != a.first.x; ++x) {
-			level.map.set_cell_type(Point(x, way), type);
+			level.map.cell(x, way) = Cell(type);
 		}
 		return std::make_pair(Point(b.second.x + 1, way), Point(a.first.x - 1, way));
 	}
@@ -315,7 +315,7 @@ std::pair<Point, Point> Dungeon::connect_rooms(Level & level, const std::pair<Po
 		int stop_x = std::min(a.second.x, b.second.x);
 		int wax = start_x + rand() % (stop_x - start_x);
 		for(int y = a.second.y + 1; y != b.first.y; ++y) {
-			level.map.set_cell_type(Point(wax, y), type);
+			level.map.cell(wax, y) = Cell(type);
 		}
 		return std::make_pair(Point(wax, a.second.y + 1), Point(wax, b.first.y - 1));
 	}
@@ -324,7 +324,7 @@ std::pair<Point, Point> Dungeon::connect_rooms(Level & level, const std::pair<Po
 		int stop_x = std::min(a.second.x, b.second.x);
 		int wax = start_x + rand() % (stop_x - start_x);
 		for(int y = b.second.y + 1; y != a.first.y; ++y) {
-			level.map.set_cell_type(Point(wax, y), type);
+			level.map.cell(wax, y) = Cell(type);
 		}
 		return std::make_pair(Point(wax, b.second.y + 1), Point(wax, a.first.y - 1));
 	}

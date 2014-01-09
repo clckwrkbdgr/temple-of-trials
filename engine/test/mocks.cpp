@@ -29,7 +29,7 @@ void TestDungeon::generate(Level & level, int level_index)
 GameWithDummyWieldingAndWearing::GameWithDummyWieldingAndWearing()
 	: game(&dungeon)
 {
-	game.level().map = Map(2, 3);
+	game.level().map = Map<Cell>(2, 3);
 	game.add_cell_type("floor").passable(true).transparent(true).name("floor");
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
 	game.add_monster_type("stub").name("stub").max_hp(100);
@@ -45,7 +45,7 @@ GameWithDummyWieldingAndWearing::GameWithDummyWieldingAndWearing()
 	game.add_item_type("full_flask").sprite(1).name("water flask");
 	game.add_item_type("empty_flask").sprite(2).name("empty flask");
 
-	game.level().map.fill(game.cell_type("floor"));
+	game.level().map.fill(Cell(game.cell_type("floor")));
 	game.add_monster("dummy").pos(Point(1, 2)).item(Item(game.item_type("spear"))).item(Item(game.item_type("armor"))).wield(0).wear(1).item(game.item_type("jacket")).item(Item::Builder(game.item_type("full_flask"), game.item_type("empty_flask")).make_empty());
 }
 Monster & GameWithDummyWieldingAndWearing::dummy() { return game.level().monsters[0]; }
@@ -53,14 +53,14 @@ Monster & GameWithDummyWieldingAndWearing::dummy() { return game.level().monster
 GameWithDummyWithItems::GameWithDummyWithItems()
 	: game(&dungeon)
 {
-	game.level().map = Map(2, 3);
+	game.level().map = Map<Cell>(2, 3);
 	game.add_cell_type("floor").passable(true).transparent(true).name("floor");
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
 	game.add_item_type("armor").sprite(1).wearable().defence(3).name("armor");
 	game.add_item_type("spear").sprite(2).damage(3).name("spear");
 	game.add_item_type("pot").sprite(1).name("pot");
 
-	game.level().map.fill(game.cell_type("floor"));
+	game.level().map.fill(Cell(game.cell_type("floor")));
 	game.add_monster("dummy").pos(Point(1, 2)).item(game.item_type("spear")).item(game.item_type("armor")).item(game.item_type("pot")).item(game.item_type("pot"));
 	dummy().inventory.take_item(2);
 }
@@ -69,7 +69,7 @@ Monster & GameWithDummyWithItems::dummy() { return game.level().monsters[0]; }
 GameWithDummyAndFood::GameWithDummyAndFood()
 	: game(&dungeon)
 {
-	game.level().map = Map(2, 2);
+	game.level().map = Map<Cell>(2, 2);
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
 
 	game.add_item_type("armor").sprite(1).wearable().defence(3).name("armor").edible();
@@ -91,7 +91,7 @@ GameWithDummyAndStairs::GameWithDummyAndStairs()
 	game.add_monster_type("dummy").name("dummy");
 	game.add_object_type("stairs").name("stairs").transporting();
 	game.add_item_type("yendor").name("Yendor").quest().sprite(1);
-	game.level().map = Map(2, 2);
+	game.level().map = Map<Cell>(2, 2);
 	game.add_monster("dummy").pos(Point(1, 1));
 	game.add_object("stairs").pos(Point(1, 1));
 }
@@ -101,7 +101,7 @@ Object & GameWithDummyAndStairs::stairs() { return game.level().objects[0]; }
 GameWithDummyAndObjects::GameWithDummyAndObjects()
 	: game(&dungeon)
 {
-	game.level().map = Map(2, 2);
+	game.level().map = Map<Cell>(2, 2);
 	game.add_cell_type("floor").name("floor").passable(true);
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
 	game.add_monster_type("stub").name("stub");
@@ -111,7 +111,7 @@ GameWithDummyAndObjects::GameWithDummyAndObjects()
 	game.add_object_type("pot").name("pot").containable();
 	game.add_object_type("well").name("well").drinkable();
 	game.add_item_type("key").name("item").sprite(1);
-	game.level().map.fill(game.cell_type("floor"));
+	game.level().map.fill(Cell(game.cell_type("floor")));
 	game.add_monster("dummy").pos(Point(1, 1));
 }
 Monster & GameWithDummyAndObjects::dummy() { return game.level().monsters[0]; }
@@ -120,7 +120,7 @@ GameWithDummyOnTrap::GameWithDummyOnTrap()
 	: game(&dungeon)
 {
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
-	game.level().map = Map(2, 2);
+	game.level().map = Map<Cell>(2, 2);
 	game.add_monster("dummy").pos(Point(1, 1));
 	game.add_object_type("trap").name("trap").triggerable();
 	game.add_item_type("item").name("item").sprite(1);
@@ -131,12 +131,12 @@ Monster & GameWithDummyOnTrap::dummy() { return game.level().monsters.front(); }
 GameWithDummy::GameWithDummy()
 	: game(&dungeon)
 {
-	game.level().map = Map(2, 2);
+	game.level().map = Map<Cell>(2, 2);
 	game.add_cell_type("floor");
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
 	game.add_monster_type("player").max_hp(100).name("dummy").faction(Monster::PLAYER);
 
-	game.level().map.fill(game.cell_type("floor"));
+	game.level().map.fill(Cell(game.cell_type("floor")));
 	game.add_item_type("armor").sprite(1).wearable().defence(3).name("item");
 	game.add_monster("dummy").pos(Point(1, 1)).item(game.item_type("armor"));
 	game.add_monster("player").pos(Point(1, 1)).item(game.item_type("armor"));
@@ -150,7 +150,7 @@ GameWithDummyAndKiller::GameWithDummyAndKiller()
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
 	game.add_monster_type("killer").max_hp(100).name("killer");
 	game.add_monster_type("poisoner").max_hp(100).name("poisoner").poisonous(true);
-	game.level().map = Map(2, 2);
+	game.level().map = Map<Cell>(2, 2);
 	game.add_item_type("armor").sprite(1).wearable().defence(3).name("item");
 	game.add_monster("dummy").pos(Point(1, 1)).item(game.item_type("armor"));
 	game.add_monster("killer").pos(Point(0, 1));
@@ -170,7 +170,7 @@ Game2x2::Game2x2()
 	game.add_object_type("passable").passable().sprite(2);
 	game.add_object_type("transparent").transparent();
 	game.add_item_type("item").sprite(4);
-	game.level().map.fill(game.cell_type("floor"));
+	game.level().map.fill(Cell(game.cell_type("floor")));
 }
 
 LevelWithPath::LevelWithPath()
@@ -181,11 +181,11 @@ LevelWithPath::LevelWithPath()
 	game.add_cell_type("wall").passable(false);
 	const CellType * f = game.cell_type("floor");
 	const CellType * w = game.cell_type("wall");
-	const CellType * a[] = {
-		f, w, f, f,
-		w, f, f, w,
-		f, w, w, f,
-		f, w, f, w,
+	const Cell a[] = {
+		Cell(f), Cell(w), Cell(f), Cell(f),
+		Cell(w), Cell(f), Cell(f), Cell(w),
+		Cell(f), Cell(w), Cell(w), Cell(f),
+		Cell(f), Cell(w), Cell(f), Cell(w),
 	};
 	game.level().map.fill(a);
 }
@@ -198,9 +198,9 @@ LevelForSeeing::LevelForSeeing()
 	game.add_cell_type("wall").sprite(2).passable(false).transparent(false);
 	const CellType * f = game.cell_type("floor");
 	const CellType * w = game.cell_type("wall");
-	const CellType * a[] = {
-		w, f, w,
-		f, w, f,
+	const Cell a[] = {
+		Cell(w), Cell(f), Cell(w),
+		Cell(f), Cell(w), Cell(f),
 	};
 	game.level().map.fill(a);
 	game.add_monster_type("player").faction(Monster::PLAYER).sight(3).sprite(100);

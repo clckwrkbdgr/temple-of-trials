@@ -147,13 +147,6 @@ Reader & Reader::add_type_registry(const TypeRegistry<Item> & type_registry)
 	return *this;
 }
 
-Reader & Reader::size_of(Map & map)
-{
-	unsigned width = 0, height = 0;
-	store(width).store(height);
-	map = Map(width, height);
-	return *this;
-}
 
 Writer::Writer(std::ostream & out_stream)
 	: actual_minor_version(0), out(out_stream)
@@ -218,8 +211,3 @@ Writer & Writer::store(const Point & value)
 	return *this;
 }
 
-Writer & Writer::size_of(const Map & map)
-{
-	store(map.width).store(map.height);
-	return *this;
-}

@@ -49,7 +49,7 @@ bool Info::valid() const
 }
 
 
-CompiledInfo & CompiledInfo::in(const Map & map)
+CompiledInfo & CompiledInfo::in(const Map<Cell> & map)
 {
 	if(map.valid(pos)) {
 		all_info.push_back(Info(map.cell(pos)));

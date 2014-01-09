@@ -172,7 +172,7 @@ TEST(reader_should_read_size_of_map_and_resize_it)
 {
 	std::istringstream in("3 4 ");
 	Reader reader(in);
-	Map map(1, 1);
+	Map<Cell> map(1, 1);
 	reader.size_of(map);
 	EQUAL(map.width, (unsigned)3);
 	EQUAL(map.height, (unsigned)4);
@@ -327,7 +327,7 @@ TEST(writer_should_write_size_of_map)
 {
 	std::ostringstream out;
 	Writer writer(out);
-	writer.size_of(Map(3, 4));
+	writer.size_of(Map<Cell>(3, 4));
 	EQUAL(out.str(), "3 4 ");
 }
 
