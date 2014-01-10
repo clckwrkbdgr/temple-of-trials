@@ -13,9 +13,15 @@ LinearDungeon::LinearDungeon()
 	: Game()
 {
 	controller_factory.add_controller(AI::PLAYER, new PlayerControl());
-	controller_factory.add_controller(AI::ANGRY_AND_WANDER, new AngryAndWander());
-	controller_factory.add_controller(AI::ANGRY_AND_STILL, new AngryAndStill());
-	controller_factory.add_controller(AI::CALM_AND_STILL, new CalmAndStill());
+	controller_factory.add_controller(AI::ANGRY_AND_WANDER,
+			(new BasicAI())->add(BasicAI::MOVE_TO_HIT_PLAYER_IF_SEES)->add(BasicAI::HIT_PLAYER_IF_NEAR)->add(BasicAI::MOVE_RANDOM)
+			);
+	controller_factory.add_controller(AI::ANGRY_AND_STILL,
+			(new BasicAI())->add(BasicAI::MOVE_TO_HIT_PLAYER_IF_SEES)->add(BasicAI::HIT_PLAYER_IF_NEAR)
+			);
+	controller_factory.add_controller(AI::CALM_AND_STILL,
+			(new BasicAI())->add(BasicAI::HIT_PLAYER_IF_NEAR)->add(BasicAI::WAIT)
+			);
 
 	cell_types.insert("floor").sprite(Sprites::FLOOR).name("floor").passable(true).transparent(true);
 	cell_types.insert("wall").sprite(Sprites::WALL).name("wall").passable(false);
