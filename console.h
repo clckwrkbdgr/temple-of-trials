@@ -8,6 +8,9 @@ class Point;
 struct Console {
 	static std::map<int, Point> directions;
 
+	Console();
+	~Console();
+
 	void draw_game(const Game & game);
 	int draw_and_get_control(Game & game);
 	Point draw_and_get_direction(Game & game);
@@ -24,14 +27,10 @@ struct Console {
 	void print_stat(int row, const std::string & text);
 	void clear();
 	int get_control();
-
-	static Console & instance();
 private:
 	unsigned messages_seen;
 	std::string notification_text;
 	std::map<int, std::pair<char, int> > sprites;
 
-	Console();
-	~Console();
 	void init_sprites();
 };

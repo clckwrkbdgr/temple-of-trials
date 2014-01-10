@@ -119,12 +119,6 @@ int Console::get_control()
 	return getch();
 }
 
-Console & Console::instance()
-{
-	static Console console;
-	return console;
-}
-
 void Console::notification(const std::string & text)
 {
 	notification_text = text;

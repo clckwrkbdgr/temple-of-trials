@@ -9,10 +9,10 @@ namespace AI {
 	enum { DUMMY, PLAYER, ANGRY_AND_WANDER, ANGRY_AND_STILL, CALM_AND_STILL };
 }
 
-LinearDungeon::LinearDungeon()
+LinearDungeon::LinearDungeon(Controller * player_controller)
 	: Game()
 {
-	controller_factory.add_controller(AI::PLAYER, new PlayerControl());
+	controller_factory.add_controller(AI::PLAYER, player_controller);
 	controller_factory.add_controller(AI::ANGRY_AND_WANDER,
 			(new BasicAI())->add(BasicAI::MOVE_TO_HIT_PLAYER_IF_SEES)->add(BasicAI::HIT_PLAYER_IF_NEAR)->add(BasicAI::MOVE_RANDOM)
 			);

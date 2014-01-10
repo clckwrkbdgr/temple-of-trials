@@ -1,4 +1,5 @@
 #include "generate.h"
+#include "player.h"
 #include "console.h"
 #include "savefile.h"
 #include "engine/game.h"
@@ -58,13 +59,15 @@ int main()
 	std::ofstream log_file("temple.log", std::ios::app);
 	direct_log(&log_file);
 
-	LinearDungeon game;
+	Console console;
+	PlayerControl player(console);
+	LinearDungeon game(&player);
 	game.messages.log_messages = true;
 	if(!load_game(game)) {
 		return 1;
 	}
 	game.run();
-	Console::instance().see_messages(game);
+	console.see_messages(game);
 	if(game.state == Game::SUSPENDED) {
 		save(game);
 	}
