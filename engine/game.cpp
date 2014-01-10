@@ -121,13 +121,13 @@ void Game::run(const ControllerFactory & controller_factory)
 			if(monster.is_dead()) {
 				continue;
 			}
-			Controller controller = controller_factory.get_controller(monster.type->ai);
+			Controller * controller = controller_factory.get_controller(monster.type->ai);
 			if(!controller) {
 				log("No controller found for AI #{0}!", monster.type->ai);
 				continue;
 			}
 			level().invalidate_fov(monster);
-			Action * action = controller(monster, *this);
+			Action * action = controller->act(monster, *this);
 			if(action) {
 				try {
 					action->commit(monster, *this);

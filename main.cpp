@@ -45,10 +45,10 @@ int main()
 	}
 
 	ControllerFactory controllers;
-	controllers.add_controller(AI::PLAYER, player_control);
-	controllers.add_controller(AI::ANGRY_AND_WANDER, angry_and_wander);
-	controllers.add_controller(AI::ANGRY_AND_STILL, angry_and_still);
-	controllers.add_controller(AI::CALM_AND_STILL, calm_and_still);
+	controllers.add_controller(AI::PLAYER, new PlayerControl());
+	controllers.add_controller(AI::ANGRY_AND_WANDER, new AngryAndWander());
+	controllers.add_controller(AI::ANGRY_AND_STILL, new AngryAndStill());
+	controllers.add_controller(AI::CALM_AND_STILL, new CalmAndStill());
 
 	game.run(controllers);
 

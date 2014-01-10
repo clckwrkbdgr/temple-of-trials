@@ -10,7 +10,7 @@
 #include <ncurses.h>
 #include <cstdlib>
 
-Action * player_control(Monster & player, Game & game)
+Action * PlayerControl::act(Monster & player, Game & game)
 {
 	game.events_to_messages();
 	Console & console = Console::instance();
@@ -82,7 +82,7 @@ Action * player_control(Monster & player, Game & game)
 	return 0;
 }
 
-Action * angry_and_wander(Monster & monster, Game & game)
+Action * AngryAndWander::act(Monster & monster, Game & game)
 {
 	const Monster & player = game.level().get_player();
 	bool sees_player = game.level().map.cell(player.pos).visible;
@@ -104,7 +104,7 @@ Action * angry_and_wander(Monster & monster, Game & game)
 	return new Wait();
 }
 
-Action * angry_and_still(Monster & monster, Game & game)
+Action * AngryAndStill::act(Monster & monster, Game & game)
 {
 	const Monster & player = game.level().get_player();
 	bool sees_player = game.level().map.cell(player.pos).visible;
@@ -122,7 +122,7 @@ Action * angry_and_still(Monster & monster, Game & game)
 	return new Wait();
 }
 
-Action * calm_and_still(Monster & monster, Game & game)
+Action * CalmAndStill::act(Monster & monster, Game & game)
 {
 	const Monster & player = game.level().get_player();
 	bool sees_player = game.level().map.cell(player.pos).visible;
