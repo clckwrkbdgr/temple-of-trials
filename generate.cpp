@@ -6,7 +6,7 @@
 #include <cstdlib>
 
 LinearDungeon::LinearDungeon()
-	: Dungeon()
+	: Game()
 {
 	cell_types.insert("floor").sprite(Sprites::FLOOR).name("floor").passable(true).transparent(true);
 	cell_types.insert("wall").sprite(Sprites::WALL).name("wall").passable(false);

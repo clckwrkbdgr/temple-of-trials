@@ -1,8 +1,9 @@
 #include "mocks.h"
+#include "../log.h"
 
 namespace GameMocks {
 
-DummyDungeon::DummyDungeon() : Dungeon() {}
+DummyDungeon::DummyDungeon() : Game() {}
 DummyDungeon::~DummyDungeon() {}
 void DummyDungeon::generate(Level & /*level*/, int /*level_index*/) {}
 void DummyDungeon::create_types(Game & /*game*/) {}
@@ -27,7 +28,7 @@ void TestDungeon::generate(Level & level, int level_index)
 
 
 GameWithDummyWieldingAndWearing::GameWithDummyWieldingAndWearing()
-	: game(&dungeon)
+	: game()
 {
 	game.level().map = Map<Cell>(2, 3);
 	game.add_cell_type("floor").passable(true).transparent(true).name("floor");
@@ -51,7 +52,7 @@ GameWithDummyWieldingAndWearing::GameWithDummyWieldingAndWearing()
 Monster & GameWithDummyWieldingAndWearing::dummy() { return game.level().monsters[0]; }
 
 GameWithDummyWithItems::GameWithDummyWithItems()
-	: game(&dungeon)
+	: game()
 {
 	game.level().map = Map<Cell>(2, 3);
 	game.add_cell_type("floor").passable(true).transparent(true).name("floor");
@@ -67,7 +68,7 @@ GameWithDummyWithItems::GameWithDummyWithItems()
 Monster & GameWithDummyWithItems::dummy() { return game.level().monsters[0]; }
 
 GameWithDummyAndFood::GameWithDummyAndFood()
-	: game(&dungeon)
+	: game()
 {
 	game.level().map = Map<Cell>(2, 2);
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
@@ -86,7 +87,7 @@ GameWithDummyAndFood::GameWithDummyAndFood()
 Monster & GameWithDummyAndFood::dummy() { return game.level().monsters[0]; }
 
 GameWithDummyAndStairs::GameWithDummyAndStairs()
-	: dungeon(Point(1, 1), Point(2, 2)), game(&dungeon)
+	: game(Point(1, 1), Point(2, 2))
 {
 	game.add_monster_type("dummy").name("dummy");
 	game.add_object_type("stairs").name("stairs").transporting();
@@ -99,7 +100,7 @@ Monster & GameWithDummyAndStairs::dummy() { return game.level().monsters[0]; }
 Object & GameWithDummyAndStairs::stairs() { return game.level().objects[0]; }
 
 GameWithDummyAndObjects::GameWithDummyAndObjects()
-	: game(&dungeon)
+	: game()
 {
 	game.level().map = Map<Cell>(2, 2);
 	game.add_cell_type("floor").name("floor").passable(true);
@@ -117,7 +118,7 @@ GameWithDummyAndObjects::GameWithDummyAndObjects()
 Monster & GameWithDummyAndObjects::dummy() { return game.level().monsters[0]; }
 
 GameWithDummyOnTrap::GameWithDummyOnTrap()
-	: game(&dungeon)
+	: game()
 {
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
 	game.level().map = Map<Cell>(2, 2);
@@ -129,7 +130,7 @@ GameWithDummyOnTrap::GameWithDummyOnTrap()
 Monster & GameWithDummyOnTrap::dummy() { return game.level().monsters.front(); }
 
 GameWithDummy::GameWithDummy()
-	: game(&dungeon)
+	: game()
 {
 	game.level().map = Map<Cell>(2, 2);
 	game.add_cell_type("floor");
@@ -145,7 +146,7 @@ Monster & GameWithDummy::dummy() { return game.level().monsters.front(); }
 Monster & GameWithDummy::player() { return game.level().monsters.back(); }
 
 GameWithDummyAndKiller::GameWithDummyAndKiller()
-	: game(&dungeon)
+	: game()
 {
 	game.add_monster_type("dummy").max_hp(100).name("dummy");
 	game.add_monster_type("killer").max_hp(100).name("killer");
@@ -161,7 +162,7 @@ Monster & GameWithDummyAndKiller::killer() { return game.level().monsters[1]; }
 Monster & GameWithDummyAndKiller::poisoner() { return game.level().monsters[2]; }
 
 Game2x2::Game2x2()
-	: game(&dungeon)
+	: game()
 {
 	game.level() = Level(2, 2);
 	game.add_cell_type("floor").sprite(1).passable(true).transparent(true);
@@ -174,7 +175,7 @@ Game2x2::Game2x2()
 }
 
 LevelWithPath::LevelWithPath()
-	: game(&dungeon)
+	: game()
 {
 	game.level() = Level(4, 4);
 	game.add_cell_type("floor").passable(true);
@@ -191,7 +192,7 @@ LevelWithPath::LevelWithPath()
 }
 
 LevelForSeeing::LevelForSeeing()
-	: game(&dungeon)
+	: game()
 {
 	game.level() = Level(3, 2);
 	game.add_cell_type("floor").sprite(1).passable(true).transparent(true);
@@ -206,8 +207,5 @@ LevelForSeeing::LevelForSeeing()
 	game.add_monster_type("player").faction(Monster::PLAYER).sight(3).sprite(100);
 	game.add_monster("player").pos(Point(2, 1));
 }
-
-
-
 
 };

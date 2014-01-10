@@ -1,7 +1,7 @@
 #pragma once
 #include "engine/game.h"
 
-class LinearDungeon : public Dungeon {
+class LinearDungeon : public Game {
 public:
 	LinearDungeon();
 	virtual ~LinearDungeon() {}

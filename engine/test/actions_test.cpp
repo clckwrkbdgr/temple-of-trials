@@ -4,6 +4,7 @@
 #include "../monsters.h"
 #include "../cell.h"
 #include "../format.h"
+#include "../log.h"
 #include "../test.h"
 
 using namespace GameMocks;
@@ -433,7 +434,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_go
 {
 	stairs().up_destination = 1;
 	GoUp().commit(dummy(), game);
-	ASSERT(dungeon.was_generated());
+	ASSERT(game.was_generated());
 }
 
 }
@@ -480,7 +481,7 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_go
 {
 	stairs().down_destination = 1;
 	GoDown().commit(dummy(), game);
-	ASSERT(dungeon.was_generated());
+	ASSERT(game.was_generated());
 }
 
 }

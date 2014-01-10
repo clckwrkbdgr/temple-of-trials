@@ -34,34 +34,48 @@ std::string to_string(const GameEvent & e);
 
 struct Game {
 	enum State { PLAYING, TURN_ENDED, SUSPENDED, PLAYER_DIED, COMPLETED };
-	Dungeon * dungeon;
 	State state;
 	Messages messages;
 	int turns;
 	std::vector<GameEvent> events;
+	int current_level_index;
+	std::map<int, Level> levels;
 
-	Game(Dungeon * game_dungeon);
+	TypeRegistry<std::string, Cell> cell_types;
+	TypeRegistry<std::string, Monster> monster_types;
+	TypeRegistry<std::string, Object> object_types;
+	TypeRegistry<std::string, Item> item_types;
+
+	Game();
+	virtual ~Game() {}
 	void create_new_game();
 	void run(const ControllerFactory & controller_factory);
+	virtual void generate(Level & level, int level_index) = 0;
+
+	Level & level();
+	const Level & level() const;
+	void go_to_level(int level);
 
 	void event(const GameEvent & e);
 	void event(const Info & event_actor, GameEvent::EventType event_type, const Info & event_target = Info(), const Info & event_help = Info());
 	void event(const Info & event_actor, GameEvent::EventType event_type, int event_amount, const Info & event_target = Info(), const Info & event_help = Info());
 	void events_to_messages();
 
-	Level & level();
-	const Level & level() const;
-
 	const ItemType * item_type(const std::string & id) const;
 	const ObjectType * object_type(const std::string & id) const;
 	const MonsterType * monster_type(const std::string & id) const;
 	const CellType * cell_type(const std::string & id) const;
 
-	ItemType::Builder add_item_type(const std::string & id) const;
-	ObjectType::Builder add_object_type(const std::string & id) const;
-	MonsterType::Builder add_monster_type(const std::string & id) const;
-	CellType::Builder add_cell_type(const std::string & id) const;
+	ItemType::Builder add_item_type(const std::string & id);
+	ObjectType::Builder add_object_type(const std::string & id);
+	MonsterType::Builder add_monster_type(const std::string & id);
+	CellType::Builder add_cell_type(const std::string & id);
 
+	Item::Builder add_item(Level & level, const std::string & type_id);
+	Item::Builder add_item(Level & level, const std::string & full_type_id, const std::string & empty_type_id);
+	Object::Builder add_object(Level & level, const std::string & type_id);
+	Object::Builder add_object(Level & level, const std::string & closed_type_id, const std::string & opened_type_id);
+	Monster::Builder add_monster(Level & level, const std::string & type_id);
 	Item::Builder add_item(const std::string & type_id);
 	Item::Builder add_item(const std::string & full_type_id, const std::string & empty_type_id);
 	Object::Builder add_object(const std::string & type_id);

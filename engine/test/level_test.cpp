@@ -9,31 +9,31 @@ SUITE(dungeon) {
 
 TEST_FIXTURE(GameWithLevels, should_save_current_level_as_visited)
 {
-	dungeon.go_to_level(1);
-	dungeon.go_to_level(2);
-	EQUAL(dungeon.levels.count(2), (unsigned)1);
+	game.go_to_level(1);
+	game.go_to_level(2);
+	EQUAL(game.levels.count(2), (unsigned)1);
 }
 
 TEST_FIXTURE(GameWithLevels, should_restore_player_from_the_old_level_at_new_pos)
 {
-	dungeon.go_to_level(1);
-	dungeon.go_to_level(2);
-	EQUAL(dungeon.level().get_player().pos, Point(2, 2));
+	game.go_to_level(1);
+	game.go_to_level(2);
+	EQUAL(game.level().get_player().pos, Point(2, 2));
 }
 
 TEST_FIXTURE(GameWithLevels, should_restore_previously_visited_level)
 {
-	dungeon.go_to_level(1);
-	dungeon.level().get_player().hp = 3;
-	dungeon.go_to_level(2);
-	dungeon.go_to_level(1);
-	EQUAL(dungeon.level().get_player().hp, 3);
+	game.go_to_level(1);
+	game.level().get_player().hp = 3;
+	game.go_to_level(2);
+	game.go_to_level(1);
+	EQUAL(game.level().get_player().hp, 3);
 }
 
 TEST_FIXTURE(GameWithLevels, should_generated_newly_visited_level)
 {
-	dungeon.go_to_level(1);
-	EQUAL(dungeon.level().get_player().type->sprite, 1);
+	game.go_to_level(1);
+	EQUAL(game.level().get_player().type->sprite, 1);
 }
 
 }
@@ -220,8 +220,7 @@ TEST_FIXTURE(LevelForSeeing, should_not_see_through_opaque_cells)
 
 TEST(should_erase_dead_monsters)
 {
-	DummyDungeon dungeon;
-	Game game(&dungeon);
+	DummyDungeon game;
 	game.level() = Level(2, 2);
 	game.add_monster_type("dead").max_hp(100).sprite(1);
 	game.add_monster_type("alive").max_hp(100).sprite(2);

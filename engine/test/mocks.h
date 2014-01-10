@@ -4,14 +4,14 @@
 
 namespace GameMocks {
 
-struct DummyDungeon : public Dungeon {
+struct DummyDungeon : public Game {
 	DummyDungeon();
 	virtual ~DummyDungeon();
 	virtual void generate(Level & /*level*/, int /*level_index*/);
 	virtual void create_types(Game & /*game*/);
 };
 
-class TestDungeon : public Dungeon {
+class TestDungeon : public Game {
 public:
 	TestDungeon(const Point & player_pos1, const Point & player_pos2);
 	virtual void create_types(Game & game);
@@ -26,60 +26,52 @@ private:
 
 
 struct GameWithDummyWieldingAndWearing {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	GameWithDummyWieldingAndWearing();
 	Monster & dummy();
 };
 
 struct GameWithDummyWithItems {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	GameWithDummyWithItems();
 	Monster & dummy();
 };
 
 struct GameWithDummyAndFood {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	enum { ARMOR, SPEAR, JUNK, FOOD, MEDKIT, MEGASPHERE, ANTIDOTE, FULL_FLASK, EMPTY_FLASK, EMPTY, NONE };
 	GameWithDummyAndFood();
 	Monster & dummy();
 };
 
 struct GameWithDummyAndStairs {
-	TestDungeon dungeon;
-	Game game;
+	TestDungeon game;
 	GameWithDummyAndStairs();
 	Monster & dummy();
 	Object & stairs();
 };
 
 struct GameWithDummyAndObjects {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	GameWithDummyAndObjects();
 	Monster & dummy();
 };
 
 struct GameWithDummyOnTrap {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	GameWithDummyOnTrap();
 	Monster & dummy();
 };
 
 struct GameWithDummy {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	GameWithDummy();
 	Monster & dummy();
 	Monster & player();
 };
 
 struct GameWithDummyAndKiller {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	GameWithDummyAndKiller();
 	Monster & dummy();
 	Monster & killer();
@@ -87,25 +79,22 @@ struct GameWithDummyAndKiller {
 };
 
 struct Game2x2 {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	Game2x2();
 };
 
 struct GameWithLevels {
-	TestDungeon dungeon;
-	GameWithLevels(): dungeon(Point(1, 1), Point(2, 2)) {}
+	TestDungeon game;
+	GameWithLevels(): game(Point(1, 1), Point(2, 2)) {}
 };
 
 struct LevelWithPath {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	LevelWithPath();
 };
 
 struct LevelForSeeing {
-	DummyDungeon dungeon;
-	Game game;
+	DummyDungeon game;
 	LevelForSeeing();
 };
 

@@ -26,90 +26,135 @@ std::string to_string(const GameEvent & e)
 }
 
 
-Game::Game(Dungeon * game_dungeon)
-	: dungeon(game_dungeon), state(PLAYING), turns(0)
+Game::Game()
+	: state(PLAYING), turns(0), current_level_index(0)
 {
-	assert(dungeon);
 }
 
 void Game::create_new_game()
 {
-	dungeon->go_to_level(1);
+	go_to_level(1);
 }
 
 Level & Game::level()
 {
-	return dungeon->level();
+	return levels[current_level_index];
 }
 
 const Level & Game::level() const
 {
-	return dungeon->level();
+	return levels.find(current_level_index)->second;
+}
+
+void Game::go_to_level(int level_index)
+{
+	Monster player = level().get_player();
+
+	current_level_index = level_index;
+	if(levels.count(level_index) == 0) {
+		generate(level(), current_level_index);
+	}
+	if(player.valid()) {
+		player.pos = level().get_player().pos;
+		level().get_player() = player;
+	} else {
+		log("Player wasn't found on the level when travelling!");
+	}
 }
 
 const ItemType * Game::item_type(const std::string & id) const
 {
-	return dungeon->item_types.get(id);
+	return item_types.get(id);
 }
 
 const ObjectType * Game::object_type(const std::string & id) const
 {
-	return dungeon->object_types.get(id);
+	return object_types.get(id);
 }
 
 const MonsterType * Game::monster_type(const std::string & id) const
 {
-	return dungeon->monster_types.get(id);
+	return monster_types.get(id);
 }
 
 const CellType * Game::cell_type(const std::string & id) const
 {
-	return dungeon->cell_types.get(id);
+	return cell_types.get(id);
 }
 
-ItemType::Builder Game::add_item_type(const std::string & id) const
+ItemType::Builder Game::add_item_type(const std::string & id)
 {
-	return dungeon->item_types.insert(id);
+	return item_types.insert(id);
 }
 
-ObjectType::Builder Game::add_object_type(const std::string & id) const
+ObjectType::Builder Game::add_object_type(const std::string & id)
 {
-	return dungeon->object_types.insert(id);
+	return object_types.insert(id);
 }
 
-MonsterType::Builder Game::add_monster_type(const std::string & id) const
+MonsterType::Builder Game::add_monster_type(const std::string & id)
 {
-	return dungeon->monster_types.insert(id);
+	return monster_types.insert(id);
 }
 
-CellType::Builder Game::add_cell_type(const std::string & id) const
+CellType::Builder Game::add_cell_type(const std::string & id)
 {
-	return dungeon->cell_types.insert(id);
+	return cell_types.insert(id);
+}
+
+Item::Builder Game::add_item(Level & level, const std::string & type_id)
+{
+	level.items.push_back(Item(item_types.get(type_id)));
+	return Item::Builder(level.items.back());
+}
+
+Item::Builder Game::add_item(Level & level, const std::string & full_type_id, const std::string & empty_type_id)
+{
+	level.items.push_back(Item(item_types.get(full_type_id), item_types.get(empty_type_id)));
+	return Item::Builder(level.items.back());
+}
+
+Object::Builder Game::add_object(Level & level, const std::string & type_id)
+{
+	level.objects.push_back(Object(object_types.get(type_id)));
+	return Object::Builder(level.objects.back());
+}
+
+Object::Builder Game::add_object(Level & level, const std::string & closed_type_id, const std::string & opened_type_id)
+{
+	level.objects.push_back(Object(object_types.get(closed_type_id), object_types.get(opened_type_id)));
+	return Object::Builder(level.objects.back());
+}
+
+Monster::Builder Game::add_monster(Level & level, const std::string & type_id)
+{
+	level.monsters.push_back(Monster(monster_types.get(type_id)));
+	return Monster::Builder(level.monsters.back());
 }
 
 Item::Builder Game::add_item(const std::string & type_id)
 {
-	return dungeon->add_item(dungeon->level(), type_id);
+	return add_item(level(), type_id);
 }
 
 Item::Builder Game::add_item(const std::string & full_type_id, const std::string & empty_type_id)
 {
-	return dungeon->add_item(dungeon->level(), full_type_id, empty_type_id);
+	return add_item(level(), full_type_id, empty_type_id);
 }
 
 Object::Builder Game::add_object(const std::string & type_id)
 {
-	return dungeon->add_object(dungeon->level(), type_id);
+	return add_object(level(), type_id);
 }
 
 Object::Builder Game::add_object(const std::string & closed_type_id, const std::string & opened_type_id)
 {
-	return dungeon->add_object(dungeon->level(), closed_type_id, opened_type_id);
+	return add_object(level(), closed_type_id, opened_type_id);
 }
 
 Monster::Builder Game::add_monster(const std::string & type_id)
 {
-	return dungeon->add_monster(dungeon->level(), type_id);
+	return add_monster(level(), type_id);
 }
 
 

@@ -1,4 +1,5 @@
 #include "test.h"
+#include "log.h"
 #include "util.h"
 #include <cstring>
 #include <cstdio>

@@ -41,28 +41,3 @@ struct DungeonBuilder {
 	static void pop_player_front(std::vector<Monster> & monsters);
 };
 
-class Dungeon {
-public:
-	TypeRegistry<std::string, Cell> cell_types;
-	TypeRegistry<std::string, Monster> monster_types;
-	TypeRegistry<std::string, Object> object_types;
-	TypeRegistry<std::string, Item> item_types;
-
-	int current_level_index;
-	std::map<int, Level> levels;
-
-	Dungeon();
-	virtual ~Dungeon() {}
-	virtual void generate(Level & level, int level_index) = 0;
-
-	Item::Builder add_item(Level & level, const std::string & type_id);
-	Item::Builder add_item(Level & level, const std::string & full_type_id, const std::string & empty_type_id);
-	Object::Builder add_object(Level & level, const std::string & type_id);
-	Object::Builder add_object(Level & level, const std::string & closed_type_id, const std::string & opened_type_id);
-	Monster::Builder add_monster(Level & level, const std::string & type_id);
-
-	Level & level();
-	const Level & level() const;
-	void go_to_level(int level);
-};
-

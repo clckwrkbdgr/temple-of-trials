@@ -22,8 +22,7 @@ int main()
 	std::ofstream log_file("temple.log", std::ios::app);
 	direct_log(&log_file);
 
-	LinearDungeon dungeon;
-	Game game(&dungeon);
+	LinearDungeon game;
 	game.messages.log_messages = true;
 	try {
 		if(!file_exists(SAVEFILE)) {
