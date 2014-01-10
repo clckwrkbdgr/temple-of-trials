@@ -2,15 +2,12 @@
 #include "map.h"
 #include "objects.h"
 #include "monsters.h"
+#include "ai.h"
 #include "level.h"
 #include "message.h"
 #include "info.h"
 #include <map>
 #include <list>
-class Game;
-
-typedef Action* (*Controller)(Monster&, Game&);
-typedef Controller (*ControllerFactory)(int ai);
 
 struct GameEvent {
 	enum EventType {
@@ -45,7 +42,7 @@ struct Game {
 
 	Game(Dungeon * game_dungeon);
 	void create_new_game();
-	void run(ControllerFactory controller_factory);
+	void run(const ControllerFactory & controller_factory);
 
 	void event(const GameEvent & e);
 	void event(const Info & event_actor, GameEvent::EventType event_type, const Info & event_target = Info(), const Info & event_help = Info());

@@ -137,15 +137,3 @@ Action * calm_and_still(Monster & monster, Game & game)
 	return new Wait();
 }
 
-Controller get_controller(int ai)
-{
-	switch(ai) {
-		case AI::PLAYER: return player_control;
-		case AI::ANGRY_AND_WANDER: return angry_and_wander;
-		case AI::ANGRY_AND_STILL: return angry_and_still;
-		case AI::CALM_AND_STILL: return calm_and_still;
-		default: log("Unknown AI code: {0}", ai); break;
-	}
-	return 0;
-}
-

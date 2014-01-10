@@ -113,7 +113,7 @@ Monster::Builder Game::add_monster(const std::string & type_id)
 }
 
 
-void Game::run(ControllerFactory controller_factory)
+void Game::run(const ControllerFactory & controller_factory)
 {
 	state = PLAYING;
 	while(state == PLAYING) {
@@ -121,7 +121,7 @@ void Game::run(ControllerFactory controller_factory)
 			if(monster.is_dead()) {
 				continue;
 			}
-			Controller controller = controller_factory(monster.type->ai);
+			Controller controller = controller_factory.get_controller(monster.type->ai);
 			if(!controller) {
 				log("No controller found for AI #{0}!", monster.type->ai);
 				continue;
