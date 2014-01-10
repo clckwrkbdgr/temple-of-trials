@@ -4,10 +4,6 @@ class Action;
 class Monster;
 class Game;
 
-namespace AI {
-	enum { DUMMY, PLAYER, ANGRY_AND_WANDER, ANGRY_AND_STILL, CALM_AND_STILL };
-}
-
 class PlayerControl : public Controller {
 public:
 	virtual Action * act(Monster & player, Game & game);

@@ -158,7 +158,7 @@ Monster::Builder Game::add_monster(const std::string & type_id)
 }
 
 
-void Game::run(const ControllerFactory & controller_factory)
+void Game::run()
 {
 	state = PLAYING;
 	while(state == PLAYING) {

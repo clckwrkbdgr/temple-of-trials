@@ -5,9 +5,18 @@
 #include "engine/log.h"
 #include <cstdlib>
 
+namespace AI {
+	enum { DUMMY, PLAYER, ANGRY_AND_WANDER, ANGRY_AND_STILL, CALM_AND_STILL };
+}
+
 LinearDungeon::LinearDungeon()
 	: Game()
 {
+	controller_factory.add_controller(AI::PLAYER, new PlayerControl());
+	controller_factory.add_controller(AI::ANGRY_AND_WANDER, new AngryAndWander());
+	controller_factory.add_controller(AI::ANGRY_AND_STILL, new AngryAndStill());
+	controller_factory.add_controller(AI::CALM_AND_STILL, new CalmAndStill());
+
 	cell_types.insert("floor").sprite(Sprites::FLOOR).name("floor").passable(true).transparent(true);
 	cell_types.insert("wall").sprite(Sprites::WALL).name("wall").passable(false);
 	cell_types.insert("goo").sprite(Sprites::GOO).name("goo").passable(true).hurts(true).transparent(true);

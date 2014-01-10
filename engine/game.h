@@ -45,11 +45,12 @@ struct Game {
 	TypeRegistry<std::string, Monster> monster_types;
 	TypeRegistry<std::string, Object> object_types;
 	TypeRegistry<std::string, Item> item_types;
+	ControllerFactory controller_factory;
 
 	Game();
 	virtual ~Game() {}
 	void create_new_game();
-	void run(const ControllerFactory & controller_factory);
+	void run();
 	virtual void generate(Level & level, int level_index) = 0;
 
 	Level & level();

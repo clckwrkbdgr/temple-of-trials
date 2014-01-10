@@ -43,13 +43,7 @@ int main()
 		game.create_new_game();
 	}
 
-	ControllerFactory controllers;
-	controllers.add_controller(AI::PLAYER, new PlayerControl());
-	controllers.add_controller(AI::ANGRY_AND_WANDER, new AngryAndWander());
-	controllers.add_controller(AI::ANGRY_AND_STILL, new AngryAndStill());
-	controllers.add_controller(AI::CALM_AND_STILL, new CalmAndStill());
-
-	game.run(controllers);
+	game.run();
 
 	Console::instance().see_messages(game);
 	if(game.state == Game::SUSPENDED) {
