@@ -63,7 +63,7 @@ void LinearDungeon::generate(Level & level, int level_index)
 			rooms.push_back(std::make_pair(topleft, bottomright));
 		}
 	}
-	rooms = shuffle_rooms(rooms);
+	rooms = DungeonBuilder::shuffle_rooms(rooms);
 	log("Rooms arranged.");
 
 	std::vector<std::string> room_content;
@@ -106,8 +106,8 @@ void LinearDungeon::generate(Level & level, int level_index)
 				level.monsters[key_holder].inventory.insert(Item::Builder(item_types.get("key")).key_type(level_index));
 			}
 		}
-		fill_room(level.map, rooms[i], cell_types.get("floor"));
-		std::vector<Point> positions = random_positions(rooms[i], room_content[i].size());
+		DungeonBuilder::fill_room(level.map, rooms[i], cell_types.get("floor"));
+		std::vector<Point> positions = DungeonBuilder::random_positions(rooms[i], room_content[i].size());
 		foreach(char cell, room_content[i]) {
 			Point pos = positions.back();
 			positions.pop_back();
@@ -152,7 +152,7 @@ void LinearDungeon::generate(Level & level, int level_index)
 			}
 		}
 		if(i > 0) {
-			std::pair<Point, Point> doors = connect_rooms(level, rooms[i], rooms[i - 1], cell_types.get("floor"));
+			std::pair<Point, Point> doors = DungeonBuilder::connect_rooms(level, rooms[i], rooms[i - 1], cell_types.get("floor"));
 			if(!doors.first.null() && !doors.second.null()) {
 				add_object(level, "closed_door", "opened_door").pos(doors.first);
 				if(is_last_room) {
@@ -164,7 +164,7 @@ void LinearDungeon::generate(Level & level, int level_index)
 		}
 	}
 	log("Rooms filled.");
-	pop_player_front(level.monsters);
+	DungeonBuilder::pop_player_front(level.monsters);
 	log("Player popped.");
 
 	log("Done.");

@@ -33,6 +33,14 @@ struct Level {
 	void erase_dead_monsters();
 };
 
+struct DungeonBuilder {
+	static void fill_room(Map<Cell> & map, const std::pair<Point, Point> & room, const CellType * type);
+	static std::vector<Point> random_positions(const std::pair<Point, Point> & room, int count);
+	static std::pair<Point, Point> connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const CellType * type);
+	static std::vector<std::pair<Point, Point> > shuffle_rooms(const std::vector<std::pair<Point, Point> > & rooms);
+	static void pop_player_front(std::vector<Monster> & monsters);
+};
+
 class Dungeon {
 public:
 	TypeRegistry<std::string, Cell> cell_types;
@@ -56,11 +64,5 @@ public:
 	Level & level();
 	const Level & level() const;
 	void go_to_level(int level);
-protected:
-	static void fill_room(Map<Cell> & map, const std::pair<Point, Point> & room, const CellType * type);
-	static std::vector<Point> random_positions(const std::pair<Point, Point> & room, int count);
-	static std::pair<Point, Point> connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const CellType * type);
-	static std::vector<std::pair<Point, Point> > shuffle_rooms(const std::vector<std::pair<Point, Point> > & rooms);
-	static void pop_player_front(std::vector<Monster> & monsters);
 };
 

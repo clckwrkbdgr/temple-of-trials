@@ -260,7 +260,7 @@ Monster::Builder Dungeon::add_monster(Level & level, const std::string & type_id
 	return Monster::Builder(level.monsters.back());
 }
 
-void Dungeon::fill_room(Map<Cell> & map, const std::pair<Point, Point> & room, const CellType * type)
+void DungeonBuilder::fill_room(Map<Cell> & map, const std::pair<Point, Point> & room, const CellType * type)
 {
 	for(int x = room.first.x; x <= room.second.x; ++x) {
 		for(int y = room.first.y; y <= room.second.y; ++y) {
@@ -269,7 +269,7 @@ void Dungeon::fill_room(Map<Cell> & map, const std::pair<Point, Point> & room, c
 	}
 }
 
-std::vector<Point> Dungeon::random_positions(const std::pair<Point, Point> & room, int count)
+std::vector<Point> DungeonBuilder::random_positions(const std::pair<Point, Point> & room, int count)
 {
 	std::vector<Point> result;
 	for(int i = 0; i < count; ++i) {
@@ -291,7 +291,7 @@ std::vector<Point> Dungeon::random_positions(const std::pair<Point, Point> & roo
 	return result;
 }
 
-std::pair<Point, Point> Dungeon::connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const CellType * type)
+std::pair<Point, Point> DungeonBuilder::connect_rooms(Level & level, const std::pair<Point, Point> & a, const std::pair<Point, Point> & b, const CellType * type)
 {
 	if(a.first.x < b.first.x) {
 		int start_y = std::max(a.first.y, b.first.y);
@@ -332,7 +332,7 @@ std::pair<Point, Point> Dungeon::connect_rooms(Level & level, const std::pair<Po
 	return std::make_pair(Point(), Point());
 }
 
-std::vector<std::pair<Point, Point> > Dungeon::shuffle_rooms(const std::vector<std::pair<Point, Point> > & rooms)
+std::vector<std::pair<Point, Point> > DungeonBuilder::shuffle_rooms(const std::vector<std::pair<Point, Point> > & rooms)
 {
 	static int a00[] = { 8, 1, 2, 7, 0, 3, 6, 5, 4, };
 	static int a01[] = { 6, 7, 8, 5, 0, 1, 4, 3, 2, };
@@ -381,7 +381,7 @@ std::vector<std::pair<Point, Point> > Dungeon::shuffle_rooms(const std::vector<s
 	return new_rooms;
 }
 
-void Dungeon::pop_player_front(std::vector<Monster> & monsters)
+void DungeonBuilder::pop_player_front(std::vector<Monster> & monsters)
 {
 	if(monsters.empty()) {
 		return;
