@@ -1,6 +1,6 @@
 #include "generate.h"
-#include "ai.h"
 #include "sprites.h"
+#include "player.h"
 #include "engine/monsters.h"
 #include "engine/log.h"
 #include <cstdlib>
