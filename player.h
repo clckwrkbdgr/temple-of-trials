@@ -3,13 +3,13 @@
 class Action;
 class Monster;
 class Game;
-class Console;
+class TempleUI;
 
 class PlayerControl : public Controller {
 public:
-	PlayerControl(Console & console);
+	PlayerControl(TempleUI & console);
 	virtual Action * act(Monster & player, Game & game);
 private:
-	Console & interface;
+	TempleUI & interface;
 };
 

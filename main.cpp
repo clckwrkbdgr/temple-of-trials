@@ -59,7 +59,7 @@ int main()
 	std::ofstream log_file("temple.log", std::ios::app);
 	direct_log(&log_file);
 
-	Console console;
+	TempleUI console;
 	PlayerControl player(console);
 	LinearDungeon game(&player);
 	game.messages.log_messages = true;

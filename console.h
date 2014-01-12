@@ -27,10 +27,16 @@ struct Console {
 	void print_stat(int row, const std::string & text);
 	void clear();
 	int get_control();
-private:
+protected:
 	unsigned messages_seen;
 	std::string notification_text;
 	std::map<int, std::pair<char, int> > sprites;
 
 	void init_sprites();
+};
+
+class TempleUI : public Console {
+public:
+	TempleUI();
+	~TempleUI();
 };

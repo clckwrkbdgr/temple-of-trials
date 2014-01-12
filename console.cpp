@@ -23,7 +23,12 @@ Console::Console()
 	curs_set(0);
 	start_color();
 	
-	init_sprites();
+	for(int fore = 0; fore < 8; ++fore) {
+		if(fore == 0) {
+			continue;
+		}
+		init_pair(fore, fore, 0);
+	}
 
 	if(directions.empty()) {
 		directions['h'] = Point(-1,  0);
@@ -45,48 +50,12 @@ Console::~Console()
 	endwin();
 }
 
-void Console::init_sprites()
-{
-	for(int fore = 0; fore < 8; ++fore) {
-		if(fore == 0) {
-			continue;
-		}
-		init_pair(fore, fore, 0);
-	}
-	sprites[Sprites::EMPTY]         = std::make_pair(' ', COLOR_PAIR(0));
-	sprites[Sprites::FLOOR]         = std::make_pair('.', COLOR_PAIR(COLOR_YELLOW));
-	sprites[Sprites::WALL]          = std::make_pair('#', COLOR_PAIR(COLOR_YELLOW));
-	sprites[Sprites::TORCH]         = std::make_pair('&', COLOR_PAIR(COLOR_RED) | A_BOLD);
-	sprites[Sprites::GOO]           = std::make_pair('~', COLOR_PAIR(COLOR_GREEN) | A_BOLD);
-	sprites[Sprites::EXPLOSIVE]     = std::make_pair('*', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
-	sprites[Sprites::MONEY]         = std::make_pair('$', COLOR_PAIR(COLOR_YELLOW));
-	sprites[Sprites::SCORPION_TAIL] = std::make_pair('!', COLOR_PAIR(COLOR_RED));
-	sprites[Sprites::SPEAR]         = std::make_pair('(', COLOR_PAIR(COLOR_BLUE) | A_BOLD);
-	sprites[Sprites::JACKET]        = std::make_pair('[', COLOR_PAIR(COLOR_BLUE) | A_BOLD);
-	sprites[Sprites::ANTIDOTE]      = std::make_pair('%', COLOR_PAIR(COLOR_MAGENTA));
-	sprites[Sprites::APPLE]         = std::make_pair('%', COLOR_PAIR(COLOR_GREEN));
-	sprites[Sprites::PLAYER]        = std::make_pair('@', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
-	sprites[Sprites::ANT]           = std::make_pair('A', COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
-	sprites[Sprites::SCORPION]      = std::make_pair('S', COLOR_PAIR(COLOR_RED) | A_BOLD);
-	sprites[Sprites::DOOR_OPENED]   = std::make_pair('-', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
-	sprites[Sprites::DOOR_CLOSED]   = std::make_pair('+', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
-	sprites[Sprites::POT]           = std::make_pair('V', COLOR_PAIR(COLOR_YELLOW));
-	sprites[Sprites::WELL]          = std::make_pair('{', COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
-	sprites[Sprites::GATE]          = std::make_pair('<', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
-	sprites[Sprites::STAIRS_UP]     = std::make_pair('<', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
-	sprites[Sprites::STAIRS_DOWN]   = std::make_pair('>', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
-	sprites[Sprites::TRAP]          = std::make_pair('^', COLOR_PAIR(COLOR_YELLOW));
-	sprites[Sprites::SHARPENED_POLE] = std::make_pair('(', COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
-	sprites[Sprites::KEY]           = std::make_pair('*', COLOR_PAIR(COLOR_WHITE));
-	sprites[Sprites::FLASK]         = std::make_pair('}', COLOR_PAIR(COLOR_WHITE));
-}
-
 void Console::print_tile(int x, int y, int sprite)
 {
 	if(sprites.count(sprite) > 0) {
 		mvaddch(y + 1, x, sprites[sprite].first | sprites[sprite].second);
 	} else {
-		log("Unknown sprite with code {0} at {1}", sprite, Point(x, y));
+		log("Unknown sprite with code {0} at ({1}, {2})", sprite, x, y);
 	}
 }
 
@@ -95,7 +64,7 @@ void Console::print_fow(int x, int y, int sprite)
 	if(sprites.count(sprite) > 0) {
 		mvaddch(y + 1, x, sprites[sprite].first);
 	} else {
-		log("Unknown fow sprite with code {0} at {1}", sprite, Point(x, y));
+		log("Unknown sprite with code {0} at ({1}, {2})", sprite, x, y);
 	}
 }
 
@@ -333,4 +302,40 @@ int Console::get_inventory_slot(const Game & game, const Monster & monster)
 		break;
 	}
 	return slot;
+}
+
+
+TempleUI::TempleUI()
+	: Console()
+{
+	sprites[Sprites::EMPTY]         = std::make_pair(' ', COLOR_PAIR(0));
+	sprites[Sprites::FLOOR]         = std::make_pair('.', COLOR_PAIR(COLOR_YELLOW));
+	sprites[Sprites::WALL]          = std::make_pair('#', COLOR_PAIR(COLOR_YELLOW));
+	sprites[Sprites::TORCH]         = std::make_pair('&', COLOR_PAIR(COLOR_RED) | A_BOLD);
+	sprites[Sprites::GOO]           = std::make_pair('~', COLOR_PAIR(COLOR_GREEN) | A_BOLD);
+	sprites[Sprites::EXPLOSIVE]     = std::make_pair('*', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
+	sprites[Sprites::MONEY]         = std::make_pair('$', COLOR_PAIR(COLOR_YELLOW));
+	sprites[Sprites::SCORPION_TAIL] = std::make_pair('!', COLOR_PAIR(COLOR_RED));
+	sprites[Sprites::SPEAR]         = std::make_pair('(', COLOR_PAIR(COLOR_BLUE) | A_BOLD);
+	sprites[Sprites::JACKET]        = std::make_pair('[', COLOR_PAIR(COLOR_BLUE) | A_BOLD);
+	sprites[Sprites::ANTIDOTE]      = std::make_pair('%', COLOR_PAIR(COLOR_MAGENTA));
+	sprites[Sprites::APPLE]         = std::make_pair('%', COLOR_PAIR(COLOR_GREEN));
+	sprites[Sprites::PLAYER]        = std::make_pair('@', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
+	sprites[Sprites::ANT]           = std::make_pair('A', COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+	sprites[Sprites::SCORPION]      = std::make_pair('S', COLOR_PAIR(COLOR_RED) | A_BOLD);
+	sprites[Sprites::DOOR_OPENED]   = std::make_pair('-', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
+	sprites[Sprites::DOOR_CLOSED]   = std::make_pair('+', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
+	sprites[Sprites::POT]           = std::make_pair('V', COLOR_PAIR(COLOR_YELLOW));
+	sprites[Sprites::WELL]          = std::make_pair('{', COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+	sprites[Sprites::GATE]          = std::make_pair('<', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
+	sprites[Sprites::STAIRS_UP]     = std::make_pair('<', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
+	sprites[Sprites::STAIRS_DOWN]   = std::make_pair('>', COLOR_PAIR(COLOR_WHITE) | A_BOLD);
+	sprites[Sprites::TRAP]          = std::make_pair('^', COLOR_PAIR(COLOR_YELLOW));
+	sprites[Sprites::SHARPENED_POLE] = std::make_pair('(', COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+	sprites[Sprites::KEY]           = std::make_pair('*', COLOR_PAIR(COLOR_WHITE));
+	sprites[Sprites::FLASK]         = std::make_pair('}', COLOR_PAIR(COLOR_WHITE));
+}
+
+TempleUI::~TempleUI()
+{
 }

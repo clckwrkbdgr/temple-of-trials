@@ -10,7 +10,7 @@
 #include <ncurses.h>
 #include <cstdlib>
 
-PlayerControl::PlayerControl(Console & console)
+PlayerControl::PlayerControl(TempleUI & console)
 	: interface(console)
 {
 }
