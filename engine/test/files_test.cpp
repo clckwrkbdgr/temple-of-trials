@@ -8,6 +8,7 @@ using namespace Chthon::UnitTest;
 
 namespace Chthon {
 
+/*
 struct ComplexStructure {
 	int i;
 	char ch;
@@ -36,7 +37,9 @@ bool operator != (const std::pair<const int, char> & a, const std::pair<int, cha
 	return a.first != b.first || a.second != b.second;
 }
 
-SUITE(files_reader) {
+*/
+
+SUITE(files) {
 
 TEST(reader_should_skip_newline)
 {
@@ -79,7 +82,7 @@ TEST(reader_should_throw_exception_when_stream_is_bad)
 	CATCH(reader.check("test"), Reader::Exception, e) {
 		EQUAL(
 				e.message,
-				"Error: savefile is corrupted (reading test) ."
+				"Error: savefile is corrupted (reading test)."
 			 );
 	}
 }
@@ -129,6 +132,7 @@ TEST(reader_should_read_string_as_quoted_string)
 	EQUAL(s, "hello world");
 }
 
+/*
 TEST(reader_should_read_point)
 {
 	std::istringstream in("2 3 ");
@@ -244,10 +248,8 @@ TEST(should_read_complex_type_by_inline_store_using_store_ext)
 	EQUAL(c.i, -1);
 	EQUAL(c.ch, 'A');
 }
+*/
 
-}
-
-SUITE(files_writer) {
 
 TEST(writer_should_write_newline)
 {
@@ -297,6 +299,7 @@ TEST(writer_should_write_bool_as_int_and_a_space)
 	EQUAL(out.str(), "1 ");
 }
 
+/*
 TEST(writer_should_write_point)
 {
 	std::ostringstream out;
@@ -390,6 +393,54 @@ TEST(should_write_complex_type_by_inline_store_using_store_ext)
 	Writer writer(out);
 	writer.store(ComplexStructure(1, 'A'));
 	EQUAL(out.str(), "1 65 ");
+}
+*/
+
+namespace UserNamespace {
+
+	struct UserDefinedType {
+		int i;
+		char ch;
+		UserDefinedType() : i(0), ch(0) {}
+		UserDefinedType(int _i, char _ch) : i(_i), ch(_ch) {}
+	};
+
+}
+
+SAVEFILE_STORE(UserNamespace::UserDefinedType, value)
+{
+	savefile.store(value.i).store(value.ch);
+}
+
+TEST(should_write_user_defined_type)
+{
+	std::ostringstream out;
+	Writer writer(out);
+	store(writer, UserNamespace::UserDefinedType(1, 'A'));
+	EQUAL(out.str(), "1 65 ");
+}
+
+TEST(should_read_user_defined_type)
+{
+	std::istringstream in("1 65 ");
+	Reader reader(in);
+	UserNamespace::UserDefinedType value;
+	store(reader, value);
+	EQUAL(value.i, 1);
+	EQUAL(value.ch, 'A');
+}
+
+TEST(should_throw_exception_when_cannot_read_user_defined_type)
+{
+	std::istringstream in("1 a ");
+	Reader reader(in);
+	UserNamespace::UserDefinedType value;
+	CATCH(store(reader, value, "user defined type"), Reader::Exception, e) {
+		EQUAL(
+				e.message,
+				"Error: savefile is corrupted (reading user defined type)."
+			 );
+	}
 }
 
 }

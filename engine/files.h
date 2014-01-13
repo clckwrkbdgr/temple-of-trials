@@ -13,11 +13,23 @@ bool file_exists(const std::string & filename);
 std::string read_string(std::istream & in, char quote = '"');
 std::string escaped(const std::string & s, char quote = '"');
 
+#define SAVEFILE_STORE(Type, variable) \
+	template<class Savefile, class T> void store_ext_##variable(Savefile & savefile, T & value); \
+	template<class Savefile> void store(Savefile & savefile, Type & variable, const char * section = 0) \
+		{ store_ext_##variable(savefile, variable); if(section) { savefile.check(section); } } \
+	template<class Savefile> void store(Savefile & savefile, const Type & variable, const char * section = 0) \
+		{ store_ext_##variable(savefile, variable); if(section) { savefile.check(section); } } \
+	template<class Savefile, class T> \
+	void store_ext_##variable(Savefile & savefile, T & value)
+
+
+/*
 #define SAVEFILE_STORE_EXT(Type, variable) \
 	template<class Savefile> void store_ext(Savefile & savefile, Type & variable) { store_##variable(savefile, variable); } \
 	template<class Savefile> void store_ext(Savefile & savefile, const Type & variable) { store_##variable(savefile, variable); } \
 	template<class Savefile, class Type> \
 	void store_##variable(Savefile & savefile, Type & variable)
+	*/
 
 class Reader {
 public:
@@ -32,23 +44,17 @@ public:
 	int version() const { return actual_minor_version; }
 	Reader & check(const std::string & section);
 	
-	template<class T>
-	Reader & store(T & value)
-	{
-		store_ext(*this, value);
-		return *this;
-	}
-
-	Reader & add_type_registry(const TypeRegistry<std::string, Cell> & type_registry);
-	Reader & add_type_registry(const TypeRegistry<std::string, Monster> & type_registry);
-	Reader & add_type_registry(const TypeRegistry<std::string, Object> & type_registry);
-	Reader & add_type_registry(const TypeRegistry<std::string, Item> & type_registry);
+	//Reader & add_type_registry(const TypeRegistry<std::string, Cell> & type_registry);
+	//Reader & add_type_registry(const TypeRegistry<std::string, Monster> & type_registry);
+	//Reader & add_type_registry(const TypeRegistry<std::string, Object> & type_registry);
+	//Reader & add_type_registry(const TypeRegistry<std::string, Item> & type_registry);
 	Reader & store(int & value);
 	Reader & store(unsigned int & value);
 	Reader & store(char & value);
 	Reader & store(bool & value);
 	Reader & store(std::string & value);
-	Reader & store(Point & value);
+	//Reader & store(Point & value);
+	/*
 	template<class T>
 	Reader & store_type(TypePtr<T> & type)
 	{
@@ -94,18 +100,19 @@ public:
 			store(map[key]).newline().check(name);
 		}
 	}
+	*/
 private:
 	int actual_minor_version;
 	std::istream & in;
 
-	const TypeRegistry<std::string, Cell> * cell_types;
-	const TypeRegistry<std::string, Monster> * monster_types;
-	const TypeRegistry<std::string, Object> * object_types;
-	const TypeRegistry<std::string, Item> * item_types;
-	const TypeRegistry<std::string, Cell> * get_registry(const Cell::Type &) { return cell_types; }
-	const TypeRegistry<std::string, Monster> * get_registry(const Monster::Type &) { return monster_types; }
-	const TypeRegistry<std::string, Object> * get_registry(const Object::Type &) { return object_types; }
-	const TypeRegistry<std::string, Item> * get_registry(const Item::Type &) { return item_types; }
+	//const TypeRegistry<std::string, Cell> * cell_types;
+	//const TypeRegistry<std::string, Monster> * monster_types;
+	//const TypeRegistry<std::string, Object> * object_types;
+	//const TypeRegistry<std::string, Item> * item_types;
+	//const TypeRegistry<std::string, Cell> * get_registry(const Cell::Type &) { return cell_types; }
+	//const TypeRegistry<std::string, Monster> * get_registry(const Monster::Type &) { return monster_types; }
+	//const TypeRegistry<std::string, Object> * get_registry(const Object::Type &) { return object_types; }
+	//const TypeRegistry<std::string, Item> * get_registry(const Item::Type &) { return item_types; }
 };
 
 class Writer {
@@ -121,18 +128,21 @@ public:
 	int version() const { return actual_minor_version; }
 	Writer & check(const std::string & section);
 	
+	/*
 	template<class T>
 	Writer & store(const T & value)
 	{
 		store_ext(*this, value);
 		return *this;
 	}
+	*/
 
 	Writer & store(int value);
 	Writer & store(unsigned int value);
 	Writer & store(char value);
 	Writer & store(bool value);
 	Writer & store(const std::string & value);
+	/*
 	Writer & store(const Point & value);
 	Writer & add_type_registry(const TypeRegistry<std::string, Cell> &) { return * this; }
 	Writer & add_type_registry(const TypeRegistry<std::string, Monster> &) { return * this; }
@@ -175,6 +185,7 @@ public:
 			store(i->first).store(i->second).newline().check(name);
 		}
 	}
+	*/
 private:
 	int actual_minor_version;
 	std::ostream & out;

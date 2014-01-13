@@ -78,7 +78,7 @@ Reader & Reader::version(int major_version, int minor_version)
 Reader & Reader::check(const std::string & section)
 {
 	if(!in.good()) {
-		throw Exception("Error: savefile is corrupted (reading " + to_string(section) + ") .");
+		throw Exception("Error: savefile is corrupted (reading " + to_string(section) + ").");
 	}
 	return *this;
 }
@@ -117,6 +117,7 @@ Reader & Reader::store(std::string & value)
 	return *this;
 }
 
+/*
 Reader & Reader::store(Point & value)
 {
 	int x, y;
@@ -149,6 +150,7 @@ Reader & Reader::add_type_registry(const TypeRegistry<std::string, Item> & type_
 	return *this;
 }
 
+*/
 
 Writer::Writer(std::ostream & out_stream)
 	: actual_minor_version(0), out(out_stream)
@@ -207,10 +209,12 @@ Writer & Writer::store(const std::string & value)
 	return *this;
 }
 
+/*
 Writer & Writer::store(const Point & value)
 {
 	store(value.x).store(value.y);
 	return *this;
 }
+*/
 
 }
