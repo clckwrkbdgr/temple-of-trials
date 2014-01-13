@@ -80,7 +80,7 @@ Action * PlayerControl::act(Monster & player, Game & game)
 			case 's': return new Swing(interface.draw_and_get_direction(game));
 			case 'o': return new Open(interface.draw_and_get_direction(game));
 			case 'c': return new Close(interface.draw_and_get_direction(game));
-			default: interface.notification(format("Unknown control '{0}'", char(ch)));
+			default: interface.set_notification(format("Unknown control '{0}'", char(ch)));
 		}
 	}
 	return 0;
