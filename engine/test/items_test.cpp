@@ -1,6 +1,10 @@
 #include "../items.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 SUITE(inventory) {
 
 TEST(should_not_empty_not_emptyable_item)
@@ -144,3 +148,4 @@ TEST(should_get_quest_items_when_carrying_one)
 
 }
 
+}

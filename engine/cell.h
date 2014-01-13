@@ -3,6 +3,8 @@
 #include "util.h"
 #include <string>
 
+namespace Chthon {
+
 struct CellType {
 	std::string id;
 	int sprite;
@@ -35,3 +37,4 @@ struct Cell {
 	explicit Cell(const CellType * cell_type = 0);
 };
 
+}

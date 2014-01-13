@@ -2,6 +2,8 @@
 #include "actions.h"
 #include "util.h"
 
+namespace Chthon {
+
 MonsterType::MonsterType(const std::string & type_id)
 	: id(type_id), faction(Monster::NEUTRAL), sprite(0), sight(0), ai(0), max_hp(1),
 	hit_strength(0), poisonous(false)
@@ -66,4 +68,4 @@ Monster::Builder & Monster::Builder::item(const Item & value) { result.inventory
 Monster::Builder & Monster::Builder::wield(int value) { result.inventory.wield(value); return *this; }
 Monster::Builder & Monster::Builder::wear(int value) { result.inventory.wear(value); return *this; }
 
-
+}

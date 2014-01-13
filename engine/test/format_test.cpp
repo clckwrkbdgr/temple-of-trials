@@ -2,6 +2,10 @@
 #include "../format.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 SUITE(format) {
 
 TEST(should_convert_int_to_string)
@@ -34,6 +38,8 @@ TEST(should_convert_string_to_string)
 {
 	std::string result = to_string(std::string("hello"));
 	EQUAL(result, "hello");
+}
+
 }
 
 }

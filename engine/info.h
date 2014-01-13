@@ -3,6 +3,9 @@
 #include "util.h"
 #include <string>
 #include <vector>
+
+namespace Chthon {
+
 class Item;
 class Object;
 class Monster;
@@ -43,3 +46,5 @@ struct CompiledInfo {
 	CompiledInfo & in(const Map<Cell> & map);
 	Info compiled() const;
 };
+
+}

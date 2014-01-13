@@ -2,6 +2,8 @@
 #include "../level.h"
 #include "../game.h"
 
+namespace Chthon {
+
 namespace GameMocks {
 
 struct DummyDungeon : public Game {
@@ -98,5 +100,6 @@ struct LevelForSeeing {
 	LevelForSeeing();
 };
 
+}
 
 }

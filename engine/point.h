@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 
+namespace Chthon {
+
 struct Point {
 	int x, y;
 	Point(int _x, int _y);
@@ -55,3 +57,4 @@ T & find_at(std::vector<T> & container, const Point & pos, typename std::vector<
 
 int distance(const Point & a, const Point & b);
 
+}

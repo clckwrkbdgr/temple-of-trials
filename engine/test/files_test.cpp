@@ -4,6 +4,10 @@
 #include "../test.h"
 #include <sstream>
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 struct ComplexStructure {
 	int i;
 	char ch;
@@ -386,6 +390,8 @@ TEST(should_write_complex_type_by_inline_store_using_store_ext)
 	Writer writer(out);
 	writer.store(ComplexStructure(1, 'A'));
 	EQUAL(out.str(), "1 65 ");
+}
+
 }
 
 }

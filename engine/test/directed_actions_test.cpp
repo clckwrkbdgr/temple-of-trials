@@ -3,6 +3,10 @@
 #include "../game.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 static std::string to_string(const TypePtr<ItemType> & type)
 {
 	return type->id;
@@ -439,6 +443,8 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_put_item_under_monster_if_t
 	} DONE(e);
 	ASSERT(!game.level().items.empty());
 	EQUAL(game.level().items[0].pos, Point(1, 2));
+}
+
 }
 
 }

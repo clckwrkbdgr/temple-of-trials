@@ -3,6 +3,10 @@
 #include <list>
 #include <iostream>
 
+namespace Chthon {
+
+namespace UnitTest {
+
 struct Test {
 	const char * suite;
 	const char * name;
@@ -15,6 +19,7 @@ struct Test {
 };
 
 std::list<Test*> & all_tests();
+int run_all_tests(int argc, char ** argv);
 
 struct AssertException {
 	const char * filename;
@@ -128,5 +133,6 @@ private:
 #define DONE(var) \
 	test_c_##var.check_at_end(__FILE__, __LINE__)
 
-int run_all_tests(int argc, char ** argv);
+}
 
+}

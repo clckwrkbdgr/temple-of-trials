@@ -4,6 +4,8 @@
 #include "actions.h"
 #include <cassert>
 
+namespace Chthon {
+
 ObjectType::ObjectType(const std::string & type_id)
 	: id(type_id), sprite(0), passable(false), transparent(false),
 	containable(false), drinkable(false), transporting(false), triggerable(false), openable(false)
@@ -80,3 +82,4 @@ Object::Builder & Object::Builder::opened(bool value) { if(value) result.open();
 Object::Builder & Object::Builder::locked(bool value) { result.locked = value; return *this; }
 Object::Builder & Object::Builder::lock_type(int value) { result.lock_type = value; return *this; }
 
+}

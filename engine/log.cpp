@@ -2,6 +2,8 @@
 #include "format.h"
 #include <iostream>
 
+namespace Chthon {
+
 std::string now()
 {
 	time_t t = time(0);
@@ -30,3 +32,4 @@ void log(const std::string & message)
 	log_control(0, message);
 }
 
+}

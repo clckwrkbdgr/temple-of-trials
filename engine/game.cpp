@@ -10,6 +10,8 @@
 #include <cassert>
 #include <cmath>
 
+namespace Chthon {
+
 GameEvent::GameEvent(const Info & event_actor, EventType event_type, const Info & event_target, const Info & event_help)
 	: type(event_type), amount(0), actor(event_actor), target(event_target), help(event_help)
 {
@@ -294,3 +296,5 @@ void Game::hit(Monster & someone, Monster & other, int damage)
 	}
 }
 
+
+}

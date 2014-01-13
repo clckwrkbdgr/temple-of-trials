@@ -5,6 +5,8 @@
 #include "util.h"
 #include <cstdlib>
 
+namespace Chthon {
+
 BasicAI * BasicAI::add(unsigned action)
 {
 	if(action < COUNT) {
@@ -73,4 +75,6 @@ Controller * ControllerFactory::get_controller(int ai) const
 	}
 	log("Unknown AI code: {0}", ai);
 	return 0;
+}
+
 }

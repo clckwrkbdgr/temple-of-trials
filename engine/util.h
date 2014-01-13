@@ -8,6 +8,8 @@
 #define decltype __typeof__
 #endif
 
+namespace Chthon {
+
 void delay(int msec);
 
 template<typename T>
@@ -43,3 +45,4 @@ std::vector<std::string> & operator<<(std::vector<std::string> & out, const char
 template<class T, size_t N>
 size_t size_of_array(T (&)[N]) { return N; }
 
+}

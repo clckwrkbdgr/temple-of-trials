@@ -1,6 +1,10 @@
 #include "../monsters.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 SUITE(monsters) {
 
 TEST(monster_with_nonzero_hp_should_be_alive)
@@ -70,3 +74,4 @@ TEST(monster_with_equipment_should_have_weapon_damage_instead)
 
 }
 
+}

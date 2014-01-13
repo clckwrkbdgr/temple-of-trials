@@ -5,6 +5,10 @@
 #include "../format.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 using namespace GameMocks;
 
 SUITE(game) {
@@ -201,3 +205,4 @@ TEST_FIXTURE(GameWithDummyAndKiller, should_die_if_hit_was_too_much)
 
 }
 
+}

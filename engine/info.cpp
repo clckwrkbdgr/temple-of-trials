@@ -4,6 +4,8 @@
 #include "monsters.h"
 #include "objects.h"
 
+namespace Chthon {
+
 static std::string invalid_id = "";
 static int invalid_sprite = 0;
 static std::string invalid_name = "";
@@ -78,3 +80,5 @@ Info CompiledInfo::compiled() const
 	return result.valid() ? result : Info();
 }
 
+
+}

@@ -2,6 +2,8 @@
 #include "monsters.h"
 #include "game.h"
 
+namespace Chthon {
+
 void Move::commit(Monster & someone, Game & game)
 {
 	Point new_pos = someone.pos + shift;
@@ -163,3 +165,5 @@ void Put::commit(Monster & someone, Game & game)
 	someone.inventory.take_wielded_item();
 }
 
+
+}

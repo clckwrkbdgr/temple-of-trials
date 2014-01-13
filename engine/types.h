@@ -1,6 +1,8 @@
 #pragma once
 #include <map>
 
+namespace Chthon {
+
 template<class T>
 struct TypePtr {
 	explicit TypePtr(const T * type_pointer = 0)
@@ -73,3 +75,5 @@ struct TypeRegistry {
 		return typename ValueType::Builder(types[id]);
 	}
 };
+
+}

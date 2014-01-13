@@ -3,6 +3,10 @@
 #include "../game.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 using namespace GameMocks;
 
 SUITE(dungeon) {
@@ -229,6 +233,8 @@ TEST(should_erase_dead_monsters)
 	game.level().erase_dead_monsters();
 	EQUAL(game.level().monsters.size(), (unsigned)1);
 	EQUAL(game.level().monsters[0].type->sprite, 2);
+}
+
 }
 
 }

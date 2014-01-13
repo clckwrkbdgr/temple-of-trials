@@ -4,6 +4,8 @@
 #include "format.h"
 #include <sys/stat.h>
 
+namespace Chthon {
+
 bool file_exists(const std::string & filename)
 {
 	struct stat buffer;   
@@ -211,3 +213,4 @@ Writer & Writer::store(const Point & value)
 	return *this;
 }
 
+}

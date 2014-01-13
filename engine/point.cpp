@@ -2,6 +2,8 @@
 #include "format.h"
 #include <cmath>
 
+namespace Chthon {
+
 Point::Point(int _x, int _y)
 	: x(_x), y(_y)
 {
@@ -86,3 +88,4 @@ int distance(const Point & a, const Point & b)
 	return int(std::sqrt(x * x + y * y));
 }
 
+}

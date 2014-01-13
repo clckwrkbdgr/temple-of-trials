@@ -1,6 +1,8 @@
 #include "items.h"
 #include "util.h"
 
+namespace Chthon {
+
 ItemType::ItemType(const std::string & type_id)
 	: id(type_id), sprite(0), damage(0), wearable(false), defence(0), edible(false), antidote(0), healing(0), quest(false)
 {
@@ -257,3 +259,5 @@ bool Inventory::has_key(int key_type) const
 	return false;
 }
 
+
+}

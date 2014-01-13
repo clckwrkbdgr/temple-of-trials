@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 
+namespace Chthon {
+
 std::string to_string(int value);
 std::string to_string(unsigned value);
 std::string to_string(long unsigned value);
@@ -25,3 +27,4 @@ template<class T0, class T1, class T2, class T3, class T4>
 	std::string format(std::string s, const T0 & t0, const T1 & t1, const T2 & t2, const T3 & t3, const T4 & t4)
 	{ subs_arg(s, 0, t0); subs_arg(s, 1, t1); subs_arg(s, 2, t2); subs_arg(s, 3, t3); subs_arg(s, 4, t4); return s; }
 
+}

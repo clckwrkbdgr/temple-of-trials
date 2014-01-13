@@ -1,6 +1,10 @@
 #include "../util.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 SUITE(util) {
 
 TEST(should_return_sign_of_positive_number)
@@ -83,6 +87,8 @@ TEST(should_push_back_c_string_to_vector)
 	stringlist << "hello";
 	EQUAL(stringlist.size(), (unsigned)1);
 	EQUAL(stringlist[0], "hello");
+}
+
 }
 
 }

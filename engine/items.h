@@ -5,6 +5,8 @@
 #include "util.h"
 #include <string>
 
+namespace Chthon {
+
 struct ItemType {
 	std::string id;
 	int sprite;
@@ -107,3 +109,4 @@ struct Inventory {
 	bool has_key(int key_type) const;
 };
 
+}

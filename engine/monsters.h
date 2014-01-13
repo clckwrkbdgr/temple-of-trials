@@ -1,6 +1,9 @@
 #pragma once
 #include "items.h"
 #include <list>
+
+namespace Chthon {
+
 class Action;
 
 struct MonsterType {
@@ -67,3 +70,4 @@ struct Monster::Builder {
 	Builder & wear(int value);
 };
 
+}

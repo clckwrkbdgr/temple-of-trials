@@ -1,6 +1,8 @@
 #include "mocks.h"
 #include "../log.h"
 
+namespace Chthon {
+
 namespace GameMocks {
 
 DummyDungeon::DummyDungeon() : Game() {}
@@ -209,3 +211,5 @@ LevelForSeeing::LevelForSeeing()
 }
 
 };
+
+}

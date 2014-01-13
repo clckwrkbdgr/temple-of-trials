@@ -2,6 +2,10 @@
 #include "../util.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 SUITE(point) {
 
 TEST(should_make_point_from_two_coords)
@@ -150,6 +154,8 @@ TEST(should_return_one_for_close_point)
 	Point a(1, 3), b(2, 4);
 	int d = distance(a, b);
 	EQUAL(d, 1);
+}
+
 }
 
 }

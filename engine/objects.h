@@ -2,6 +2,8 @@
 #include "util.h"
 #include "items.h"
 
+namespace Chthon {
+
 struct ObjectType {
 	std::string id;
 	int sprite;
@@ -70,4 +72,4 @@ struct Object::Builder {
 	Builder & lock_type(int value);
 };
 
-
+}

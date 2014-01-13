@@ -2,6 +2,8 @@
 #include "point.h"
 #include <vector>
 
+namespace Chthon {
+
 template<class T>
 class Map {
 public:
@@ -48,3 +50,4 @@ public:
 	}
 };
 
+}

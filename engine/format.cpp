@@ -1,6 +1,8 @@
 #include "format.h"
 #include <sstream>
 
+namespace Chthon {
+
 std::string to_string(int value)
 {
     std::ostringstream value_out;
@@ -51,3 +53,4 @@ void subs_arg_str(std::string & result, int index, const std::string & value)
 	}
 }
 
+}

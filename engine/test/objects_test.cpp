@@ -2,6 +2,10 @@
 #include "../game.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 SUITE(objects) {
 
 TEST(should_not_open_not_openable_object)
@@ -53,6 +57,8 @@ TEST(negative_down_destination_should_be_exit_from_dungeon)
 	ObjectType type = ObjectType::Builder("test").transporting();
 	Object object = Object::Builder(&type).down_destination(-1);
 	ASSERT(object.is_exit_down());
+}
+
 }
 
 }

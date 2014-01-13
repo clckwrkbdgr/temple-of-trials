@@ -8,6 +8,8 @@
 #include <map>
 #include <list>
 
+namespace Chthon {
+
 struct GameEvent {
 	enum EventType {
 		UNKNOWN,
@@ -93,3 +95,5 @@ struct Game {
 	void hit(Monster & someone, Monster & other, int damage);
 	void hit(Item & item, Monster & other, int damage);
 };
+
+}

@@ -1,5 +1,7 @@
 #include "cell.h"
 
+namespace Chthon {
+
 CellType::CellType(const std::string & type_id)
 	: id(type_id), sprite(0), passable(false), transparent(false), hurts(false)
 {
@@ -17,4 +19,4 @@ Cell::Cell(const CellType * cell_type)
 {
 }
 
-
+}

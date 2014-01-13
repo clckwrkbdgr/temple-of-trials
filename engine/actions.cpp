@@ -6,6 +6,8 @@
 #include "util.h"
 #include "format.h"
 
+namespace Chthon {
+
 void Action::assert(bool expression, GameEvent::EventType exception_type, const Info & subject, const Info & object)
 {
 	if(!expression) {
@@ -165,4 +167,6 @@ void GoDown::commit(Monster & someone, Game & game)
 		game.go_to_level(object.down_destination);
 		game.state = Game::TURN_ENDED;
 	}
+}
+
 }

@@ -1,6 +1,9 @@
 #pragma once
 #include <map>
 #include <vector>
+
+namespace Chthon {
+
 class Game;
 class Monster;
 class Action;
@@ -32,3 +35,4 @@ private:
 	std::map<int, Controller*> controllers;
 };
 
+}

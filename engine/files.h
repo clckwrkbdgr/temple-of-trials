@@ -7,6 +7,8 @@
 #include <vector>
 #include <map>
 
+namespace Chthon {
+
 bool file_exists(const std::string & filename);
 std::string read_string(std::istream & in, char quote = '"');
 std::string escaped(const std::string & s, char quote = '"');
@@ -178,3 +180,4 @@ private:
 	std::ostream & out;
 };
 
+}

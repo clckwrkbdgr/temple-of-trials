@@ -2,6 +2,9 @@
 #include "game.h"
 #include "info.h"
 #include "point.h"
+
+namespace Chthon {
+
 class Game;
 class Monster;
 
@@ -126,3 +129,5 @@ public:
 	Put(const Point & shift) : DirectedAction(shift) {}
 	virtual void commit(Monster & someone, Game & game);
 };
+
+}

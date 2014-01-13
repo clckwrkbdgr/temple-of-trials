@@ -6,6 +6,9 @@
 #include "cell.h"
 #include <vector>
 #include <list>
+
+namespace Chthon {
+
 class Monster;
 class Item;
 class Object;
@@ -41,3 +44,4 @@ struct DungeonBuilder {
 	static void pop_player_front(std::vector<Monster> & monsters);
 };
 
+}

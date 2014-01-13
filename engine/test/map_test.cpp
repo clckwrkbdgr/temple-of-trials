@@ -2,6 +2,10 @@
 #include "../point.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 SUITE(map) {
 
 TEST(point_inside_map_should_be_valid)
@@ -37,6 +41,8 @@ TEST(should_fill_map_with_multi_values)
 	EQUAL(map.cell(1, 0), 2);
 	EQUAL(map.cell(0, 1), 3);
 	EQUAL(map.cell(1, 1), 4);
+}
+
 }
 
 }

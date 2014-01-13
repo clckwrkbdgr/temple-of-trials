@@ -3,6 +3,10 @@
 #include "../monsters.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 SUITE(info) {
 
 struct ItemBase {
@@ -40,3 +44,4 @@ TEST_FIXTURE(MonsterBase, should_mark_monster_as_transparent)
 
 }
 
+}

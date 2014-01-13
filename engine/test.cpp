@@ -6,6 +6,10 @@
 #include <cstdlib>
 #include <signal.h>
 
+namespace Chthon {
+
+namespace UnitTest {
+
 std::list<Test*> & all_tests()
 {
 	static std::list<Test*> tests;
@@ -98,3 +102,6 @@ int run_all_tests(int argc, char ** argv)
 	return failed_tests;
 }
 
+}
+
+}

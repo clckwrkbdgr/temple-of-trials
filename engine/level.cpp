@@ -8,6 +8,8 @@
 #include <cmath>
 #include <algorithm>
 
+namespace Chthon {
+
 Level::Level()
 	: map(1, 1)
 {
@@ -334,3 +336,5 @@ void DungeonBuilder::pop_player_front(std::vector<Monster> & monsters)
 	}
 }
 
+
+}

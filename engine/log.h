@@ -1,6 +1,8 @@
 #pragma once
 #include "format.h"
 
+namespace Chthon {
+
 std::string now();
 
 void direct_log(std::ostream * out_stream);
@@ -17,3 +19,5 @@ template<class T0, class T1, class T2>
 	{ log(format(message, t0, t1, t2)); }
 
 #define TRACE(x) do { log(format(#x "={0}", (x))); } while(0);
+
+}

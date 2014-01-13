@@ -7,6 +7,10 @@
 #include "../log.h"
 #include "../test.h"
 
+using namespace Chthon::UnitTest;
+
+namespace Chthon {
+
 using namespace GameMocks;
 
 SUITE(drop) {
@@ -482,6 +486,8 @@ TEST_FIXTURE(GameWithDummyAndStairs, should_generate_corresponding_level_when_go
 	stairs().down_destination = 1;
 	GoDown().commit(dummy(), game);
 	ASSERT(game.was_generated());
+}
+
 }
 
 }
