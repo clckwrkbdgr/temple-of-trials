@@ -1,5 +1,6 @@
 #pragma once
 #include "messages.h"
+#include "engine/format.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -7,6 +8,7 @@ class Game;
 class Monster;
 class Point;
 class Level;
+class GameEvent;
 
 struct Console {
 	struct Window {
@@ -16,6 +18,14 @@ struct Console {
 	};
 
 	static std::map<int, Point> directions;
+
+	unsigned messages_seen;
+	bool log_messages;
+	std::string notification;
+	std::vector<std::string> messages;
+	std::map<int, std::pair<char, int> > sprites;
+
+	void init_sprites();
 
 	Console();
 	~Console();
@@ -39,13 +49,17 @@ struct Console {
 	void clear();
 	int get_control();
 
-	Messages messages;
-protected:
-	unsigned messages_seen;
-	std::string notification;
-	std::map<int, std::pair<char, int> > sprites;
-
-	void init_sprites();
+	void message(const GameEvent & event);
+	void message(const std::string & text);
+	template<class T>
+		void message(const std::string & text, const T & t)
+		{ message(format(text, t)); }
+	template<class T1, class T2>
+		void message(const std::string & text, const T1 & t1, const T2 & t2)
+		{ message(format(text, t1, t2)); }
+	template<class T1, class T2, class T3>
+		void message(const std::string & text, const T1 & t1, const T2 & t2, const T3 & t3)
+		{ message(format(text, t1, t2, t3)); }
 };
 
 class TempleUI : public Console {

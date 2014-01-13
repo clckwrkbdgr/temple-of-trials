@@ -62,7 +62,7 @@ int main()
 	TempleUI console;
 	PlayerControl player(console);
 	LinearDungeon game(&player);
-	console.messages.log_messages = true;
+	console.log_messages = true;
 	if(!load_game(game)) {
 		return 1;
 	}
