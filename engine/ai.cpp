@@ -1,5 +1,6 @@
 #include "ai.h"
 #include "game.h"
+#include "actions.h"
 #include "log.h"
 #include "util.h"
 #include <cstdlib>

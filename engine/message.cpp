@@ -1,5 +1,6 @@
 #include "message.h"
 #include "game.h"
+#include "actions.h"
 #include "objects.h"
 #include "monsters.h"
 #include "map.h"
@@ -25,7 +26,7 @@ void Messages::message(const std::string & text)
 	}
 }
 
-void Messages::message(const Action::Exception & e)
+void Messages::message(const ActionException & e)
 {
 	switch(e.type) {
 		case Action::ALREADY_CLOSED: message(format("{0} is already closed.", e.subject.name)); break;

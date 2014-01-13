@@ -1,5 +1,4 @@
 #pragma once
-#include "actions.h"
 #include "format.h"
 #include <vector>
 #include <string>
@@ -8,6 +7,7 @@ class Item;
 class Monster;
 class CellType;
 class GameEvent;
+class ActionException;
 
 struct Messages {
 	bool log_messages;
@@ -25,6 +25,6 @@ struct Messages {
 		void message(const std::string & text, const T1 & t1, const T2 & t2, const T3 & t3)
 		{ message(format(text, t1, t2, t3)); }
 
-	void message(const Action::Exception & e);
+	void message(const ActionException & e);
 	void message(const GameEvent & event);
 };

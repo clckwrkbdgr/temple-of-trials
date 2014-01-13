@@ -6,7 +6,7 @@
 #include "util.h"
 #include "format.h"
 
-Action::Exception::Exception(unsigned exception_type, const Info & action_subject, const Info & action_object)
+ActionException::ActionException(unsigned exception_type, const Info & action_subject, const Info & action_object)
 	: type(exception_type), subject(action_subject), object(action_object)
 {
 }

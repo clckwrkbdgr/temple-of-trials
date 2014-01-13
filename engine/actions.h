@@ -4,6 +4,12 @@
 class Game;
 class Monster;
 
+struct ActionException {
+	unsigned type;
+	Info subject, object;
+	ActionException(unsigned exception_type, const Info & action_subject, const Info & action_object = Info());
+};
+
 class Action {
 public:
 	enum ExceptionType {
@@ -36,12 +42,7 @@ public:
 
 		COUNT
 	};
-
-	struct Exception {
-		unsigned type;
-		Info subject, object;
-		Exception(unsigned exception_type, const Info & action_subject, const Info & action_object = Info());
-	};
+	typedef ActionException Exception;
 
 	virtual ~Action() {}
 	virtual void commit(Monster & someone, Game & game) = 0;
