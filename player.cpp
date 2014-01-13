@@ -17,7 +17,6 @@ PlayerControl::PlayerControl(TempleUI & console)
 
 Action * PlayerControl::act(Monster & player, Game & game)
 {
-	game.events_to_messages();
 	while(game.state == Game::PLAYING) {
 		if(!player.plan.empty()) {
 			interface.draw_game(game);
@@ -30,7 +29,7 @@ Action * PlayerControl::act(Monster & player, Game & game)
 		switch(ch) {
 			case 'Q':
 				game.state = Game::PLAYER_DIED;
-				game.messages.message("You commited suicide.");
+				interface.messages.message("You commited suicide.");
 				break;
 			case 'q':
 				game.state = Game::SUSPENDED;

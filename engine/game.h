@@ -4,10 +4,10 @@
 #include "monsters.h"
 #include "ai.h"
 #include "level.h"
-#include "message.h"
 #include "info.h"
 #include <map>
 #include <list>
+class ActionException;
 
 struct GameEvent {
 	enum EventType {
@@ -35,8 +35,8 @@ std::string to_string(const GameEvent & e);
 struct Game {
 	enum State { PLAYING, TURN_ENDED, SUSPENDED, PLAYER_DIED, COMPLETED };
 	State state;
-	Messages messages;
 	int turns;
+	std::vector<ActionException> action_exceptions;
 	std::vector<GameEvent> events;
 	int current_level_index;
 	std::map<int, Level> levels;
@@ -48,7 +48,7 @@ struct Game {
 	ControllerFactory controller_factory;
 
 	Game();
-	virtual ~Game() {}
+	virtual ~Game();
 	void create_new_game();
 	void run();
 	virtual void generate(Level & level, int level_index) = 0;
@@ -60,7 +60,6 @@ struct Game {
 	void event(const GameEvent & e);
 	void event(const Info & event_actor, GameEvent::EventType event_type, const Info & event_target = Info(), const Info & event_help = Info());
 	void event(const Info & event_actor, GameEvent::EventType event_type, int event_amount, const Info & event_target = Info(), const Info & event_help = Info());
-	void events_to_messages();
 
 	const ItemType * item_type(const std::string & id) const;
 	const ObjectType * object_type(const std::string & id) const;

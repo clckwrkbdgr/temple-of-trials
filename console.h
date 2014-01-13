@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/message.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -37,6 +38,8 @@ struct Console {
 	void print_stat(int row, const std::string & text);
 	void clear();
 	int get_control();
+
+	Messages messages;
 protected:
 	unsigned messages_seen;
 	std::string notification;

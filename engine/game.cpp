@@ -31,6 +31,10 @@ Game::Game()
 {
 }
 
+Game::~Game()
+{
+}
+
 void Game::create_new_game()
 {
 	go_to_level(1);
@@ -177,7 +181,7 @@ void Game::run()
 				try {
 					action->commit(monster, *this);
 				} catch(const Action::Exception & e) {
-					messages.message(e);
+					action_exceptions.push_back(e);
 				}
 				delete action;
 				action = 0;
@@ -213,14 +217,6 @@ void Game::event(const Info & event_actor, GameEvent::EventType event_type, cons
 void Game::event(const Info & event_actor, GameEvent::EventType event_type, int event_amount, const Info & event_target, const Info & event_help)
 {
 	events.push_back(GameEvent(event_actor, event_type, event_amount, event_target, event_help));
-}
-
-void Game::events_to_messages()
-{
-	foreach(const GameEvent & e, events) {
-		messages.message(e);
-	}
-	events.clear();
 }
 
 void Game::process_environment(Monster & someone)

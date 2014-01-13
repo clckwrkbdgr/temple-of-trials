@@ -1,6 +1,7 @@
 #include "console.h"
 #include "sprites.h"
 #include "engine/game.h"
+#include "engine/actions.h"
 #include "engine/monsters.h"
 #include "engine/log.h"
 #include "engine/format.h"
@@ -141,7 +142,7 @@ void Console::draw_game(const Game & game)
 	unsigned width, height;
 	getmaxyx(stdscr, height, width);
 	Window message_window(0, map_window.y + map_window.height, width, height - (map_window.y + map_window.height));
-	print_messages(message_window, game.messages.messages);
+	print_messages(message_window, messages.messages);
 
 	print_notification();
 
@@ -231,10 +232,19 @@ Point Console::draw_and_get_direction(Game & game)
 
 int Console::see_messages(Game & game)
 {
+	foreach(const GameEvent & e, game.events) {
+		messages.message(e);
+	}
+	game.events.clear();
+	foreach(const ActionException & e, game.action_exceptions) {
+		messages.message(e);
+	}
+	game.action_exceptions.clear();
+
 	draw_game(game);
 	bool ask_control = game.state != Game::SUSPENDED;
-	int ch = (!ask_control && game.messages.messages.size() == messages_seen) ? 0 : get_control();
-	while(game.messages.messages.size() > messages_seen) {
+	int ch = (!ask_control && messages.messages.size() == messages_seen) ? 0 : get_control();
+	while(messages.messages.size() > messages_seen) {
 		if(ch == ' ') {
 			draw_game(game);
 		}
