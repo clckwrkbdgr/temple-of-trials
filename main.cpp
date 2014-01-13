@@ -19,10 +19,11 @@ const std::string SAVEFILE = "temple.sav";
 
 bool load_game(Game & game)
 {
+	if(!file_exists(SAVEFILE)) {
+		game.create_new_game();
+		return true;
+	}
 	try {
-		if(!file_exists(SAVEFILE)) {
-			throw Reader::Exception(format("File '{0}' doesn't exists!", SAVEFILE));
-		}
 		std::ifstream in(SAVEFILE.c_str(), std::ios::in);
 		if(!in) {
 			throw Reader::Exception(format("Cannot open file '{0}' for reading!", SAVEFILE));
@@ -30,12 +31,11 @@ bool load_game(Game & game)
 		Reader savefile(in);
 		load(savefile, game);
 		if(remove(SAVEFILE.c_str()) != 0) {
-			log("Error: cannot delete savefile!");
-			return false;
+			throw Reader::Exception("Error: cannot delete savefile!");
 		}
 	} catch(const Reader::Exception & e) {
 		log(e.message);
-		game.create_new_game();
+		return false;
 	}
 	return true;
 }

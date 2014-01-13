@@ -13,6 +13,10 @@ bool file_exists(const std::string & filename);
 std::string read_string(std::istream & in, char quote = '"');
 std::string escaped(const std::string & s, char quote = '"');
 
+#define FORWARD_DECLARE_SAVEFILE_STORE(Type) \
+	template<class Savefile> void store(Savefile &, Type &, const char * section = 0); \
+	template<class Savefile> void store(Savefile &, const Type &, const char * section = 0)
+
 #define SAVEFILE_STORE(Type, variable) \
 	template<class Savefile, class T> void store_ext_##variable(Savefile &, T &); \
 	template<class Savefile> void store(Savefile & savefile, Type & variable, const char * section = 0) \
@@ -22,6 +26,11 @@ std::string escaped(const std::string & s, char quote = '"');
 	template<class Savefile, class T> \
 	void store_ext_##variable(Savefile & savefile, T & variable)
 
+SAVEFILE_STORE(int, int_value) { savefile.store(int_value); }
+SAVEFILE_STORE(unsigned int, unsigned_int_value) { savefile.store(unsigned_int_value); }
+SAVEFILE_STORE(char, char_value) { savefile.store(char_value); }
+SAVEFILE_STORE(bool, bool_value) { savefile.store(bool_value); }
+SAVEFILE_STORE(std::string, string_value) { savefile.store(string_value); }
 
 /*
 #define SAVEFILE_STORE_EXT(Type, variable) \
