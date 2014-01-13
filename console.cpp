@@ -6,6 +6,7 @@
 #include "engine/log.h"
 #include "engine/format.h"
 #include <ncurses.h>
+using namespace Chthon;
 
 std::map<int, Point> Console::directions;
 

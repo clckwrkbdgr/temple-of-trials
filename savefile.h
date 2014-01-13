@@ -1,8 +1,10 @@
 #pragma once
-class Reader;
-class Writer;
-class Game;
+namespace Chthon {
+	class Reader;
+	class Writer;
+	class Game;
+}
 
-void load(Reader & reader, Game & game);
-void save(Writer & reader, const Game & game);
+void load(Chthon::Reader & reader, Chthon::Game & game);
+void save(Chthon::Writer & reader, const Chthon::Game & game);
 

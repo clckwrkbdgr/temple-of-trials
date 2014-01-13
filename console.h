@@ -1,14 +1,15 @@
 #pragma once
-#include "messages.h"
 #include "engine/format.h"
 #include <string>
 #include <vector>
 #include <map>
-class Game;
-class Monster;
-class Point;
-class Level;
-class GameEvent;
+namespace Chthon {
+	class Game;
+	class Monster;
+	class Point;
+	class Level;
+	class GameEvent;
+}
 
 struct Console {
 	struct Window {
@@ -17,7 +18,7 @@ struct Console {
 			: x(window_x), y(window_y), width(window_width), height(window_height) {}
 	};
 
-	static std::map<int, Point> directions;
+	static std::map<int, Chthon::Point> directions;
 
 	unsigned messages_seen;
 	bool log_messages;
@@ -30,18 +31,18 @@ struct Console {
 	Console();
 	~Console();
 
-	void draw_game(const Game & game);
-	int draw_and_get_control(Game & game);
-	Point draw_and_get_direction(Game & game);
-	int draw_target_mode(Game & game, const Point & target);
-	Point target_mode(Game & game, const Point & start);
-	int see_messages(Game & game);
-	void draw_inventory(const Game & game, const Monster & monster);
-	int get_inventory_slot(const Game & game, const Monster & monster);
+	void draw_game(const Chthon::Game & game);
+	int draw_and_get_control(Chthon::Game & game);
+	Chthon::Point draw_and_get_direction(Chthon::Game & game);
+	int draw_target_mode(Chthon::Game & game, const Chthon::Point & target);
+	Chthon::Point target_mode(Chthon::Game & game, const Chthon::Point & start);
+	int see_messages(Chthon::Game & game);
+	void draw_inventory(const Chthon::Game & game, const Chthon::Monster & monster);
+	int get_inventory_slot(const Chthon::Game & game, const Chthon::Monster & monster);
 	void set_notification(const std::string & text);
 
 	void print_messages(const Window & window, const std::vector<std::string> & messages);
-	void print_map(const Window & window, const Level & level);
+	void print_map(const Window & window, const Chthon::Level & level);
 	void print_notification();
 	void print_tile(int x, int y, int sprite, bool with_color);
 	void print_text(int x, int y, const std::string & text);
@@ -49,17 +50,17 @@ struct Console {
 	void clear();
 	int get_control();
 
-	void message(const GameEvent & event);
+	void message(const Chthon::GameEvent & event);
 	void message(const std::string & text);
 	template<class T>
 		void message(const std::string & text, const T & t)
-		{ message(format(text, t)); }
+		{ message(Chthon::format(text, t)); }
 	template<class T1, class T2>
 		void message(const std::string & text, const T1 & t1, const T2 & t2)
-		{ message(format(text, t1, t2)); }
+		{ message(Chthon::format(text, t1, t2)); }
 	template<class T1, class T2, class T3>
 		void message(const std::string & text, const T1 & t1, const T2 & t2, const T3 & t3)
-		{ message(format(text, t1, t2, t3)); }
+		{ message(Chthon::format(text, t1, t2, t3)); }
 };
 
 class TempleUI : public Console {

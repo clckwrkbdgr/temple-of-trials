@@ -1,14 +1,16 @@
 #pragma once
 #include "engine/ai.h"
-class Action;
-class Monster;
-class Game;
+namespace Chthon {
+	class Action;
+	class Monster;
+	class Game;
+}
 class TempleUI;
 
-class PlayerControl : public Controller {
+class PlayerControl : public Chthon::Controller {
 public:
 	PlayerControl(TempleUI & console);
-	virtual Action * act(Monster & player, Game & game);
+	virtual Chthon::Action * act(Chthon::Monster & player, Chthon::Game & game);
 private:
 	TempleUI & interface;
 };

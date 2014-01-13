@@ -13,6 +13,7 @@
 #include <map>
 #include <cstdlib>
 #include <cstdio>
+using namespace Chthon;
 
 const std::string SAVEFILE = "temple.sav";
 

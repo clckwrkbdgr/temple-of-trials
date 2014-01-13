@@ -1,20 +1,21 @@
 #include "engine/game.h"
 #include "engine/files.h"
+using namespace Chthon;
 
 enum { SAVEFILE_MAJOR_VERSION = 35, SAVEFILE_MINOR_VERSION = 0 };
 
-SAVEFILE_STORE_EXT(CellType, celltype)
+SAVEFILE_STORE(CellType, celltype)
 {
 	savefile.store(celltype.id).store(celltype.sprite).store(celltype.passable);
 	savefile.store(celltype.hurts).store(celltype.transparent).store(celltype.name);
 }
 
-SAVEFILE_STORE_EXT(Cell, cell)
+SAVEFILE_STORE(Cell, cell)
 {
 	savefile.store_type(cell.type).store(cell.seen_sprite);
 }
 
-SAVEFILE_STORE_EXT(Item, item)
+SAVEFILE_STORE(Item, item)
 {
 	savefile.store_type(item.type);
 	if(savefile.version() >= 1) {
@@ -23,7 +24,7 @@ SAVEFILE_STORE_EXT(Item, item)
 	savefile.store(item.pos).store(item.key_type);
 }
 
-SAVEFILE_STORE_EXT(Object, object)
+SAVEFILE_STORE(Object, object)
 {
 	savefile.store_type(object.type);
 	savefile.store_type(object.closed_type);
@@ -35,7 +36,7 @@ SAVEFILE_STORE_EXT(Object, object)
 	savefile.store(object.items, "object item");
 }
 
-SAVEFILE_STORE_EXT(Inventory, inventory)
+SAVEFILE_STORE(Inventory, inventory)
 {
 	savefile.store(inventory.wielded);
 	savefile.store(inventory.worn);
@@ -43,7 +44,7 @@ SAVEFILE_STORE_EXT(Inventory, inventory)
 	savefile.store(inventory.items, "inventory item");
 }
 
-SAVEFILE_STORE_EXT(Monster, monster)
+SAVEFILE_STORE(Monster, monster)
 {
 	savefile.store_type(monster.type);
 	savefile.store(monster.pos).store(monster.hp);
@@ -52,7 +53,7 @@ SAVEFILE_STORE_EXT(Monster, monster)
 	savefile.store(monster.inventory);
 }
 
-SAVEFILE_STORE_EXT(Level, level)
+SAVEFILE_STORE(Level, level)
 {
 	savefile.size_of(level.map);
 	savefile.newline();
@@ -75,12 +76,12 @@ SAVEFILE_STORE_EXT(Level, level)
 	savefile.store(level.objects, "object");
 }
 
-SAVEFILE_STORE_EXT(Game, game)
+SAVEFILE_STORE(Game, game)
 {
-	savefile.add_type_registry(game.cell_types);
-	savefile.add_type_registry(game.monster_types);
-	savefile.add_type_registry(game.object_types);
-	savefile.add_type_registry(game.item_types);
+	//savefile.add_type_registry(game.cell_types);
+	//savefile.add_type_registry(game.monster_types);
+	//savefile.add_type_registry(game.object_types);
+	//savefile.add_type_registry(game.item_types);
 
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
 	savefile.newline();
@@ -95,10 +96,10 @@ SAVEFILE_STORE_EXT(Game, game)
 
 void load(Reader & savefile, Game & game)
 {
-	savefile.store(game);
+	store(savefile, game);
 }
 
 void save(Writer & savefile, const Game & game)
 {
-	savefile.store(game);
+	store(savefile, game);
 }

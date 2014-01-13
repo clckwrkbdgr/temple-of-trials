@@ -4,6 +4,7 @@
 #include "engine/monsters.h"
 #include "engine/log.h"
 #include <cstdlib>
+using namespace Chthon;
 
 namespace AI {
 	enum { DUMMY, PLAYER, ANGRY_AND_WANDER, ANGRY_AND_STILL, CALM_AND_STILL };

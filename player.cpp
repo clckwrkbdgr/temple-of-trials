@@ -9,6 +9,7 @@
 #include "engine/format.h"
 #include <ncurses.h>
 #include <cstdlib>
+using namespace Chthon;
 
 PlayerControl::PlayerControl(TempleUI & console)
 	: interface(console)
