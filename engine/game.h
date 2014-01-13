@@ -7,7 +7,6 @@
 #include "info.h"
 #include <map>
 #include <list>
-class ActionException;
 
 struct GameEvent {
 	enum EventType {
@@ -20,6 +19,13 @@ struct GameEvent {
 		EATS, EMPTIES, REFILLS, TAKES_OFF, THROWS, UNWIELDS, WEARS, WIELDS,
 		DROPS_AT, FALLS_INTO, PICKS_UP_FROM, TAKES_FROM,
 		PICKED_UP_A_QUEST_ITEM, SHOULD_GET_QUEST_ITEM, WINS_GAME_WITH,
+
+		ALREADY_CLOSED, ALREADY_FULL, ALREADY_OPENED,
+		CANNOT_DRINK, CANNOT_EAT, CANNOT_GO_DOWN, CANNOT_GO_UP, CANNOT_WEAR,
+		LOCKED,
+		NOTHING_TO_CLOSE, NOTHING_TO_DRINK, NOTHING_TO_DROP, NOTHING_TO_EAT, NOTHING_TO_GRAB, NOTHING_TO_OPEN,
+		NOTHING_TO_TAKE_OFF, NOTHING_TO_UNWIELD, NOTHING_TO_WEAR, NOTHING_TO_WIELD, NOTHING_TO_PUT, NOTHING_TO_THROW,
+		NO_SPACE_LEFT, NO_SUCH_ITEM, HAS_NO_ITEMS,
 
 		COUNT
 	};
@@ -36,7 +42,6 @@ struct Game {
 	enum State { PLAYING, TURN_ENDED, SUSPENDED, PLAYER_DIED, COMPLETED };
 	State state;
 	int turns;
-	std::vector<ActionException> action_exceptions;
 	std::vector<GameEvent> events;
 	int current_level_index;
 	std::map<int, Level> levels;

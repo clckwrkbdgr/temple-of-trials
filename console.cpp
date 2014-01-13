@@ -236,10 +236,6 @@ int Console::see_messages(Game & game)
 		messages.message(e);
 	}
 	game.events.clear();
-	foreach(const ActionException & e, game.action_exceptions) {
-		messages.message(e);
-	}
-	game.action_exceptions.clear();
 
 	draw_game(game);
 	bool ask_control = game.state != Game::SUSPENDED;

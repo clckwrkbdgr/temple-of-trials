@@ -181,7 +181,7 @@ void Game::run()
 				try {
 					action->commit(monster, *this);
 				} catch(const Action::Exception & e) {
-					action_exceptions.push_back(e);
+					events.push_back(e);
 				}
 				delete action;
 				action = 0;

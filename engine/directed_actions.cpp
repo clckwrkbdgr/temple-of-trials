@@ -26,9 +26,9 @@ void Drink::commit(Monster & someone, Game & game)
 {
 	Point new_pos = someone.pos + shift;
     Monster & monster = find_at(game.level().monsters, new_pos);
-	assert(!monster.valid(), CANNOT_DRINK, someone, monster);
+	assert(!monster.valid(), Exception::CANNOT_DRINK, someone, monster);
     Object & object = find_at(game.level().objects, new_pos);
-	assert(object.valid() && object.type->drinkable, NOTHING_TO_DRINK, someone, object);
+	assert(object.valid() && object.type->drinkable, Exception::NOTHING_TO_DRINK, someone, object);
 	game.event(someone, GameEvent::DRINKS, object);
 	if(someone.heal_by(1)) {
 		game.event(object, GameEvent::HEALS, someone);
@@ -39,18 +39,18 @@ void Open::commit(Monster & someone, Game & game)
 {
     Point new_pos = someone.pos + shift;
     Object & object = find_at(game.level().objects, new_pos);
-	assert(object.valid() && (object.type->openable || object.type->containable), NOTHING_TO_OPEN, someone);
+	assert(object.valid() && (object.type->openable || object.type->containable), Exception::NOTHING_TO_OPEN, someone);
     if(object.type->openable) {
-		assert(!object.opened(), ALREADY_OPENED, object);
+		assert(!object.opened(), Exception::ALREADY_OPENED, object);
 		if(object.locked) {
-			assert(someone.inventory.has_key(object.lock_type), LOCKED, object);
+			assert(someone.inventory.has_key(object.lock_type), Exception::LOCKED, object);
 			game.event(someone, GameEvent::UNLOCKS, object);
 			object.locked = false;
 		}
 		object.open();
 		game.event(someone, GameEvent::OPENS, object);
     } else if(object.type->containable) {
-		assert(!object.items.empty(), HAS_NO_ITEMS, object);
+		assert(!object.items.empty(), Exception::HAS_NO_ITEMS, object);
 		foreach(Item & item, object.items) {
 			item.pos = someone.pos;
 			game.level().items.push_back(item);
@@ -64,8 +64,8 @@ void Close::commit(Monster & someone, Game & game)
 {
     Point new_pos = someone.pos + shift;
     Object & object = find_at(game.level().objects, new_pos);
-    assert(object.valid() && object.type->openable, NOTHING_TO_CLOSE, someone);
-    assert(object.opened(), ALREADY_CLOSED, object);
+    assert(object.valid() && object.type->openable, Exception::NOTHING_TO_CLOSE, someone);
+    assert(object.opened(), Exception::ALREADY_CLOSED, object);
     object.close();
     game.event(someone, GameEvent::CLOSES, object);
 }
@@ -83,7 +83,7 @@ void Swing::commit(Monster & someone, Game & game)
 		game.event(someone, GameEvent::HITS, object);
 		if(object.type->openable && !object.opened()) {
 			if(object.locked) {
-				assert(someone.inventory.has_key(object.lock_type), LOCKED, object);
+				assert(someone.inventory.has_key(object.lock_type), Exception::LOCKED, object);
 				game.event(someone, GameEvent::UNLOCKS, object);
 				object.locked = false;
 			}
@@ -102,7 +102,7 @@ void Swing::commit(Monster & someone, Game & game)
 void Fire::commit(Monster & someone, Game & game)
 {
 	Item item = someone.inventory.take_wielded_item();
-	assert(item.valid(), NOTHING_TO_THROW, someone);
+	assert(item.valid(), Exception::NOTHING_TO_THROW, someone);
     item.pos = someone.pos;
 	game.event(someone, GameEvent::THROWS, item);
 	while(true) {
@@ -143,13 +143,13 @@ void Fire::commit(Monster & someone, Game & game)
 void Put::commit(Monster & someone, Game & game)
 {
 	Item & item = someone.inventory.wielded_item();
-	assert(item.valid(), NOTHING_TO_PUT, someone);
+	assert(item.valid(), Exception::NOTHING_TO_PUT, someone);
 
 	item.pos = someone.pos;
 
 	Object & object = find_at(game.level().objects, item.pos + shift);
 	if(object.valid() && object.type->drinkable && item.is_emptyable()) {
-		assert(item.is_empty(), ALREADY_FULL, item);
+		assert(item.is_empty(), Exception::ALREADY_FULL, item);
 		game.event(someone, GameEvent::REFILLS, item);
 		item.make_full();
 		return;

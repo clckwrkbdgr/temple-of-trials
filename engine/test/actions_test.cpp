@@ -15,14 +15,14 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_drop_if_nothing_to_drop
 {
 	dummy().inventory.clear();
 	CATCH(Drop(0).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_DROP);
+		EQUAL(e.type, GameEvent::NOTHING_TO_DROP);
 	}
 }
 
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_drop_items_only_in_range)
 {
 	CATCH(Drop(4).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NO_SUCH_ITEM);
+		EQUAL(e.type, GameEvent::NO_SUCH_ITEM);
 	}
 }
 
@@ -68,7 +68,7 @@ SUITE(grab) {
 TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_if_floor_is_empty)
 {
 	CATCH(Grab().commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_GRAB);
+		EQUAL(e.type, GameEvent::NOTHING_TO_GRAB);
 	}
 }
 
@@ -107,7 +107,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_grab_item_if_inventory_
 	}
 	game.add_item("item").pos(Point(1, 2));
 	CATCH(Grab().commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NO_SPACE_LEFT);
+		EQUAL(e.type, GameEvent::NO_SPACE_LEFT);
 	}
 }
 
@@ -126,14 +126,14 @@ TEST_FIXTURE(GameWithDummyWithItems, should_wield_any_item)
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wield_invalid_slot)
 {
 	CATCH(Wield(10).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NO_SUCH_ITEM);
+		EQUAL(e.type, GameEvent::NO_SUCH_ITEM);
 	}
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wield_empty_slot)
 {
 	CATCH(Wield(2).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NO_SUCH_ITEM);
+		EQUAL(e.type, GameEvent::NO_SUCH_ITEM);
 	}
 }
 
@@ -181,7 +181,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_unwield_item_if_wielded)
 TEST_FIXTURE(GameWithDummyWithItems, should_not_unwield_item_if_not_wielded)
 {
 	CATCH(Unwield().commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_UNWIELD);
+		EQUAL(e.type, GameEvent::NOTHING_TO_UNWIELD);
 	}
 }
 
@@ -200,22 +200,22 @@ TEST_FIXTURE(GameWithDummyWithItems, should_wear_any_item)
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wear_invalid_slot)
 {
 	CATCH(Wear(10).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NO_SUCH_ITEM);
+		EQUAL(e.type, GameEvent::NO_SUCH_ITEM);
 	}
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wear_empty_slot)
 {
 	CATCH(Wear(2).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NO_SUCH_ITEM);
+		EQUAL(e.type, GameEvent::NO_SUCH_ITEM);
 	}
 }
 
 TEST_FIXTURE(GameWithDummyWithItems, should_not_wear_unwearable_item)
 {
 	CATCH(Wear(3).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::CANNOT_WEAR);
-		EQUAL(e.object.name, "pot");
+		EQUAL(e.type, GameEvent::CANNOT_WEAR);
+		EQUAL(e.target.name, "pot");
 	}
 }
 
@@ -263,7 +263,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_take_off_item_if_worn)
 TEST_FIXTURE(GameWithDummyWithItems, should_not_take_off_item_if_not_worn)
 {
 	CATCH(TakeOff().commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_TAKE_OFF);
+		EQUAL(e.type, GameEvent::NOTHING_TO_TAKE_OFF);
 	}
 }
 
@@ -274,22 +274,22 @@ SUITE(eat) {
 TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_invalid_slot)
 {
 	CATCH(Eat(NONE).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NO_SUCH_ITEM);
+		EQUAL(e.type, GameEvent::NO_SUCH_ITEM);
 	}
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_empty_slot)
 {
 	CATCH(Eat(EMPTY).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NO_SUCH_ITEM);
+		EQUAL(e.type, GameEvent::NO_SUCH_ITEM);
 	}
 }
 
 TEST_FIXTURE(GameWithDummyAndFood, should_not_eat_not_edible_item)
 {
 	CATCH(Eat(JUNK).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::CANNOT_EAT);
-		EQUAL(e.object.name, "junk");
+		EQUAL(e.type, GameEvent::CANNOT_EAT);
+		EQUAL(e.target.name, "junk");
 	}
 }
 

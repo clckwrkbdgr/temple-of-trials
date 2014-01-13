@@ -1,52 +1,17 @@
 #pragma once
-#include "point.h"
+#include "game.h"
 #include "info.h"
+#include "point.h"
 class Game;
 class Monster;
 
-struct ActionException {
-	unsigned type;
-	Info subject, object;
-	ActionException(unsigned exception_type, const Info & action_subject, const Info & action_object = Info());
-};
-
 class Action {
 public:
-	enum ExceptionType {
-		UNKNOWN,
-
-		ALREADY_CLOSED,
-		ALREADY_FULL,
-		ALREADY_OPENED,
-		CANNOT_DRINK,
-		CANNOT_EAT,
-		CANNOT_GO_DOWN,
-		CANNOT_GO_UP,
-		CANNOT_WEAR,
-		LOCKED,
-		NOTHING_TO_CLOSE,
-		NOTHING_TO_DRINK,
-		NOTHING_TO_DROP,
-		NOTHING_TO_EAT,
-		NOTHING_TO_GRAB,
-		NOTHING_TO_OPEN,
-		NOTHING_TO_TAKE_OFF,
-		NOTHING_TO_UNWIELD,
-		NOTHING_TO_WEAR,
-		NOTHING_TO_WIELD,
-		NOTHING_TO_PUT,
-		NOTHING_TO_THROW,
-		NO_SPACE_LEFT,
-		NO_SUCH_ITEM,
-		HAS_NO_ITEMS,
-
-		COUNT
-	};
-	typedef ActionException Exception;
+	typedef GameEvent Exception;
 
 	virtual ~Action() {}
 	virtual void commit(Monster & someone, Game & game) = 0;
-	void assert(bool expression, unsigned exception_type, const Info & subject, const Info & object = Info());
+	void assert(bool expression, GameEvent::EventType exception_type, const Info & subject, const Info & object = Info());
 };
 
 class DirectedAction : public Action {

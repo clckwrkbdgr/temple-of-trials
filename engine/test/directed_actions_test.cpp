@@ -77,7 +77,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_drink_monsters)
 {
 	game.add_monster("stub").pos(Point(1, 0));
 	CATCH(Drink(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::CANNOT_DRINK);
+		EQUAL(e.type, GameEvent::CANNOT_DRINK);
 	}
 }
 
@@ -85,14 +85,14 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_drink_not_drinkable_objects)
 {
 	game.add_object("pot").pos(Point(1, 0));
 	CATCH(Drink(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_DRINK);
+		EQUAL(e.type, GameEvent::NOTHING_TO_DRINK);
 	}
 }
 
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_drink_at_empty_cell)
 {
 	CATCH(Drink(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_DRINK);
+		EQUAL(e.type, GameEvent::NOTHING_TO_DRINK);
 	}
 }
 
@@ -126,8 +126,8 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_already_opened_doors)
 {
 	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(true);
 	CATCH(Open(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::ALREADY_OPENED);
-		EQUAL(e.subject.name, "door");
+		EQUAL(e.type, GameEvent::ALREADY_OPENED);
+		EQUAL(e.actor.name, "door");
 	}
 	ASSERT(game.level().objects[0].opened());
 }
@@ -146,8 +146,8 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_locked_doors_without_a_key
 {
 	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(false).locked(true).lock_type(1);
 	CATCH(Open(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::LOCKED);
-		EQUAL(e.subject.name, "door");
+		EQUAL(e.type, GameEvent::LOCKED);
+		EQUAL(e.actor.name, "door");
 	}
 	ASSERT(game.level().objects[0].locked);
 	ASSERT(!game.level().objects[0].opened());
@@ -170,7 +170,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_open_locked_doors_with_a_key)
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_empty_cell)
 {
 	CATCH(Open(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_OPEN);
+		EQUAL(e.type, GameEvent::NOTHING_TO_OPEN);
 	}
 }
 
@@ -190,8 +190,8 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_open_empty_containers)
 {
 	game.add_object("pot").pos(Point(1, 0));
 	CATCH(Open(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::HAS_NO_ITEMS);
-		EQUAL(e.subject.name, "pot");
+		EQUAL(e.type, GameEvent::HAS_NO_ITEMS);
+		EQUAL(e.actor.name, "pot");
 	}
 	ASSERT(game.level().items.empty());
 	ASSERT(game.level().objects[0].items.empty());
@@ -215,7 +215,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_close_already_closed_doors)
 {
 	game.add_object("closed_door", "opened_door").pos(Point(1, 0)).opened(false);
 	CATCH(Close(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::ALREADY_CLOSED);
+		EQUAL(e.type, GameEvent::ALREADY_CLOSED);
 	}
 	ASSERT(!game.level().objects[0].opened());
 }
@@ -223,7 +223,7 @@ TEST_FIXTURE(GameWithDummyAndObjects, should_not_close_already_closed_doors)
 TEST_FIXTURE(GameWithDummyAndObjects, should_not_close_empty_cell)
 {
 	CATCH(Close(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_CLOSE);
+		EQUAL(e.type, GameEvent::NOTHING_TO_CLOSE);
 	}
 }
 
@@ -280,7 +280,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_throw_if_wields_nothing
 {
 	dummy().inventory.unwield();
 	CATCH(Fire(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_THROW);
+		EQUAL(e.type, GameEvent::NOTHING_TO_THROW);
 	}
 }
 
@@ -377,7 +377,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_put_if_wields_nothing)
 {
 	dummy().inventory.unwield();
 	CATCH(Put(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::NOTHING_TO_PUT);
+		EQUAL(e.type, GameEvent::NOTHING_TO_PUT);
 	}
 }
 
@@ -422,7 +422,7 @@ TEST_FIXTURE(GameWithDummyWieldingAndWearing, should_not_refill_already_full_ite
 	dummy().inventory.get_item(3).make_full();
 	dummy().inventory.wield(3);
 	CATCH(Put(Point(0, -1)).commit(dummy(), game), Action::Exception, e) {
-		EQUAL(e.type, Action::ALREADY_FULL);
+		EQUAL(e.type, GameEvent::ALREADY_FULL);
 	}
 	ASSERT(dummy().inventory.has_item(3));
 	ASSERT(dummy().inventory.get_item(3).is_full());
