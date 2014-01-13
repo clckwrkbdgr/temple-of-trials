@@ -117,40 +117,6 @@ Reader & Reader::store(std::string & value)
 	return *this;
 }
 
-/*
-Reader & Reader::store(Point & value)
-{
-	int x, y;
-	store(x).store(y);
-	value = Point(x, y);
-	return *this;
-}
-
-Reader & Reader::add_type_registry(const TypeRegistry<std::string, Cell> & type_registry)
-{
-	cell_types = &type_registry;
-	return *this;
-}
-
-Reader & Reader::add_type_registry(const TypeRegistry<std::string, Monster> & type_registry)
-{
-	monster_types = &type_registry;
-	return *this;
-}
-
-Reader & Reader::add_type_registry(const TypeRegistry<std::string, Object> & type_registry)
-{
-	object_types = &type_registry;
-	return *this;
-}
-
-Reader & Reader::add_type_registry(const TypeRegistry<std::string, Item> & type_registry)
-{
-	item_types = &type_registry;
-	return *this;
-}
-
-*/
 
 Writer::Writer(std::ostream & out_stream)
 	: actual_minor_version(0), out(out_stream)
@@ -208,13 +174,5 @@ Writer & Writer::store(const std::string & value)
 	out << escaped(value) << ' ';
 	return *this;
 }
-
-/*
-Writer & Writer::store(const Point & value)
-{
-	store(value.x).store(value.y);
-	return *this;
-}
-*/
 
 }

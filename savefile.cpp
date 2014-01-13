@@ -19,14 +19,6 @@ SAVEFILE_STORE(Point, value)
 	savefile.store(value.x).store(value.y);
 }
 
-/*
-SAVEFILE_STORE(CellType, celltype)
-{
-	savefile.store(celltype.id).store(celltype.sprite).store(celltype.passable);
-	savefile.store(celltype.hurts).store(celltype.transparent).store(celltype.name);
-}
-*/
-
 template<class Savefile, class T>
 void store_type(Savefile & savefile, TypePtr<T> & type)
 {
@@ -154,18 +146,6 @@ SAVEFILE_STORE(Monster, monster)
 SAVEFILE_STORE(Level, level)
 {
 	store(savefile, level.map);
-	/*
-	savefile.size_of(level.map);
-	savefile.newline();
-	savefile.check("map size");
-	for(unsigned y = 0; y < level.map.height; ++y) {
-		for(unsigned x = 0; x < level.map.width; ++x) {
-			savefile.store(level.map.cell(x, y));
-			savefile.check("map cell");
-		}
-		savefile.newline();
-	}
-	*/
 	savefile.newline();
 
 	store(savefile, level.monsters, "monster");
@@ -203,11 +183,6 @@ void store(Savefile & savefile, const std::map<K, V> & map, const std::string & 
 
 SAVEFILE_STORE(Game, game)
 {
-	//savefile.add_type_registry(game.cell_types);
-	//savefile.add_type_registry(game.monster_types);
-	//savefile.add_type_registry(game.object_types);
-	//savefile.add_type_registry(game.item_types);
-
 	savefile.version(SAVEFILE_MAJOR_VERSION, SAVEFILE_MINOR_VERSION);
 	savefile.newline();
 
