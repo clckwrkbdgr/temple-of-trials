@@ -1,12 +1,6 @@
-#include "message.h"
-#include "game.h"
-#include "actions.h"
-#include "objects.h"
-#include "monsters.h"
-#include "map.h"
-#include "log.h"
-#include "format.h"
-#include "util.h"
+#include "messages.h"
+#include "engine/game.h"
+#include "engine/log.h"
 
 Messages::Messages()
 	: log_messages(false)
