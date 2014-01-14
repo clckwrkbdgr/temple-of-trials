@@ -61,8 +61,8 @@ int main()
 	direct_log(&log_file);
 
 	TempleUI console;
-	PlayerControl player(console);
-	LinearDungeon game(&player);
+	Chthon::Controller * player = new PlayerControl(console);
+	LinearDungeon game(player);
 	console.log_messages = true;
 	if(!load_game(game)) {
 		return 1;
