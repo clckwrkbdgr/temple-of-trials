@@ -3,7 +3,7 @@
 #include <vector>
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#if GCC_VERSION < 403000
+#if GCC_VERSION < 40300
 // Ugly hack for decltype presence.
 #define decltype __typeof__
 #endif
