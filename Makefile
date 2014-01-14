@@ -7,7 +7,10 @@ endif
 
 BIN = temple
 TEST_BIN = temple_test
+VERSION = $(shell git tag | tail -1 | sed 's/.*\([0-9]\+\.[0-9]\+\.[0-9]\+\)/\1/')
+MAJOR_VERSION = $(shell git tag | tail -1 | sed 's/.*\([0-9]\+\)\.[0-9]\+\.[0-9]\+/\1/')
 LIBNAME = libchthon.so
+LIBRARY = $(LIBNAME).$(VERSION)
 LIBS = -lncurses
 ENGINE_SOURCES = $(wildcard engine/*.cpp)
 TEST_SOURCES = $(wildcard engine/test/*.cpp) $(ENGINE_SOURCES)
@@ -24,7 +27,7 @@ LD_LIB_ENV = LD_LIBRARY_PATH=$(LD_LIB_PATH):$$LD_LIBRARY_PATH
 
 all: $(BIN)
 
-lib: $(LIBNAME)
+lib: $(LIBRARY)
 
 run: $(BIN)
 	$(TERMINAL) 'sh -c "export $(LD_LIB_ENV); ./$(BIN)"'
@@ -32,7 +35,7 @@ run: $(BIN)
 test: $(TEST_BIN)
 	./$(TEST_BIN) $(TESTS)
 
-$(LIBNAME): $(LIB_OBJ)
+$(LIBRARY): $(LIB_OBJ)
 	$(CXX) -shared $(LIBS) -o $@ $^
 
 $(TEST_BIN): $(TEST_OBJ)
@@ -47,7 +50,7 @@ tmp/%.o: %.cpp
 .PHONY: clean Makefile
 
 clean:
-	$(RM) -rf tmp/* $(BIN) $(TEST_BIN)
+	$(RM) -rf tmp/* $(BIN) $(TEST_BIN) $(LIBRARY)
 
 $(shell mkdir -p tmp)
 $(shell mkdir -p tmp/engine)
