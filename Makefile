@@ -12,7 +12,7 @@ LIBS = -lncurses
 ENGINE_SOURCES = $(wildcard engine/*.cpp)
 TEST_SOURCES = $(wildcard engine/test/*.cpp) $(ENGINE_SOURCES)
 LIB_SOURCES = $(ENGINE_SOURCES)
-SOURCES = $(wildcard *.cpp) $(ENGINE_SOURCES)
+SOURCES = $(wildcard *.cpp)
 OBJ = $(addprefix tmp/,$(SOURCES:.cpp=.o))
 LIB_OBJ = $(addprefix tmp/,$(LIB_SOURCES:.cpp=.o))
 TEST_OBJ = $(addprefix tmp/,$(TEST_SOURCES:.cpp=.o))
@@ -37,7 +37,7 @@ $(TEST_BIN): $(TEST_OBJ)
 	$(CXX) $(LIBS) -o $@ $^
 
 $(BIN): $(OBJ)
-	$(CXX) $(LIBS) -o $@ $^
+	$(CXX) $(LIBS) -L. -lchthon -o $@ $^
 
 tmp/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -fpic $< -o $@
