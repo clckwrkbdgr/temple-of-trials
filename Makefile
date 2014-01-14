@@ -7,21 +7,31 @@ endif
 
 BIN = temple
 TEST_BIN = temple_test
+LIBNAME = libchthon.so
 LIBS = -lncurses
 ENGINE_SOURCES = $(wildcard engine/*.cpp)
 TEST_SOURCES = $(wildcard engine/test/*.cpp) $(ENGINE_SOURCES)
+LIB_SOURCES = $(ENGINE_SOURCES)
 SOURCES = $(wildcard *.cpp) $(ENGINE_SOURCES)
 OBJ = $(addprefix tmp/,$(SOURCES:.cpp=.o))
+LIB_OBJ = $(addprefix tmp/,$(LIB_SOURCES:.cpp=.o))
 TEST_OBJ = $(addprefix tmp/,$(TEST_SOURCES:.cpp=.o))
-CXXFLAGS = -MD -MP -Werror -Wall
+WARNINGS = -Werror -Wall
+#WARNINGS = -pedantic -Werror -Wall -Wextra -Wformat=2 -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wuninitialized -Wunused -Wfloat-equal -Wundef -Wno-endif-labels -Wshadow -Wcast-qual -Wcast-align -Wconversion -Wsign-conversion -Wlogical-op -Wmissing-declarations -Wno-multichar -Wpadded -Wredundant-decls -Wunreachable-code -Winline -Winvalid-pch -Wvla -Wdouble-promotion -Wzero-as-null-pointer-constant -Wuseless-cast -Wvarargs -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=noreturn -Wsuggest-attribute=format
+CXXFLAGS = -MD -MP $(WARNINGS)
+
+all: $(BIN)
+
+lib: $(LIBNAME)
 
 run: $(BIN)
 	$(TERMINAL) './$(BIN)'
 
-all: $(BIN)
-
 test: $(TEST_BIN)
 	./$(TEST_BIN) $(TESTS)
+
+$(LIBNAME): $(LIB_OBJ)
+	$(CXX) -shared $(LIBS) -o $@ $^
 
 $(TEST_BIN): $(TEST_OBJ)
 	$(CXX) $(LIBS) -o $@ $^
@@ -30,7 +40,7 @@ $(BIN): $(OBJ)
 	$(CXX) $(LIBS) -o $@ $^
 
 tmp/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c -fpic $< -o $@
 
 .PHONY: clean Makefile
 
