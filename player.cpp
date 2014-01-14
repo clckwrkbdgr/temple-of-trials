@@ -1,14 +1,7 @@
 #include "player.h"
 #include "console.h"
-#include "engine/game.h"
-#include "engine/actions.h"
-#include "engine/level.h"
-#include "engine/objects.h"
-#include "engine/monsters.h"
-#include "engine/log.h"
-#include "engine/format.h"
-#include <ncurses.h>
-#include <cstdlib>
+#include <chthon/game.h>
+#include <chthon/actions.h>
 using namespace Chthon;
 
 PlayerControl::PlayerControl(TempleUI & console)

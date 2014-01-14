@@ -1,8 +1,6 @@
 #include "generate.h"
 #include "sprites.h"
-#include "player.h"
-#include "engine/monsters.h"
-#include "engine/log.h"
+#include <chthon/log.h>
 #include <cstdlib>
 using namespace Chthon;
 

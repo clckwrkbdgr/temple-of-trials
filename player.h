@@ -1,5 +1,5 @@
 #pragma once
-#include "engine/ai.h"
+#include <chthon/ai.h>
 namespace Chthon {
 	class Action;
 	class Monster;

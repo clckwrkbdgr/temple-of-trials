@@ -2,17 +2,12 @@
 #include "player.h"
 #include "console.h"
 #include "savefile.h"
-#include "engine/game.h"
-#include "engine/map.h"
-#include "engine/objects.h"
-#include "engine/files.h"
-#include "engine/util.h"
-#include "engine/log.h"
-#include "engine/format.h"
-#include <algorithm>
-#include <map>
+#include <chthon/game.h>
+#include <chthon/files.h>
+#include <chthon/log.h>
+#include <chthon/format.h>
 #include <cstdlib>
-#include <cstdio>
+#include <string>
 using namespace Chthon;
 
 const std::string SAVEFILE = "temple.sav";

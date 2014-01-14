@@ -1,11 +1,12 @@
 #include "console.h"
 #include "sprites.h"
-#include "engine/game.h"
-#include "engine/actions.h"
-#include "engine/monsters.h"
-#include "engine/log.h"
-#include "engine/format.h"
+#include <chthon/game.h>
+#include <chthon/level.h>
+#include <chthon/info.h>
+#include <chthon/point.h>
+#include <chthon/log.h>
 #include <ncurses.h>
+#include <map>
 using namespace Chthon;
 
 std::map<int, Point> Console::directions;

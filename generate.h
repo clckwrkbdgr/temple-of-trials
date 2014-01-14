@@ -1,5 +1,5 @@
 #pragma once
-#include "engine/game.h"
+#include <chthon/game.h>
 
 class LinearDungeon : public Chthon::Game {
 public:

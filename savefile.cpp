@@ -1,6 +1,11 @@
-#include "engine/game.h"
-#include "engine/files.h"
-#include "engine/log.h"
+#include <chthon/game.h>
+#include <chthon/level.h>
+#include <chthon/items.h>
+#include <chthon/objects.h>
+#include <chthon/monsters.h>
+#include <chthon/cell.h>
+#include <chthon/files.h>
+#include <chthon/types.h>
 using namespace Chthon;
 
 enum { SAVEFILE_MAJOR_VERSION = 35, SAVEFILE_MINOR_VERSION = 0 };
@@ -14,9 +19,9 @@ const TypeRegistry<std::string, Monster> * get_registry(const MonsterType *) { r
 const TypeRegistry<std::string, Object> * get_registry(const ObjectType *) { return object_types; }
 const TypeRegistry<std::string, Item> * get_registry(const ItemType *) { return item_types; }
 
-SAVEFILE_STORE(Point, value)
+SAVEFILE_STORE(Point, point)
 {
-	savefile.store(value.x).store(value.y);
+	savefile.store(point.x).store(point.y);
 }
 
 template<class Savefile, class T>
