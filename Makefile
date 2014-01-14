@@ -2,8 +2,11 @@ XFCE_TERMINAL_VERSION := $(shell xfce4-terminal --version 2>/dev/null)
 ifdef XFCE_TERMINAL_VERSION
 	TERMINAL = xfce4-terminal --geometry 80x40 -e
 else
-	TERMINAL = screen sh -c
+	TERMINAL = screen
 endif
+
+INSTALL_PREFIX = /usr/local
+INSTALL_PREFIX_LIB = $(INSTALL_PREFIX)/lib
 
 BIN = temple
 TEST_BIN = temple_test
@@ -22,15 +25,10 @@ TEST_OBJ = $(addprefix tmp/,$(TEST_SOURCES:.cpp=.o))
 WARNINGS = -Werror -Wall
 #WARNINGS = -pedantic -Werror -Wall -Wextra -Wformat=2 -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wuninitialized -Wunused -Wfloat-equal -Wundef -Wno-endif-labels -Wshadow -Wcast-qual -Wcast-align -Wconversion -Wsign-conversion -Wlogical-op -Wmissing-declarations -Wno-multichar -Wpadded -Wredundant-decls -Wunreachable-code -Winline -Winvalid-pch -Wvla -Wdouble-promotion -Wzero-as-null-pointer-constant -Wuseless-cast -Wvarargs -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=noreturn -Wsuggest-attribute=format
 CXXFLAGS = -MD -MP $(WARNINGS)
-LD_LIB_PATH = $(shell pwd)
-LD_LIB_ENV = LD_LIBRARY_PATH=$(LD_LIB_PATH):$$LD_LIBRARY_PATH
 
 all: $(BIN)
 
 lib: $(LIBRARY)
-
-INSTALL_PREFIX = /usr/local
-INSTALL_PREFIX_LIB = $(INSTALL_PREFIX)/lib
 
 libinstall: lib
 	cp $(LIBRARY) $(INSTALL_PREFIX_LIB)
@@ -40,7 +38,7 @@ libinstall: lib
 	ldconfig
 
 run: $(BIN)
-	$(TERMINAL) 'sh -c "export $(LD_LIB_ENV); ./$(BIN)"'
+	$(TERMINAL) './$(BIN)'
 
 test: $(TEST_BIN)
 	./$(TEST_BIN) $(TESTS)
