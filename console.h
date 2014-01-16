@@ -13,8 +13,9 @@ namespace Chthon {
 
 struct Console {
 	struct Window {
-		unsigned x, y, width, height;
-		Window(unsigned window_x, unsigned window_y, unsigned window_width, unsigned window_height)
+		int x, y;
+		unsigned width, height;
+		Window(int window_x, int window_y, unsigned window_width, unsigned window_height)
 			: x(window_x), y(window_y), width(window_width), height(window_height) {}
 	};
 
@@ -24,7 +25,7 @@ struct Console {
 	bool log_messages;
 	std::string notification;
 	std::vector<std::string> messages;
-	std::map<int, std::pair<char, int> > sprites;
+	std::map<int, std::pair<unsigned char, unsigned> > sprites;
 
 	void init_sprites();
 
@@ -38,10 +39,10 @@ struct Console {
 	Chthon::Point target_mode(Chthon::Game & game, const Chthon::Point & start);
 	int see_messages(Chthon::Game & game);
 	void draw_inventory(const Chthon::Game & game, const Chthon::Monster & monster);
-	int get_inventory_slot(const Chthon::Game & game, const Chthon::Monster & monster);
+	unsigned get_inventory_slot(const Chthon::Game & game, const Chthon::Monster & monster);
 	void set_notification(const std::string & text);
 
-	void print_messages(const Window & window, const std::vector<std::string> & messages);
+	void print_messages(const Window & window);
 	void print_map(const Window & window, const Chthon::Level & level);
 	void print_notification();
 	void print_tile(int x, int y, int sprite, bool with_color);

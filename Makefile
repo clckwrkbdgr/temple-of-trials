@@ -9,8 +9,8 @@ BIN = temple
 LIBS = -lncurses -lchthon
 SOURCES = $(wildcard *.cpp)
 OBJ = $(addprefix tmp/,$(SOURCES:.cpp=.o))
-WARNINGS = -Werror -Wall
-#WARNINGS = -pedantic -Werror -Wall -Wextra -Wformat=2 -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wuninitialized -Wunused -Wfloat-equal -Wundef -Wno-endif-labels -Wshadow -Wcast-qual -Wcast-align -Wconversion -Wsign-conversion -Wlogical-op -Wmissing-declarations -Wno-multichar -Wpadded -Wredundant-decls -Wunreachable-code -Winline -Winvalid-pch -Wvla -Wdouble-promotion -Wzero-as-null-pointer-constant -Wuseless-cast -Wvarargs -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=noreturn -Wsuggest-attribute=format
+# -Wpadded
+WARNINGS = -pedantic -Werror -Wall -Wextra -Wformat=2 -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wuninitialized -Wunused -Wfloat-equal -Wundef -Wno-endif-labels -Wshadow -Wcast-qual -Wcast-align -Wconversion -Wsign-conversion -Wlogical-op -Wmissing-declarations -Wno-multichar -Wredundant-decls -Wunreachable-code -Winline -Winvalid-pch -Wvla -Wdouble-promotion -Wzero-as-null-pointer-constant -Wuseless-cast -Wvarargs -Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=noreturn -Wsuggest-attribute=format
 CXXFLAGS = -MD -MP -std=c++0x $(WARNINGS)
 
 all: $(BIN)
@@ -22,7 +22,8 @@ $(BIN): $(OBJ)
 	$(CXX) $(LIBS) -o $@ $^
 
 tmp/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@echo Compiling $<...
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .PHONY: clean Makefile
 

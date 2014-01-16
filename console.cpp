@@ -26,7 +26,7 @@ Console::Console()
 	curs_set(0);
 	start_color();
 	
-	for(int fore = 0; fore < 8; ++fore) {
+	for(short fore = 0; fore < 8; ++fore) {
 		if(fore == 0) {
 			continue;
 		}
@@ -56,8 +56,8 @@ Console::~Console()
 void Console::print_tile(int x, int y, int sprite, bool with_color)
 {
 	if(sprites.count(sprite) > 0) {
-		int value = sprites[sprite].first;
-		int color = with_color ? sprites[sprite].second : 0;
+		chtype value = sprites[sprite].first;
+		chtype color = with_color ? sprites[sprite].second : 0;
 		mvaddch(y, x,  value | color);
 	} else {
 		log("Unknown sprite with code {0} at ({1}, {2})", sprite, x, y);
@@ -102,8 +102,8 @@ void Console::print_notification()
 
 void Console::print_map(const Window & window, const Level & level)
 {
-	for(unsigned x = 0; x < level.map.width && (x < window.width - window.x); ++x) {
-		for(unsigned y = 0; y < level.map.height && (y < window.height - window.y); ++y) {
+	for(int x = 0; x < int(level.map.width) && (x < int(window.width) - window.x); ++x) {
+		for(int y = 0; y < int(level.map.height) && (y < int(window.height) - window.y); ++y) {
 			if(level.map.cell(x, y).visible) {
 				print_tile(window.x + x, window.y + y, level.get_info(Point(x, y)).compiled().sprite, true);
 			} else if(level.map.cell(x, y).seen_sprite) {
@@ -113,7 +113,7 @@ void Console::print_map(const Window & window, const Level & level)
 	}
 }
 
-void Console::print_messages(const Window & window, const std::vector<std::string> & messages)
+void Console::print_messages(const Window & window)
 {
 	if(messages.size() > messages_seen) {
 		if(window.height == 0) {
@@ -122,11 +122,11 @@ void Console::print_messages(const Window & window, const std::vector<std::strin
 			unsigned messages_left = messages.size() - messages_seen;
 			unsigned messages_to_draw = std::min(messages_left, window.height);
 			for(unsigned i = 0; i < messages_to_draw; ++i) {
-				const std::string & message = messages[messages_seen + i];
+				const std::string & current_message = messages[messages_seen + i];
 				if(messages_to_draw < messages_left && i == messages_to_draw - 1) {
-					print_text(0, window.y + i, message + " (...)");
+					print_text(0, window.y + int(i), current_message + " (...)");
 				} else {
-					print_text(0, window.y + i, message);
+					print_text(0, window.y + int(i), current_message);
 				}
 			}
 			messages_seen += messages_to_draw;
@@ -139,16 +139,18 @@ void Console::draw_game(const Game & game)
 	NCursesUpdate upd;
 
 	Window map_window(0, 1, 60, 23);
-	print_map(map_window, game.level());
+	print_map(map_window, game.current_level());
 
 	unsigned width, height;
 	getmaxyx(stdscr, height, width);
-	Window message_window(0, map_window.y + map_window.height, width, height - (map_window.y + map_window.height));
-	print_messages(message_window, messages);
+	int message_pan_top = map_window.y + int(map_window.height);
+	unsigned message_pan_height = (0 <= message_pan_top) ? height - unsigned(message_pan_top) : height;
+	Window message_window(0, message_pan_top, width, message_pan_height);
+	print_messages(message_window);
 
 	print_notification();
 
-	const Monster & player = game.level().get_player();
+	const Monster & player = game.current_level().get_player();
 	if(!player.valid()) {
 		return;
 	}
@@ -172,19 +174,19 @@ Point Console::target_mode(Game & game, const Point & start)
 	int ch = 0;
 	curs_set(1);
 	while(ch != 'x' && ch != 27 && ch != '.') {
-		if(game.level().map.valid(target)) {
-			if(game.level().map.cell(target).visible) {
-				set_notification(format("You see {0}.", game.level().get_info(target).compiled().name));
-			} else if(game.level().map.cell(target).seen_sprite) {
-				set_notification(format("You recall {0}.", game.level().get_info(target).compiled().name));
+		if(game.current_level().map.valid(target)) {
+			if(game.current_level().map.cell(target).visible) {
+				set_notification(format("You see {0}.", game.current_level().get_info(target).compiled().name));
+			} else if(game.current_level().map.cell(target).seen_sprite) {
+				set_notification(format("You recall {0}.", game.current_level().get_info(target).compiled().name));
 			} else {
 				set_notification("You cannot see there.");
 			}
 		}
 		draw_game(game);
-		if(game.level().map.valid(target)) {
-			int ch = mvinch(target.y + 1, target.x);
-			mvaddch(target.y + 1, target.x, ch ^ A_BLINK);
+		if(game.current_level().map.valid(target)) {
+			int chh = mvinch(target.y + 1, target.x);
+			mvaddch(target.y + 1, target.x, chh ^ A_BLINK);
 			move(target.y + 1, target.x);
 		}
 		ch = get_control();
@@ -200,14 +202,14 @@ Point Console::target_mode(Game & game, const Point & start)
 
 		if(directions.count(ch) != 0) {
 			Point new_target = target + directions[ch];
-			if(game.level().map.valid(new_target)) {
+			if(game.current_level().map.valid(new_target)) {
 				target = new_target;
 			}
 		}
 	}
 	curs_set(0);
 	if(ch == '.') {
-		if(game.level().map.cell(target).seen_sprite == 0) {
+		if(game.current_level().map.cell(target).seen_sprite == 0) {
 			set_notification("You don't know how to get there.");
 		} else {
 			return target;
@@ -251,13 +253,14 @@ int Console::see_messages(Game & game)
 	return ch;
 }
 
-void Console::draw_inventory(const Game & game, const Monster & monster)
+void Console::draw_inventory(const Game &, const Monster & monster)
 {
 	clear();
 	int width, height;
 	getmaxyx(stdscr, height, width);
 	(void)height;
-	int pos = 0, index = 0;
+	int pos = 0;
+	unsigned index = 0;
 	foreach(const Item & item, monster.inventory.items) {
 		if(item.valid()) {
 			int x = (pos < 13) ? 0 : width / 2;
@@ -279,14 +282,14 @@ void Console::draw_inventory(const Game & game, const Monster & monster)
 	}
 }
 
-int Console::get_inventory_slot(const Game & game, const Monster & monster)
+unsigned Console::get_inventory_slot(const Game & game, const Monster & monster)
 {
 	draw_inventory(game, monster);
 
-	int width, height;
+	unsigned width, height;
 	getmaxyx(stdscr, height, width);
 	(void)height;
-	int slot = -1;
+	unsigned slot = Inventory::NOTHING;
 	while(true) {
 		mvprintw(0, 0, "%s", std::string(width, ' ').c_str());
 		print_notification();
@@ -297,7 +300,7 @@ int Console::get_inventory_slot(const Game & game, const Monster & monster)
 			ch = getch();
 			nodelay(stdscr, FALSE);
 			if(ch == ERR || ch == 27) {
-				slot = -1;
+				slot = Inventory::NOTHING;
 				break;
 			}
 			set_notification("This is not a slot");
@@ -307,7 +310,7 @@ int Console::get_inventory_slot(const Game & game, const Monster & monster)
 			set_notification("This is not a slot");
 			continue;
 		}
-		slot = ch - 'a';
+		slot = unsigned(ch - 'a');
 		if(!monster.inventory.get_item(slot).valid()) {
 			set_notification("Slot is empty; nothing is here.");
 			continue;
@@ -323,7 +326,7 @@ void Console::message(const std::string & text)
 		return;
 	}
 	std::string titled_text = text;
-	titled_text[0] = toupper(titled_text[0]);
+	titled_text[0] = (char)toupper(titled_text[0]);
 	messages.push_back(titled_text);
 	if(log_messages) {
 		log("Message: " + titled_text);
@@ -392,8 +395,9 @@ void Console::message(const GameEvent & e)
 		case GameEvent::NO_SPACE_LEFT: message(format("{0} carries too much items.", e.actor.name)); break;
 		case GameEvent::NO_SUCH_ITEM: message("No such item."); break;
 		case GameEvent::HAS_NO_ITEMS: message(format("{0} is totally empty.", e.actor.name)); break;
+		case GameEvent::UNKNOWN:
+		case GameEvent::COUNT:
 		default: log("Unknown event type #{0} with actor <{1}> and target <{2}>", e.type, e.actor.id, e.target.id);
-
 	}
 }
 

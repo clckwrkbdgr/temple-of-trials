@@ -29,7 +29,7 @@ Action * PlayerControl::act(Monster & player, Game & game)
 				game.state = Game::SUSPENDED;
 				break;
 			case 'x':
-				player.add_path(game.level().find_path(player.pos, interface.target_mode(game, player.pos)));
+				player.add_path(game.current_level().find_path(player.pos, interface.target_mode(game, player.pos)));
 				break;
 			case 'i':
 				interface.draw_inventory(game, player);
@@ -39,10 +39,10 @@ Action * PlayerControl::act(Monster & player, Game & game)
 			{
 				Point shift = interface.directions[ch];
 				Point new_pos = player.pos + shift;
-				if(find_at(game.level().monsters, new_pos).valid()) {
+				if(find_at(game.current_level().monsters, new_pos).valid()) {
 					return new Swing(shift);
 				}
-				Object & object = find_at(game.level().objects, new_pos);
+				Object & object = find_at(game.current_level().objects, new_pos);
 				if(object.valid()) {
 					if(object.type->openable && !object.opened()) {
 						player.plan.push_front(new Move(shift));
@@ -76,6 +76,6 @@ Action * PlayerControl::act(Monster & player, Game & game)
 			default: interface.set_notification(format("Unknown control '{0}'", char(ch)));
 		}
 	}
-	return 0;
+	return nullptr;
 }
 

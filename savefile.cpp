@@ -1,3 +1,4 @@
+#include "savefile.h"
 #include <chthon/game.h>
 #include <chthon/level.h>
 #include <chthon/items.h>
@@ -10,14 +11,14 @@ using namespace Chthon;
 
 enum { SAVEFILE_MAJOR_VERSION = 35, SAVEFILE_MINOR_VERSION = 0 };
 
-static const TypeRegistry<std::string, Cell> * cell_types = 0;
-static const TypeRegistry<std::string, Monster> * monster_types = 0;
-static const TypeRegistry<std::string, Object> * object_types = 0;
-static const TypeRegistry<std::string, Item> * item_types = 0;
-const TypeRegistry<std::string, Cell> * get_registry(const CellType *) { return cell_types; }
-const TypeRegistry<std::string, Monster> * get_registry(const MonsterType *) { return monster_types; }
-const TypeRegistry<std::string, Object> * get_registry(const ObjectType *) { return object_types; }
-const TypeRegistry<std::string, Item> * get_registry(const ItemType *) { return item_types; }
+static const TypeRegistry<std::string, Cell> * cell_types = nullptr;
+static const TypeRegistry<std::string, Monster> * monster_types = nullptr;
+static const TypeRegistry<std::string, Object> * object_types = nullptr;
+static const TypeRegistry<std::string, Item> * item_types = nullptr;
+static const TypeRegistry<std::string, Cell> * get_registry(const CellType *) { return cell_types; }
+static const TypeRegistry<std::string, Monster> * get_registry(const MonsterType *) { return monster_types; }
+static const TypeRegistry<std::string, Object> * get_registry(const ObjectType *) { return object_types; }
+static const TypeRegistry<std::string, Item> * get_registry(const ItemType *) { return item_types; }
 
 SAVEFILE_STORE(Point, point)
 {
@@ -78,8 +79,8 @@ void store(Savefile & savefile, Map<T> & map)
 
 	savefile.newline();
 	savefile.check("map size");
-	for(unsigned y = 0; y < map.height; ++y) {
-		for(unsigned x = 0; x < map.width; ++x) {
+	for(int y = 0; y < int(map.height); ++y) {
+		for(int x = 0; x < int(map.width); ++x) {
 			store(savefile, map.cell(x, y));
 			savefile.check("map cell");
 		}
@@ -94,8 +95,8 @@ void store(Savefile & savefile, const Map<T> & map)
 
 	savefile.newline();
 	savefile.check("map size");
-	for(unsigned y = 0; y < map.height; ++y) {
-		for(unsigned x = 0; x < map.width; ++x) {
+	for(int y = 0; y < int(map.height); ++y) {
+		for(int x = 0; x < int(map.width); ++x) {
 			store(savefile, map.cell(x, y));
 			savefile.check("map cell");
 		}

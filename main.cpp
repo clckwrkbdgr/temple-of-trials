@@ -12,7 +12,7 @@ using namespace Chthon;
 
 const std::string SAVEFILE = "temple.sav";
 
-bool load_game(Game & game)
+static bool load_game(Game & game)
 {
 	if(!file_exists(SAVEFILE)) {
 		game.create_new_game();
@@ -35,7 +35,7 @@ bool load_game(Game & game)
 	return true;
 }
 
-void save(const Game & game)
+static void save(const Game & game)
 {
 	try {
 		std::ofstream out(SAVEFILE.c_str(), std::ios::out);
@@ -51,7 +51,7 @@ void save(const Game & game)
 
 int main()
 {
-	srand(time(0));
+	srand((unsigned)time(nullptr));
 	std::ofstream log_file("temple.log", std::ios::app);
 	direct_log(&log_file);
 

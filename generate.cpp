@@ -70,10 +70,10 @@ void LinearDungeon::generate(Level & level, int level_index)
 	std::vector<std::pair<Point, Point> > rooms;
 	for(int y = 0; y < 3; ++y) {
 		for(int x = 0; x < 3; ++x) {
-			int cell_width = level.map.width / 3;
-			int cell_height = level.map.height / 3;
-			Point topleft = Point(x * cell_width + 2, y * cell_height + 2);
-			Point bottomright = Point(x * cell_width + cell_width - 2, y * cell_height + cell_height - 2);
+			unsigned cell_width = level.map.width / 3;
+			unsigned cell_height = level.map.height / 3;
+			Point topleft = Point(x * int(cell_width) + 2, y * int(cell_height) + 2);
+			Point bottomright = Point(x * int(cell_width) + int(cell_width) - 2, y * int(cell_height) + int(cell_height) - 2);
 			rooms.push_back(std::make_pair(topleft, bottomright));
 		}
 	}
@@ -116,7 +116,7 @@ void LinearDungeon::generate(Level & level, int level_index)
 		bool is_last_room = i == rooms.size() - 1;
 		if(is_last_room) {
 			if(!level.monsters.empty()) {
-				int key_holder = rand() % level.monsters.size();
+				unsigned key_holder = (unsigned)rand() % level.monsters.size();
 				level.monsters[key_holder].inventory.insert(Item::Builder(item_types.get("key")).key_type(level_index));
 			}
 		}
