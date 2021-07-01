@@ -1,0 +1,24 @@
+[_] replace current entity system with plain objects
+[_] rewrite using libtcod
+[_] init screen, greatings, readme etc
+[_] story and character creation screen
+[_] level design
+[_] v0.1.0
+[_] experience, exp levels
+[_] skills: unarmed combat
+[_] skills: melee combat
+[_] skills: repairing, broken wells, applying skills
+[_] skill: healing, applying to itself
+[_] skill: lockpicking and trap disarming
+[_] skill: sneaking
+[_] v0.2.0
+[_] companion dog quest
+[_] companion dog
+[_] v0.3.0
+[_] handcrafting: producing items from bunch of other items
+[_] v0.4.0
+[_] fix bugs, playtesting, check gamedesign for flaws
+[_] readme, installation instructions
+[_] settings etc
+[_] good story and graphics
+[_] v1.0.0
